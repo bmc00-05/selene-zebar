@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor / OS
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 백업 파일
+# .bak 은 한글(HWP) 백업 확장자로 연결돼 있어, 폴더에 남으면
+# 다른 프로그램이 열려고 실행되는 일이 생긴다. 저장소에 두지 않는다.
+*.bak
+*.bak-*
+
+# 로컬 전용
+.env
+.env.local
+*.local
