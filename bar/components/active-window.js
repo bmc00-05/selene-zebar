@@ -42,14 +42,17 @@ export function mountActiveWindow(root, zebar) {
   let shownTitle = null;
   let shownKey = null;
   let activeSlot = 0;
+  let clearPrevious = null;
+
+  // The fade the outgoing title has to finish before its span is emptied.
+  const fadeMs = readMs('--dur-base');
 
   return function update({ glazewm }) {
     const container = glazewm?.focusedContainer;
 
     if (!container || container.type !== 'window') {
       root.hidden = true;
-      shownTitle = null;
-      shownKey = null;
+      clearReadout();
       return;
     }
 
@@ -65,9 +68,38 @@ export function mountActiveWindow(root, zebar) {
   };
 
   /**
+   * Empties everything the last window left behind.
+   *
+   * Hiding the container is not enough on its own. The title and the icon both
+   * survive in the DOM, so the next window to take focus cross-faded out of a
+   * title that had no business being there and, for a moment, wore the previous
+   * application's icon. The stale title also still sized the readout, which
+   * pushed the centred widget off to one side.
+   */
+  function clearReadout() {
+    clearTimeout(clearPrevious);
+
+    for (const span of els.titles) {
+      span.textContent = '';
+    }
+
+    root.classList.remove('has-icon');
+    els.icon.style.backgroundImage = '';
+
+    shownTitle = null;
+    shownKey = null;
+  }
+
+  /**
    * Swaps the title in by cross-fading two stacked spans. Writing the new text
    * into the visible span would just flash it; fading a second span in over
    * the first reads as one window handing over to the next.
+   *
+   * The outgoing span is emptied once the fade is over. Both spans share one
+   * grid cell, so the wider of the two decides how wide the readout is — and
+   * while the old text lingered it was often the wider one, sizing the widget
+   * to a title that was no longer shown. Since the centre region is centred,
+   * that made the whole thing sit off to one side.
    */
   function setTitle(title) {
     if (title === shownTitle) {
@@ -76,10 +108,21 @@ export function mountActiveWindow(root, zebar) {
     shownTitle = title;
 
     const next = 1 - activeSlot;
+    const previous = activeSlot;
+
     els.titles[next].textContent = title;
     els.titles[next].classList.add('is-current');
-    els.titles[activeSlot].classList.remove('is-current');
+    els.titles[previous].classList.remove('is-current');
     activeSlot = next;
+
+    clearTimeout(clearPrevious);
+    clearPrevious = setTimeout(() => {
+      // Only if it is still the outgoing one — another swap may have overtaken
+      // this timer, in which case that swap owns the span now.
+      if (activeSlot !== previous) {
+        els.titles[previous].textContent = '';
+      }
+    }, fadeMs);
   }
 
   async function showIcon(key, handle) {
@@ -144,4 +187,12 @@ function cacheKey(container) {
   return PWA_HOSTS.has(container.processName)
     ? `${container.processName}:${container.handle}`
     : container.processName;
+}
+
+/** Reads a duration token off :root, so the number stays in tokens.css. */
+function readMs(name) {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value.endsWith('ms') ? parseFloat(value) : parseFloat(value) * 1000;
 }
