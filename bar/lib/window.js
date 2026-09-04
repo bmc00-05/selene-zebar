@@ -17,7 +17,7 @@
  * open one, and the window stays where it is.
  */
 
-import { readMs } from './css.js';
+import { readMs, readPx } from './css.js';
 
 /** Live claims, keyed by the element that made them. */
 const claims = new Map();
@@ -26,15 +26,38 @@ const claims = new Map();
 let win = null;
 
 /**
- * The window's own geometry, read once at mount — before anything here has
- * grown it. Never re-read: a close waits for the panel's exit before putting
- * the window back, so a reopen inside that wait would catch the window still
- * grown, record that as the resting size, and the widget would stay there for
- * good. Measured exactly that way once: 1920x50 -> 1920x1080 and no way back.
+ * Where the window sits and how wide it is, read once at mount.
+ *
+ * Never re-read: a close waits for the panel's exit before putting the window
+ * back, so a reopen inside that wait would catch the window still grown, record
+ * that as the resting geometry, and the widget would stay there for good.
+ * Measured exactly that way once: 1920x50 -> 1920x1080 and no way back.
+ *
+ * The height is deliberately not part of this — see restingHeight().
  */
 let resting = null;
 
 let pending = null;
+
+/**
+ * The bar strip's height, in physical pixels.
+ *
+ * Taken from the tokens rather than from a measurement, because height is the
+ * one dimension the panels change and so the one a measurement cannot be
+ * trusted for. A reload while a panel is open records the grown height as the
+ * resting one and the bar never shrinks back — and the menu's own "Reload bar"
+ * is exactly that: it calls location.reload() with the menu still open and the
+ * window still 220 tall. Position and width are safe to measure; nothing here
+ * moves the window except the full-screen claim, which puts it back where the
+ * preset already had it.
+ *
+ * tokens.css states the other half of this: --bar-inset-y plus --bar-height
+ * must equal the preset height in zpack.json.
+ */
+function restingHeight() {
+  const logical = readPx('--bar-inset-y') + readPx('--bar-height');
+  return Math.round(logical * window.devicePixelRatio);
+}
 
 /**
  * Grows the window while `el` is open, and puts it back when it closes.
@@ -101,7 +124,7 @@ async function apply() {
     await win.setSize({
       type: 'Physical',
       width: size.width,
-      height: size.height,
+      height: restingHeight(),
     });
     return;
   }
