@@ -28,8 +28,23 @@ Start-Process "C:\Program Files\glzr.io\Zebar\zebar.exe" `
 `zebar startup` 을 먼저 띄우면 안 된다. `settings.json` 이 아직 `glzr-io.starter`
 를 가리켜서 기본 바가 같이 뜨고 우리 바와 겹친다.
 
-`zpack.json` 을 고쳤으면 Zebar 를 내렸다 다시 띄워야 반영된다. HTML · CSS · JS
-수정은 위젯 리로드(우클릭 메뉴)만으로 반영된다.
+`zpack.json` 을 고쳤으면 Zebar 를 내렸다 다시 띄워야 반영된다.
+
+**Zebar 위젯에는 우클릭 메뉴가 없다.** 트레이 아이콘 메뉴가 전부이고
+(`Open settings` · `Browse widgets...` · `Empty cache && reload configs` ·
+`Exit`), DevTools 항목은 없다. HTML · CSS · JS 를 고친 뒤 반영하려면 트레이의
+`Empty cache && reload configs` 를 쓴다.
+
+DevTools 는 WebView2 원격 디버깅 포트로 붙는다. 위 기동 명령 앞에 환경변수를
+붙여 띄우면 된다:
+
+```powershell
+$env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = "--remote-debugging-port=9222"
+```
+
+그 다음 Edge 에서 `edge://inspect/#devices` → `Configure` 에 `127.0.0.1:9222`
+추가 → `selene-zebar` 타깃을 inspect. 환경변수를 시스템 전역에 박지 않는다 —
+이 머신의 모든 WebView2 앱이 디버깅 포트를 열게 된다.
 
 ## 이 프로젝트를 시작한 이유
 

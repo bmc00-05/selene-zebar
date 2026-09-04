@@ -69,7 +69,20 @@ pnpm install       # prettier only
 pnpm format
 ```
 
-Right-click the bar → **Show DevTools** for the console and live style editing.
+Zebar widgets have no context menu, so DevTools is reached over WebView2's
+remote debugging port. Launch Zebar with the port open:
+
+```powershell
+$env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = "--remote-debugging-port=9222"
+Start-Process "C:\Program Files\glzr.io\Zebar\zebar.exe" `
+  -ArgumentList 'start-widget-preset','--pack','selene-zebar','--widget-name','bar','--preset','default'
+```
+
+Then in Edge open `edge://inspect/#devices`, add `127.0.0.1:9222` under
+**Configure**, and inspect the `selene-zebar` target. Editing a custom property
+on `:root` in the Styles pane relays the whole bar instantly, which is the
+fastest way to settle on spacing and colour values before writing them into
+`tokens.css`.
 
 ## License
 
