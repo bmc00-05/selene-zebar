@@ -1,0 +1,65 @@
+/*
+ * RAM ring.
+ *
+ * The arc is drawn with stroke-dasharray against a circumference normalised to
+ * 100 by `pathLength` in the markup, so `--mem-level` is a plain percentage.
+ * Measured: with pathLength, `50 100` paints exactly the top half of the ring;
+ * without it the same value repeats as a dashed circle.
+ *
+ * The colour lives on the wrapper and both the arc and the label take it from
+ * there through currentColor, so a state change cannot move one and not the
+ * other.
+ */
+
+.memory {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-item);
+  color: var(--fg-soft);
+  transition: color var(--dur-base) var(--ease-standard);
+}
+
+.memory__ring {
+  display: block;
+  width: var(--mem-ring);
+  height: var(--mem-ring);
+}
+
+.memory__track,
+.memory__arc {
+  fill: none;
+  stroke-width: var(--mem-stroke);
+}
+
+/* The full circle underneath, so an almost-empty ring still reads as a ring
+ * rather than a stray mark. */
+.memory__track {
+  stroke: var(--mem-track);
+}
+
+.memory__arc {
+  stroke: currentColor;
+  stroke-linecap: round;
+  /* From twelve o'clock, clockwise. Only the arc is rotated — the track is a
+   * complete circle, so turning it would change nothing. */
+  transform: rotate(-90deg);
+  transform-origin: center;
+  stroke-dasharray: var(--mem-level, 0) 100;
+  transition: stroke-dasharray var(--dur-base) var(--ease-standard);
+}
+
+.memory__label {
+  /* The digits change under a ring that does not move; tabular figures stop the
+   * label from breathing, the same reason the clock has them. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Shared with the battery, which uses the same two colours at 15% and 5%. Why
+ * they leave hue 278 is in tokens.css, next to the values. */
+.memory[data-state='warn'] {
+  color: var(--warn);
+}
+
+.memory[data-state='alert'] {
+  color: var(--alert);
+}

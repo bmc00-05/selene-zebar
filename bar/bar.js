@@ -19,11 +19,15 @@ import { mountBattery } from './components/battery.js';
 import { mountPower } from './components/power.js';
 import { mountClock, CLOCK_FORMAT } from './components/clock.js';
 import { mountCalendar } from './components/calendar.js';
+import { mountMemory } from './components/memory.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
   battery: { type: 'battery' },
   date: { type: 'date', formatting: CLOCK_FORMAT },
+  // Five seconds is also the default; stated so the interval is a decision in
+  // the file rather than something inherited silently.
+  memory: { type: 'memory', refreshInterval: 5000 },
 });
 
 const offline = document.querySelector('#glazewm-offline');
@@ -36,6 +40,7 @@ const updates = [
   mountWorkspaces(document.querySelector('#workspaces'), zebar),
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
+  mountMemory(document.querySelector('#memory'), zebar),
   mountClock(document.querySelector('#clock'), zebar),
   mountCalendar(document.querySelector('#calendar'), zebar),
   mountBattery(document.querySelector('#battery'), zebar),

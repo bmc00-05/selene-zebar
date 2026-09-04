@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./styles/brand.css" />
     <link rel="stylesheet" href="./styles/workspaces.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
+    <link rel="stylesheet" href="./styles/memory.css" />
     <link rel="stylesheet" href="./styles/clock.css" />
     <link rel="stylesheet" href="./styles/calendar.css" />
     <link rel="stylesheet" href="./styles/battery.css" />
@@ -91,6 +92,29 @@
       </div>
 
       <div class="bar__region bar__region--right">
+        <!--
+          Leftmost of the right-hand group on purpose. This region is anchored
+          to the right edge, so a width change travels leftwards only: measured,
+          the percentage going from 8% to 100% moves nothing at all here, where
+          in any other slot it shifted the clock by 13px.
+
+          `pathLength` normalises the circumference to 100, so the arc length in
+          memory.css is a plain percentage rather than a fraction of 2*pi*r.
+        -->
+        <div class="memory" id="memory" hidden>
+          <svg class="memory__ring" viewBox="0 0 16 16" aria-hidden="true">
+            <circle
+              class="memory__track"
+              cx="8"
+              cy="8"
+              r="6"
+              pathLength="100"
+            />
+            <circle class="memory__arc" cx="8" cy="8" r="6" pathLength="100" />
+          </svg>
+          <span class="memory__label"></span>
+        </div>
+
         <!-- popovertarget is the whole connection between clock and calendar;
              neither component knows about the other in JavaScript. -->
         <button

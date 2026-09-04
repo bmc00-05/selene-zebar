@@ -46,6 +46,25 @@
   --fg-muted: var(--sl-mist);
   /* Text sitting on top of --accent, not on the bar. */
   --on-accent: var(--sl-void);
+
+  /* --- Danger ------------------------------------------------------------
+   * The only two colours in this file that leave hue 278, and the exception is
+   * deliberate. Everything else says "look here" with brightness, which works
+   * while there is one thing to say; it stops working when the meaning is
+   * "this is going wrong" and the widget next door is merely bright.
+   *
+   * Used by the RAM ring at 80/90% and by the battery at 15/5%. Two widgets,
+   * one vocabulary: amber is a caution, red is a problem.
+   *
+   * Lightness is held at the accent's 80% so the swap does not read as the
+   * widget suddenly getting brighter — only chroma and hue move. Chroma goes
+   * above the ramp's ceiling of 0.069, and that is the part that says "not the
+   * usual state". Both are warm, so the pair reads as one family against the
+   * cool base rather than as two unrelated colours.
+   *
+   * If the palette is ever retuned, these two are meant to stay off-hue. */
+  --warn: oklch(82% 0.11 85); /* #e5bf6d */
+  --alert: oklch(70% 0.17 25); /* #f66d67 */
   /* Two layers rather than one wide blur. A single large blur bright enough to
    * notice also swallows the ring it is meant to light; the tight inner shadow
    * keeps the stroke crisp while the wide one carries the bloom. A moon's halo
@@ -190,6 +209,16 @@
    * between case and gauge. */
   --battery-glow-width: 2;
   --battery-glow-blur: 2px;
+
+  /* RAM ring. 16px puts it on the pixel grid and at the same optical size as
+   * the mark, the window icon and the workspace ring. r=6 with a 2-wide stroke
+   * makes the outer diameter 14, leaving 1 of margin inside the 16 box.
+   *
+   * The circumference is normalised to 100 by `pathLength` in the markup, so
+   * nothing here or in memory.js has to carry 2*pi*r. */
+  --mem-ring: 16px;
+  --mem-stroke: 2;
+  --mem-track: color-mix(in srgb, var(--fg-muted) 28%, transparent);
 
   /* Power button and overlay. The scrim is opaque rather than blurred: a
    * transparent window's backdrop-filter cannot reach the applications behind
