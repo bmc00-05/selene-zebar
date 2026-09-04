@@ -50,11 +50,18 @@ Then point Zebar at the pack in `~/.glzr/zebar/settings.json`:
 The name is Selene, the moon, and the palette follows from it: a night-sky
 ground with moonlit silver on top. Three rules hold it together.
 
-**One hue.** Every colour in the bar sits at hue 278 — a violet leaning blue.
-Only lightness and chroma move, from `oklch(15% 0.013 278)` at the darkest to
-`oklch(94% 0.016 278)` at the lightest. The accent is not a different colour,
-just the highest chroma on the same ramp, which is why it reads as silver
-carrying violet rather than as violet.
+**One hue, with one exception.** Every colour in the bar sits at hue 278 — a
+violet leaning blue. Only lightness and chroma move, from `oklch(15% 0.013 278)`
+at the darkest to `oklch(94% 0.016 278)` at the lightest. The accent is not a
+different colour, just the highest chroma on the same ramp, which is why it
+reads as silver carrying violet rather than as violet.
+
+The exception is danger: `--warn` and `--alert`, amber and red, worn by the RAM
+ring at 80/90% and the battery at 15/5%. Brightness carries "look here" well
+enough, but not "this is going wrong" — and once one widget warns in colour, the
+one beside it warning in brightness reads as merely bright. Both keep the
+accent's lightness so the swap is a change of colour and not of brightness; only
+chroma climbs above the ramp's ceiling, and that is the part that registers.
 
 **Colours are written in `oklch()`.** Its lightness is perceptual, so
 `68% → 76% → 84%` are evenly spaced steps to the eye where the same jumps in

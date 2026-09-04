@@ -5,17 +5,28 @@
  * its left keep a fixed position instead of sliding whenever the battery state
  * changes.
  *
- * The warning for a low battery is brightness, not colour. Everything in this
- * bar sits at one hue, and a red would be the only thing in it that does not.
- * Going from --fg-soft up to --accent makes the gauge the brightest thing on
- * the right-hand side, which reads as loudly as a colour change would.
+ * The warning is a colour, amber then red, the same two the RAM ring uses. The
+ * bar signals with brightness everywhere else and this widget used to as well,
+ * but once one thing on the row warns in colour, the one beside it warning in
+ * brightness reads as merely bright rather than as a warning.
+ *
+ * The thresholds came down with the change. Colour is a much louder signal than
+ * a step of brightness, and at the old 30% the gauge would have sat amber for a
+ * good part of every day.
  */
 
-/** Below this, discharging counts as low: the gauge brightens. */
-const LOW_PERCENT = 30;
+/** Below this, discharging counts as low: amber. */
+const LOW_PERCENT = 15;
 
-/** Below this it also pulses. Kept in JS because JS is what picks the class. */
-const CRITICAL_PERCENT = 15;
+/**
+ * Below this, red, and it pulses. Where the RAM ring stops at colour, this does
+ * not: memory at 90% means the machine is being used, but a battery here is
+ * minutes from going out, and it is the one thing in this bar worth
+ * interrupting for.
+ *
+ * Kept in JS because JS is what picks the class.
+ */
+const CRITICAL_PERCENT = 5;
 
 /**
  * Smallest fill the gauge will draw for a non-empty battery, as a fraction of

@@ -7,8 +7,13 @@
  * level slides cleanly. battery.js only ever sets --battery-level to 0..1.
  *
  * Every state is one value of [data-state], which keeps this a flat list
- * instead of a matrix of combinations. The warning is brightness — the bar has
- * one hue and a red would be the only thing in it that does not.
+ * instead of a matrix of combinations.
+ *
+ * Low and critical are a colour, amber then red, shared with the RAM ring. A
+ * state picks one --battery-signal and the gauge, the fill and the label all
+ * read it; the everyday colours sit in the var() fallbacks. Stating the colour
+ * per state rather than per element is what keeps this at two rules instead of
+ * six, and makes it impossible for the three to disagree.
  */
 
 .battery {
@@ -22,7 +27,7 @@
   width: var(--battery-w);
   height: var(--battery-h);
   /* Both the shell and the terminal inherit this; the fill overrides it. */
-  color: var(--fg-muted);
+  color: var(--battery-signal, var(--fg-muted));
   transition: color var(--dur-base) var(--ease-standard);
 }
 
@@ -51,7 +56,7 @@
 }
 
 .battery__fill {
-  fill: var(--fg-soft);
+  fill: var(--battery-signal, var(--fg-soft));
   /* Anchored to the rect's own left edge, not the viewBox origin. `left`
    * resolves against the SVG user-space origin at x=0, and the rect starts at
    * x=2, so scaling would have slid the fill out of the shell — at 10% it
@@ -68,7 +73,7 @@
 }
 
 .battery__label {
-  color: var(--fg);
+  color: var(--battery-signal, var(--fg));
   /* Digits keep one width, so 9% -> 10% -> 100% does not jiggle the row. */
   font-variant-numeric: tabular-nums;
   transition: color var(--dur-base) var(--ease-standard);
@@ -98,21 +103,18 @@
   opacity: 1;
 }
 
-/* Low. The gauge is now the brightest thing on the right, which is the
- * warning; nothing changes hue. */
-.battery[data-state='low'] .battery__gauge,
-.battery[data-state='critical'] .battery__gauge {
-  color: var(--accent);
+/* Low and critical, in the two colours the RAM ring also uses. Only the signal
+ * is set here; the three elements above pick it up.
+ *
+ * These only ever appear while discharging — battery.js layers them on top of
+ * that one provider state — so they never collide with the charging fill or
+ * with empty. */
+.battery[data-state='low'] {
+  --battery-signal: var(--warn);
 }
 
-.battery[data-state='low'] .battery__fill,
-.battery[data-state='critical'] .battery__fill {
-  fill: var(--accent);
-}
-
-.battery[data-state='low'] .battery__label,
-.battery[data-state='critical'] .battery__label {
-  color: var(--accent);
+.battery[data-state='critical'] {
+  --battery-signal: var(--alert);
 }
 
 /* Critical also breathes, deeply and faster than the rest of the bar moves.
