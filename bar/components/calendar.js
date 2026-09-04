@@ -2,9 +2,9 @@
  * The month calendar behind the clock.
  *
  * Same shape as the Selene menu: the popover attributes in index.html hand the
- * browser the top layer, Escape and light dismiss, CSS anchor positioning puts
- * the panel under the clock, and the only thing left for JavaScript is growing
- * the widget window — a popover escapes the page, not the window.
+ * browser the top layer, Escape and light dismiss, and CSS anchor positioning
+ * puts the panel under the clock. A popover escapes the page but not the
+ * window, so the window has to grow — lib/window.js owns that.
  *
  * This month only. There is no navigation and therefore no state to get out of
  * sync: every open shows today. What fills the grid comes from the date
@@ -12,7 +12,8 @@
  * never disagree, and the calendar rolls over at midnight on its own.
  */
 
-import { readMs, readPx } from '../lib/css.js';
+import { readPx } from '../lib/css.js';
+import { growWindowWhileOpen } from '../lib/window.js';
 
 /** A calendar is always six rows, so the panel is one height. See build(). */
 const CELLS = 42;
@@ -40,8 +41,6 @@ export function mountCalendar(root, zebar) {
   const body = root.querySelector('.calendar__body');
 
   const widget = zebar.currentWidget();
-  const openHeight = readPx('--cal-window-h');
-  const barHeight = window.innerHeight;
 
   // Where the week starts and which days are the weekend both come from the
   // locale. `firstDay` is ISO — 1 is Monday, 7 is Sunday — where Date.getDay()
@@ -59,53 +58,19 @@ export function mountCalendar(root, zebar) {
   // this changes, which is at most once a day.
   let builtDay = null;
   let today = null;
-  let shrink = null;
 
   buildHead();
+  growWindowWhileOpen(root, widget, { height: readPx('--cal-window-h') });
 
-  const resize = height =>
-    widget.tauriWindow.setSize({
-      type: 'Logical',
-      width: window.innerWidth,
-      height,
-    });
-
-  // beforetoggle, not toggle: the window has to be tall enough before the panel
-  // is painted, or the first frame shows it cut off.
+  // beforetoggle, not toggle: the grid has to be right before the panel is
+  // painted, or the first frame shows yesterday.
   root.addEventListener('beforetoggle', event => {
     const isOpening = event.newState === 'open';
     trigger.setAttribute('aria-expanded', String(isOpening));
 
-    if (isOpening) {
-      clearTimeout(shrink);
-      if (today && today !== builtDay) {
-        build(today);
-      }
-      resize(openHeight);
-      return;
+    if (isOpening && today && today !== builtDay) {
+      build(today);
     }
-
-    // The panel is still on screen for the length of its exit. Shrinking the
-    // window now leaves `position-area: bottom` no room below the clock, so
-    // position-try-fallbacks relocates the panel on top of the bar: measured, it
-    // jumped from y=35 to y=6 and painted 34px of the month header over the
-    // plate for six frames. So the window waits until the panel is gone.
-    // One frame past the discrete `display` transition in calendar.css, which is
-    // what actually takes the panel off screen.
-    const gone = readMs('--dur-base') + 20;
-
-    clearTimeout(shrink);
-    shrink = setTimeout(() => {
-      // Opening another popover closes this one, and the open arrives first —
-      // so shrinking regardless would pull the window out from under the panel
-      // that just opened. Only the last popover standing puts the window back.
-      const another = [...document.querySelectorAll(':popover-open')].some(
-        el => el !== root,
-      );
-      if (!another && !root.matches(':popover-open')) {
-        resize(barHeight);
-      }
-    }, gone);
   });
 
   // Light dismiss only covers clicks this window receives. Clicking another

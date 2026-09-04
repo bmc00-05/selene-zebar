@@ -12,6 +12,7 @@
  */
 
 import { readMs } from '../lib/css.js';
+import { growWindowWhileOpen } from '../lib/window.js';
 
 /**
  * Windows, at the far end of shellExec. Each is registered in zpack.json under
@@ -43,59 +44,20 @@ export function mountPower(root, zebar) {
   const widget = zebar.currentWidget();
   const holdMs = readMs('--power-hold');
 
-  /**
-   * The window's own geometry, read at mount — before this overlay or either of
-   * the other panels has grown it.
-   *
-   * Read once, not on every open. A close now waits for the scrim to fade, so
-   * reopening inside that wait cancels the pending restore and leaves the
-   * window full screen; re-reading at that moment would record full screen as
-   * the geometry to go back to, and the widget would stay there for good.
-   * Measured exactly that way: 1920x50 -> 1920x1080 and no way back.
-   */
-  let restoreTo = null;
   let holdTimer = null;
-  let restoreTimer = null;
 
-  captureGeometry();
+  // Full screen is the only claim that also moves the window, and the only one
+  // that needs focus: the widget is configured `focused: false`, so without
+  // asking the window never takes focus and Escape has nothing to close.
+  const grown = growWindowWhileOpen(overlay, widget, {
+    fullScreen: true,
+    focus: true,
+  });
 
-  overlay.addEventListener('beforetoggle', async event => {
-    const isOpening = event.newState === 'open';
-
-    if (isOpening) {
-      clearTimeout(restoreTimer);
-      // Only if the read at mount has not landed yet; the window is still the
-      // bar strip at that point, so this is the same value.
-      if (!restoreTo) {
-        await captureGeometry();
-      }
-      await widget.tauriWindow.setPosition({ type: 'Logical', x: 0, y: 0 });
-      await widget.tauriWindow.setSize({
-        type: 'Logical',
-        width: window.screen.width,
-        height: window.screen.height,
-      });
-      // The widget is configured `focused: false`, so without asking the window
-      // never takes focus and Escape has nothing to close.
-      await widget.tauriWindow.setFocus();
-      return;
+  overlay.addEventListener('beforetoggle', event => {
+    if (event.newState !== 'open') {
+      cancelHold();
     }
-
-    cancelHold();
-
-    // The scrim is still on screen for the length of its fade. Putting the
-    // window back now shrinks it to the bar strip underneath a scrim that is
-    // still at `height: 100%`, so the whole plate is covered by flat scrim until
-    // the fade ends — measured at 40px of it for 167ms. So the window waits,
-    // one frame past the discrete `display` transition in power.css.
-    const gone = readMs('--dur-base') + 20;
-
-    clearTimeout(restoreTimer);
-    restoreTimer = setTimeout(() => {
-      if (!overlay.matches(':popover-open')) {
-        restoreWindow();
-      }
-    }, gone);
   });
 
   // The popover fills the screen, so there is no "outside" for light dismiss to
@@ -137,35 +99,6 @@ export function mountPower(root, zebar) {
     holdTimer = null;
   }
 
-  /**
-   * Physical units both ways: what the window reports is what it is given back,
-   * with no logical/physical rounding in between.
-   */
-  async function captureGeometry() {
-    restoreTo = {
-      pos: await widget.tauriWindow.outerPosition(),
-      size: await widget.tauriWindow.innerSize(),
-    };
-  }
-
-  /** Back to the bar strip, at the geometry read at mount. */
-  function restoreWindow() {
-    if (!restoreTo) {
-      return;
-    }
-
-    widget.tauriWindow.setPosition({
-      type: 'Physical',
-      x: restoreTo.pos.x,
-      y: restoreTo.pos.y,
-    });
-    widget.tauriWindow.setSize({
-      type: 'Physical',
-      width: restoreTo.size.width,
-      height: restoreTo.size.height,
-    });
-  }
-
   async function run(action) {
     const command = ACTIONS[action];
     if (!command) {
@@ -178,8 +111,7 @@ export function mountPower(root, zebar) {
     // seen on waking — worth more than the fade, which nobody is watching once
     // the screen is on its way out.
     overlay.hidePopover();
-    clearTimeout(restoreTimer);
-    restoreWindow();
+    grown.restoreNow();
 
     try {
       await zebar.shellExec(command[0], command[1]);
