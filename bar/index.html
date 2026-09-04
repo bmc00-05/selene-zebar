@@ -50,25 +50,38 @@
 
       <div class="bar__region bar__region--center">
         <div class="active-window" id="active-window" hidden>
-          <span class="active-window__icon" aria-hidden="true"></span>
-          <!-- Stand-in for windows that have no icon: a bare window frame. -->
-          <svg
-            class="active-window__fallback"
-            viewBox="0 0 16 16"
-            aria-hidden="true"
-            hidden
-          >
-            <rect
-              x="1.5"
-              y="2.5"
-              width="13"
-              height="11"
-              rx="2"
-              fill="none"
-              stroke="currentColor"
-            />
-            <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" stroke="currentColor" />
-          </svg>
+          <!--
+            Both of these sit in one grid cell and cross-fade. The glyph is what
+            the slot holds until the real icon arrives — extracting one costs
+            most of a second the first time an application is focused, and an
+            empty gap next to a title that has already changed reads as broken.
+            It stays put for windows that turn out to have no icon at all.
+          -->
+          <span class="active-window__slot">
+            <svg
+              class="active-window__fallback"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <rect
+                x="1.5"
+                y="2.5"
+                width="13"
+                height="11"
+                rx="2"
+                fill="none"
+                stroke="currentColor"
+              />
+              <line
+                x1="1.5"
+                y1="5.5"
+                x2="14.5"
+                y2="5.5"
+                stroke="currentColor"
+              />
+            </svg>
+            <span class="active-window__icon" aria-hidden="true"></span>
+          </span>
           <span class="active-window__title"><span></span><span></span></span>
         </div>
       </div>

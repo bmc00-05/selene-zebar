@@ -26,7 +26,6 @@ const ICON_SCRIPT = 'scripts/window-icon.ps1';
 export function mountActiveWindow(root, zebar) {
   const els = {
     icon: root.querySelector('.active-window__icon'),
-    fallback: root.querySelector('.active-window__fallback'),
     titles: [...root.querySelectorAll('.active-window__title > span')],
   };
 
@@ -85,10 +84,10 @@ export function mountActiveWindow(root, zebar) {
     let icon = iconCache.get(key);
 
     if (icon === undefined) {
-      // Not seen before: show nothing while it loads, not the previous app's
-      // icon under the new app's title.
-      els.icon.classList.remove('is-loaded');
-      els.fallback.hidden = true;
+      // Not seen before. Fall back to the glyph rather than leaving a gap or
+      // keeping the previous application's icon under the new title — this is
+      // the state the slot holds for the second or so the extraction takes.
+      root.classList.remove('has-icon');
 
       icon = await fetchIcon(handle);
       iconCache.set(key, icon);
@@ -102,13 +101,9 @@ export function mountActiveWindow(root, zebar) {
 
     if (icon) {
       els.icon.style.backgroundImage = `url(${icon})`;
-      els.icon.classList.add('is-loaded');
-      els.fallback.hidden = true;
-    } else {
-      els.icon.classList.remove('is-loaded');
-      els.icon.style.backgroundImage = '';
-      els.fallback.hidden = false;
     }
+    // No icon means the glyph is the answer, not a placeholder: leave it.
+    root.classList.toggle('has-icon', Boolean(icon));
   }
 
   async function fetchIcon(handle) {

@@ -16,10 +16,32 @@
   min-width: 0;
 }
 
-.active-window__icon {
+/*
+ * The glyph and the real icon share one cell and cross-fade. Swapping one for
+ * the other would change the slot twice in half a second — once when the title
+ * changes, again when the icon lands — and two hard changes in a row read as a
+ * flicker. Fading one out under the other reads as the slot filling in.
+ *
+ * Stacking them also means neither is ever removed, so nothing here depends on
+ * the `hidden` attribute. That matters: `hidden` does nothing to an inline
+ * <svg>, which lives in the SVG namespace and so falls outside the UA
+ * stylesheet's [hidden] rule.
+ */
+.active-window__slot {
+  display: grid;
   flex: none;
   width: var(--aw-icon);
   height: var(--aw-icon);
+}
+
+.active-window__slot > * {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+.active-window__icon {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -27,27 +49,21 @@
    * its chroma down keeps it recognisable without letting it shout. */
   filter: saturate(var(--aw-icon-saturate));
   opacity: 0;
-  transition: opacity var(--dur-base) var(--ease-standard);
 }
 
-.active-window__icon.is-loaded {
+.active-window__fallback {
+  color: var(--fg-muted);
   opacity: 1;
 }
 
-/* Shown when the window has no icon to give. Same box as the icon so the title
- * does not shift between the two. */
-.active-window__fallback {
-  flex: none;
-  width: var(--aw-icon);
-  height: var(--aw-icon);
-  color: var(--fg-muted);
+/* Set once the extracted icon is in place: the glyph steps back as it arrives,
+ * and stays if it never does. */
+.active-window.has-icon .active-window__icon {
+  opacity: 1;
 }
 
-/* `hidden` is an HTML attribute; the UA stylesheet does not apply it to an
- * inline <svg>, which is in the SVG namespace. Without this the glyph sat next
- * to the real icon even with the attribute set. */
-.active-window__fallback[hidden] {
-  display: none;
+.active-window.has-icon .active-window__fallback {
+  opacity: 0;
 }
 
 .active-window__title {
