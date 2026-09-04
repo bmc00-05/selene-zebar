@@ -1,0 +1,345 @@
+/*
+ * Media: the equaliser and the track in the bar, and the panel behind them.
+ *
+ * The bar half is capped at --media-max-w and that cap is not cosmetic. The
+ * bar's three regions are a `1fr auto 1fr` grid and the left region is
+ * start-aligned, so content that outgrows its track does not push the centre —
+ * it silently draws on top of it. Measured: 371px of content here and the
+ * region overlapped the focused-window title by 12px.
+ */
+
+.media {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-item);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-soft);
+  font: inherit;
+  cursor: pointer;
+  transition: color var(--dur-base) var(--ease-standard);
+  anchor-name: --media;
+}
+
+.media:hover,
+.media:focus-visible,
+.media[aria-expanded='true'] {
+  color: var(--accent);
+  outline: none;
+}
+
+/* --- Equaliser ----------------------------------------------------------- */
+
+/*
+ * Seven bars, none of them driven by the music.
+ *
+ * Nothing in reach reports a spectrum — the media provider carries no audio,
+ * and every route to the real signal was measured and rejected: the microphone
+ * hears the room rather than the stream, tab capture demands a picker every
+ * launch, and the Windows peak meter gives one amplitude per channel, not
+ * frequencies. This is decoration that says "playing", and it is honest about
+ * being decoration.
+ *
+ * What makes it read as a waveform instead of seven blinking things is that no
+ * two bars agree. Each has its own cycle length, its own phase, and its own
+ * travel; the durations share no common multiple, so the group never resolves
+ * into a pattern you can catch.
+ *
+ * The travel is shaped like a spectrum rather than being uniform: the middle
+ * bars swing hardest and the outer ones barely move, which is roughly what a
+ * real analyser looks like once the sub-bass and the air have fallen away.
+ *
+ * scaleY, never height: animating the box re-rounds its edges to the device
+ * grid every frame, the same thing that made the workspace dot wobble.
+ */
+.media__eq {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--media-eq-gap);
+  flex: none;
+  height: var(--media-eq-h);
+}
+
+.media__eq i {
+  display: block;
+  width: var(--media-eq-bar);
+  height: 100%;
+  border-radius: 1px;
+  background: currentColor;
+  transform: scaleY(var(--lo));
+  transform-origin: bottom;
+  animation: media-eq var(--dur) var(--ease, ease-in-out) infinite alternate;
+  animation-delay: var(--offset);
+}
+
+/* --lo and --hi are read inside the shared @keyframes, so one rule animates
+ * every bar over a different range. */
+.media__eq i:nth-child(1) {
+  --lo: 0.18;
+  --hi: 0.52;
+  --dur: 0.68s;
+  --offset: 0s;
+}
+
+.media__eq i:nth-child(2) {
+  --lo: 0.22;
+  --hi: 0.74;
+  --dur: 0.47s;
+  --offset: -0.21s;
+  /* Two bars step instead of gliding, the way a level meter lights segments.
+   * Mixed with five smooth ones it reads as detail rather than as a glitch. */
+  --ease: steps(5, end);
+}
+
+.media__eq i:nth-child(3) {
+  --lo: 0.3;
+  --hi: 0.9;
+  --dur: 0.83s;
+  --offset: -0.09s;
+}
+
+.media__eq i:nth-child(4) {
+  --lo: 0.34;
+  --hi: 1;
+  --dur: 0.55s;
+  --offset: -0.33s;
+}
+
+.media__eq i:nth-child(5) {
+  --lo: 0.28;
+  --hi: 0.86;
+  --dur: 0.71s;
+  --offset: -0.16s;
+  --ease: steps(4, end);
+}
+
+.media__eq i:nth-child(6) {
+  --lo: 0.22;
+  --hi: 0.68;
+  --dur: 0.51s;
+  --offset: -0.28s;
+}
+
+.media__eq i:nth-child(7) {
+  --lo: 0.18;
+  --hi: 0.48;
+  --dur: 0.77s;
+  --offset: -0.05s;
+}
+
+@keyframes media-eq {
+  from {
+    transform: scaleY(var(--lo));
+  }
+  to {
+    transform: scaleY(var(--hi));
+  }
+}
+
+/* Paused playback freezes the bars where they stand. The state needs no
+ * separate glyph — the equaliser already is the play indicator. */
+.media[data-playing='false'] {
+  color: var(--fg-muted);
+}
+
+.media[data-playing='false'] .media__eq i {
+  animation-play-state: paused;
+}
+
+/* --- Marquee ------------------------------------------------------------- */
+
+.media__marquee {
+  display: flex;
+  overflow: hidden;
+  max-width: var(--media-max-w);
+  white-space: nowrap;
+}
+
+/* Only a title that does not fit gets to move. media.js measures and adds
+ * this; a short one sits still, which is the quieter default. */
+.media.is-scrolling .media__marquee {
+  gap: var(--media-gap);
+  /* Softens both ends so a letter leaving the box fades rather than being
+   * guillotined by the overflow edge. */
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 12px,
+    #000 calc(100% - 16px),
+    transparent 100%
+  );
+}
+
+.media.is-scrolling .media__track {
+  animation: media-marquee var(--media-dur) linear infinite;
+}
+
+/* One copy plus the gap puts the second copy exactly where the first started,
+ * so the loop has no seam and needs no jump to hide. */
+@keyframes media-marquee {
+  to {
+    transform: translateX(calc(-1 * var(--media-shift)));
+  }
+}
+
+.media__track {
+  flex: none;
+}
+
+/* --- Panel --------------------------------------------------------------- */
+
+.media-panel {
+  position-anchor: --media;
+  /* Below the button, running rightwards from its left edge — the same
+   * direction the Selene menu opens, and away from the screen edge. */
+  position-area: bottom span-right;
+  position-try-fallbacks: flip-block;
+  width: var(--media-panel-w);
+  margin: 6px 0 0;
+  padding: 12px;
+  border: 1px solid var(--menu-border);
+  border-radius: var(--menu-radius);
+  background: var(--menu-bg);
+  box-shadow: var(--menu-shadow);
+  color: var(--fg);
+  overflow: visible;
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transition:
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-out-back),
+    overlay var(--dur-base) allow-discrete,
+    display var(--dur-base) allow-discrete;
+}
+
+.media-panel:popover-open {
+  display: grid;
+  gap: 10px;
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .media-panel:popover-open {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.media-panel__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  /* The panel is where a long title is finally readable, so it wraps here
+   * instead of scrolling. Two lines, then an ellipsis. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.media-panel__artist {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- Progress ------------------------------------------------------------ */
+
+.media-panel__times {
+  display: flex;
+  justify-content: space-between;
+  color: var(--fg-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.media-panel__rail {
+  height: var(--media-rail);
+  border-radius: calc(var(--media-rail) / 2);
+  background: var(--mem-track);
+  overflow: hidden;
+}
+
+/* scaleX for the same reason the battery fill uses it. The transition is short
+ * and linear: media.js redraws twice a second, so this only has to carry the
+ * gap between those, not animate a jump. */
+.media-panel__progress {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform: scaleX(var(--media-progress, 0));
+  transform-origin: left center;
+  transition: transform var(--dur-fast) linear;
+}
+
+/* A stream has no duration, so there is no proportion to show. */
+.media-panel[data-timed='false'] .media-panel__rail {
+  display: none;
+}
+
+/* --- Controls ------------------------------------------------------------ */
+
+.media-panel__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.media-panel__button {
+  display: grid;
+  place-items: center;
+  width: var(--media-button);
+  height: var(--media-button);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--fg-soft);
+  cursor: pointer;
+  transition:
+    color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+
+.media-panel__button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.media-panel__button:hover,
+.media-panel__button:focus-visible {
+  color: var(--accent);
+  background: var(--menu-item-hover);
+  outline: none;
+}
+
+.media-panel__button:active {
+  transform: scale(0.88);
+}
+
+/* Play and pause are one button, so only one of the two glyphs is ever up.
+ * The state is mirrored onto the panel because it is not a sibling of the bar
+ * button — the popover lives at the end of the document. */
+.media-panel__icon--play {
+  display: block;
+}
+
+.media-panel__icon--pause {
+  display: none;
+}
+
+.media-panel[data-playing='true'] .media-panel__icon--play {
+  display: none;
+}
+
+.media-panel[data-playing='true'] .media-panel__icon--pause {
+  display: block;
+}

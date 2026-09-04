@@ -20,6 +20,7 @@ import { mountPower } from './components/power.js';
 import { mountClock, CLOCK_FORMAT } from './components/clock.js';
 import { mountCalendar } from './components/calendar.js';
 import { mountMemory } from './components/memory.js';
+import { mountMedia } from './components/media.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
@@ -28,6 +29,9 @@ const providers = zebar.createProviderGroup({
   // Five seconds is also the default; stated so the interval is a decision in
   // the file rather than something inherited silently.
   memory: { type: 'memory', refreshInterval: 5000 },
+  // No interval to set: MediaProviderConfig is `{ type: 'media' }` alone. It
+  // emits about every eight seconds and immediately on play/pause.
+  media: { type: 'media' },
 });
 
 const offline = document.querySelector('#glazewm-offline');
@@ -38,6 +42,7 @@ const offline = document.querySelector('#glazewm-offline');
  */
 const updates = [
   mountWorkspaces(document.querySelector('#workspaces'), zebar),
+  mountMedia(document.querySelector('#media'), zebar),
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
   mountMemory(document.querySelector('#memory'), zebar),

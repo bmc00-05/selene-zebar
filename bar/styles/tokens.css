@@ -190,6 +190,40 @@
    * than half the cell so neighbouring days do not touch it. */
   --cal-today-r: 13px;
 
+  /* Media.
+   *
+   * `--media-max-w` is a guard, not a taste call. The bar's regions are a
+   * `1fr auto 1fr` grid and the left region is start-aligned, so content that
+   * outgrows its track does not push the centre — it draws on top of it.
+   * Measured from the media slot: 350px still cleared the focused-window title
+   * by 9px, 371px overlapped it by 12. At 240 the whole group (equaliser 14 +
+   * gap 6 + text) comes to 260 and leaves 99px of daylight.
+   *
+   * For scale: `DEMON TIME · Jeffrey White` is 168px and sits still; a long
+   * Korean title with an artist runs about 255px and scrolls.
+   *
+   * --media-window-h is how tall the widget window grows for the panel, read
+   * by media.js through lib/window.js. */
+  --media-max-w: 240px;
+  /* Seven bars, 26.4 wide against 16 tall. Wider than tall on purpose: a
+   * square block of bars reads as an icon, a wide one reads as a meter.
+   *
+   * The odd-looking widths are the same trick as --ws-ring-width. This monitor
+   * scales by 1.25, so a value lands on whole device pixels when it is a
+   * multiple of 0.8: the bars are 3 device pixels and the gaps 2, where a
+   * round 2px would have been 2.5 and softened both vertical edges. The whole
+   * group comes to exactly 33 device pixels.
+   *
+   * Height is a multiple of 4 like everything else. The bar count lives in the
+   * markup, the per-bar travel in media.css. */
+  --media-eq-h: 16px;
+  --media-eq-bar: 2.4px;
+  --media-eq-gap: 1.6px;
+  --media-panel-w: 240px;
+  --media-window-h: 220px;
+  --media-rail: 4px;
+  --media-button: 28px;
+
   /* Focused-window readout. 16px keeps the icon on the pixel grid and at the
    * same optical size as the mark and the workspace ring. `--aw-max-w` is where
    * long titles start to ellipsise; YASB cut at 20 characters, but width is the

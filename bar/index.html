@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="./styles/bar.css" />
     <link rel="stylesheet" href="./styles/brand.css" />
     <link rel="stylesheet" href="./styles/workspaces.css" />
+    <link rel="stylesheet" href="./styles/media.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
     <link rel="stylesheet" href="./styles/memory.css" />
     <link rel="stylesheet" href="./styles/clock.css" />
@@ -50,6 +51,30 @@
         </button>
 
         <div class="workspaces" id="workspaces" hidden></div>
+
+        <!--
+          The equaliser is the play indicator: it runs while playing and
+          freezes where it stands when paused, so no separate glyph is needed.
+
+          The label scrolls only when it does not fit; media.js measures that
+          and appends the second copy. Capped in CSS because this region
+          overlaps the centre rather than pushing it.
+        -->
+        <button
+          class="media"
+          id="media"
+          type="button"
+          popovertarget="media-panel"
+          hidden
+        >
+          <span class="media__eq" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </span>
+          <span class="media__marquee">
+            <span class="media__track"></span>
+          </span>
+        </button>
+
         <span class="offline" id="glazewm-offline">GlazeWM offline</span>
       </div>
 
@@ -346,6 +371,74 @@
         </thead>
         <tbody class="calendar__body"></tbody>
       </table>
+    </div>
+
+    <!--
+      The media panel. Title and artist are written by media.js; the elapsed
+      time is redrawn twice a second while this is open, because the provider
+      only reports a position about every eight seconds and a bar that stepped
+      that coarsely would read as broken.
+    -->
+    <div class="media-panel" id="media-panel" popover>
+      <p class="media-panel__title"></p>
+      <p class="media-panel__artist"></p>
+
+      <div class="media-panel__rail">
+        <div class="media-panel__progress"></div>
+      </div>
+      <div class="media-panel__times">
+        <span class="media-panel__elapsed"></span>
+        <span class="media-panel__total"></span>
+      </div>
+
+      <div class="media-panel__controls">
+        <button
+          class="media-panel__button"
+          type="button"
+          data-action="previous"
+          aria-label="Previous"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M13 3.5v9L6 8z" fill="currentColor" />
+            <rect x="3" y="3.5" width="1.6" height="9" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button
+          class="media-panel__button"
+          type="button"
+          data-action="toggle"
+          aria-label="Play"
+        >
+          <svg
+            class="media-panel__icon--play"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+          >
+            <path d="M4.5 3l8 5-8 5z" fill="currentColor" />
+          </svg>
+          <svg
+            class="media-panel__icon--pause"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+          >
+            <rect x="4" y="3" width="2.6" height="10" fill="currentColor" />
+            <rect x="9.4" y="3" width="2.6" height="10" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button
+          class="media-panel__button"
+          type="button"
+          data-action="next"
+          aria-label="Next"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M3 3.5v9L10 8z" fill="currentColor" />
+            <rect x="11.4" y="3.5" width="1.6" height="9" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <script type="module" src="./bar.js"></script>
