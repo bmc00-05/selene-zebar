@@ -2,7 +2,7 @@
 
 > A [Zebar](https://github.com/glzr-io/zebar) status bar for Windows, built for [GlazeWM](https://github.com/glzr-io/glazewm).
 
-Catppuccin Mocha palette, Inter typography, moonlit accents.
+Minimal and quiet: a night-sky ground, moonlit silver, Inter typography.
 
 > **Status: bar shell + workspaces.** The left region is live; centre and right
 > are still empty.
@@ -52,7 +52,7 @@ bar/
   index.html            the widget Zebar loads
   bar.js                provider wiring and DOM reconciliation
   styles/
-    tokens.css          Catppuccin Mocha + typography, metrics, motion
+    tokens.css          the Selene colour ramp, typography, metrics, motion
     bar.css             reset and the three-region shell
     workspaces.css      workspace pills
 scripts/link.ps1        symlink into ~/.glzr/zebar

@@ -1,47 +1,45 @@
 /*
- * Catppuccin Mocha + the handful of derived values the bar reasons about.
- * Everything downstream reads from here; no raw hex below this file.
+ * The Selene ramp and the handful of derived values the bar reasons about.
+ * Everything downstream reads from here; no raw colour below this file.
  */
 
 :root {
-  /* --- Catppuccin Mocha ------------------------------------------------- */
-  --ctp-rosewater: #f5e0dc;
-  --ctp-flamingo: #f2cdcd;
-  --ctp-pink: #f5c2e7;
-  --ctp-mauve: #cba6f7;
-  --ctp-red: #f38ba8;
-  --ctp-maroon: #eba0ac;
-  --ctp-peach: #fab387;
-  --ctp-yellow: #f9e2af;
-  --ctp-green: #a6e3a1;
-  --ctp-teal: #94e2d5;
-  --ctp-sky: #89dceb;
-  --ctp-sapphire: #74c7ec;
-  --ctp-blue: #89b4fa;
-  --ctp-lavender: #b4befe;
+  /* --- Selene ramp -------------------------------------------------------
+   * One hue for the whole bar — 278, a violet leaning blue. Only lightness
+   * and chroma move, which is what makes background and foreground read as
+   * one family rather than two palettes that happen to sit together.
+   *
+   * Written in oklch because its lightness is perceptual: 68% -> 76% -> 84%
+   * are evenly spaced steps to the eye, where the same jumps in hex are not.
+   * Retuning a step means editing one number. Hex is noted for the picker. */
+  --sl-void: oklch(15% 0.013 278); /* #0a0b11 */
+  --sl-night: oklch(17% 0.017 278); /* #0e0f17 */
+  --sl-dusk: oklch(20% 0.02 278); /* #14151f */
+  --sl-haze: oklch(23% 0.023 278); /* #1a1c28 */
+  --sl-ash: oklch(27% 0.024 278); /* #232532 */
 
-  --ctp-text: #cdd6f4;
-  --ctp-subtext1: #bac2de;
-  --ctp-subtext0: #a6adc8;
-  --ctp-overlay2: #9399b2;
-  --ctp-overlay1: #7f849c;
-  --ctp-overlay0: #6c7086;
-  --ctp-surface2: #585b70;
-  --ctp-surface1: #45475a;
-  --ctp-surface0: #313244;
-  --ctp-base: #1e1e2e;
-  --ctp-mantle: #181825;
-  --ctp-crust: #11111b;
+  --sl-mist: oklch(68% 0.045 278); /* #9196b4 */
+  --sl-soft: oklch(76% 0.04 278); /* #abafcb */
+  --sl-silver: oklch(84% 0.032 278); /* #c5c9e0 */
+  --sl-moon: oklch(94% 0.016 278); /* #e8eaf6 */
+
+  /* Chroma peaks here, at 0.069. High for this ramp, low in absolute terms —
+   * which is the point: it reads as silver carrying violet, not as violet. */
+  --sl-glow: oklch(80% 0.069 278); /* #b3baea */
+  --sl-halo: oklch(87% 0.047 278); /* #ccd2f4 */
 
   /* --- Semantic roles --------------------------------------------------- */
-  --accent: var(--ctp-mauve);
-  --accent-soft: var(--ctp-lavender);
-  --bar-bg: color-mix(in srgb, var(--ctp-base) 92%, transparent);
-  --bar-border: var(--ctp-surface0);
-  --fg: var(--ctp-text);
-  --fg-muted: var(--ctp-overlay1);
-  --pill-bg: var(--ctp-surface0);
-  --pill-bg-hover: var(--ctp-surface1);
+  --accent: var(--sl-glow);
+  --accent-soft: var(--sl-halo);
+  --bar-bg: color-mix(in srgb, var(--sl-night) 92%, transparent);
+  --bar-border: var(--sl-dusk);
+  --fg: var(--sl-silver);
+  --fg-soft: var(--sl-soft);
+  --fg-muted: var(--sl-mist);
+  /* Text sitting on top of --accent, not on the bar. */
+  --on-accent: var(--sl-void);
+  --pill-bg: var(--sl-haze);
+  --pill-bg-hover: var(--sl-ash);
 
   /* --- Typography -------------------------------------------------------- */
   --font-body: 'Inter', 'Segoe UI Variable', 'Segoe UI', sans-serif;

@@ -43,7 +43,7 @@
 
 /* Has windows, but is not the workspace being shown. */
 .workspace.is-occupied {
-  color: var(--ctp-subtext0);
+  color: var(--fg-soft);
 }
 
 /* Visible on some monitor, without keyboard focus. */
@@ -54,7 +54,7 @@
 
 .workspace.is-focused {
   background: var(--accent);
-  color: var(--ctp-crust);
+  color: var(--on-accent);
   font-weight: 600;
   padding-inline: 10px;
 }

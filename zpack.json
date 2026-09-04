@@ -2,8 +2,8 @@
   "$schema": "https://github.com/glzr-io/zebar/raw/v3.3.1/resources/zpack-schema.json",
   "name": "selene-zebar",
   "version": "0.1.0",
-  "description": "A moonlit status bar for GlazeWM. Catppuccin Mocha, Inter, hand-written CSS.",
-  "tags": ["topbar", "glazewm", "catppuccin"],
+  "description": "A moonlit status bar for GlazeWM. Night-sky dark, silver accents, hand-written CSS.",
+  "tags": ["topbar", "glazewm", "dark", "minimal"],
   "previewImages": [],
   "repositoryUrl": "https://github.com/bmc00-05/selene-zebar",
   "widgets": [
