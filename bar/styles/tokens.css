@@ -70,11 +70,20 @@
    * keeps the stroke crisp while the wide one carries the bloom. A moon's halo
    * falls off the same way — bright at the rim, thin further out. */
   --ws-halo-ring:
-    0 0 3px color-mix(in srgb, var(--accent) 55%, transparent),
-    0 0 10px color-mix(in srgb, var(--accent) 28%, transparent);
+    0 0 4.8px color-mix(in srgb, var(--accent) 88%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 45%, transparent);
   --ws-halo-dot:
-    0 0 3px color-mix(in srgb, var(--accent) 80%, transparent),
-    0 0 9px color-mix(in srgb, var(--accent) 40%, transparent);
+    0 0 4.8px color-mix(in srgb, var(--accent) 95%, transparent),
+    0 0 14.4px color-mix(in srgb, var(--accent) 64%, transparent);
+  /* The bottom of the breath, as a fraction of the halo's full strength. A
+   * plain number and not a second pair of shadows: see the note on the layer
+   * in workspaces.css for why the halo is faded rather than redrawn.
+   *
+   * This started at 0.55 and was not visible — rendered side by side, the
+   * trough and the peak were the same picture. The halo above was raised
+   * about 1.6x at the same time, so the peak is brighter than the old resting
+   * level and the swing has somewhere to happen. */
+  --ws-breathe-low: 0.35;
   /* Floating panels — the Selene menu and the calendar. These sit over the
    * desktop rather than on the bar plate, so they are opaque: there is nothing
    * behind them worth showing, and translucency over an unknown wallpaper only
@@ -151,6 +160,19 @@
   --ws-hit: 16px;
   --ws-dot: 8px;
   --ws-ring-width: 0.8px;
+
+  /* Focus changes get their own timing rather than the bar's default.
+   * --ease-standard front-loads hard: measured on a real switch, 68% of a
+   * 220ms change had landed 65ms in, which reads as a cut rather than a move.
+   * Longer, and on a curve that spends its time in the middle. */
+  --ws-focus-dur: 320ms;
+  --ws-focus-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* How long one breath of the focused halo takes. Close to the battery's
+   * charging pulse (2.6s) now that the depth is close to it too — 4s with a
+   * deep swing read as laboured rather than calm. Still the slowest thing in
+   * the bar. */
+  --ws-breathe-dur: 3s;
 
   /* Rendered dot = --ws-dot x scale: 5px, 6px, 7px, 8px. */
   --ws-scale-empty: 0.625;

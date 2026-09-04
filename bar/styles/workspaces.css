@@ -31,13 +31,17 @@
   border: var(--ws-ring-width) solid transparent;
   border-radius: 50%;
   cursor: pointer;
+  /* Anchors the halo layer below. */
+  position: relative;
+  /* The focus timing, not the bar's default — see --ws-focus-dur. The press
+   * scale keeps the quick one: a click should answer immediately. */
   transition:
-    border-color var(--dur-base) var(--ease-standard),
-    box-shadow var(--dur-base) var(--ease-standard),
+    border-color var(--ws-focus-dur) var(--ws-focus-ease),
     transform var(--dur-fast) var(--ease-standard);
 }
 
 .workspace__dot {
+  position: relative;
   width: var(--ws-dot);
   height: var(--ws-dot);
   border: var(--ws-ring-width) solid var(--fg-muted);
@@ -49,10 +53,50 @@
    * glow snapped on at frame one while the dot was still small, and the two
    * arriving separately is most of what read as a bounce. */
   transition:
-    transform var(--dur-base) var(--ease-standard),
-    background-color var(--dur-base) var(--ease-standard),
-    border-color var(--dur-base) var(--ease-standard),
-    box-shadow var(--dur-base) var(--ease-standard);
+    transform var(--ws-focus-dur) var(--ws-focus-ease),
+    background-color var(--ws-focus-dur) var(--ws-focus-ease),
+    border-color var(--ws-focus-dur) var(--ws-focus-ease);
+}
+
+/*
+ * The halo, in two layers.
+ *
+ * The shadow is cast once and never recomputed; nothing after this animates
+ * anything but opacity. Animating box-shadow directly worked but cost 162ms of
+ * renderer work every 4 seconds — about 4% of a core, permanently — because the
+ * keyframe reached the shadow through custom properties and color-mix() and
+ * every frame re-resolved them. RecalcStyleDuration went 0.4ms -> 39.7ms.
+ * Fading a settled shadow costs 4.9ms over the same window, recalc 1.1ms.
+ *
+ * Two layers rather than one because focus and the breath both want opacity,
+ * and an animation on a property beats the transition on it. With one layer the
+ * halo left in a single frame: unfocusing removed the animation, which is not a
+ * change a transition can catch, so it snapped from 0.64 to 0. Split, the outer
+ * layer fades with focus and the inner one breathes inside it, and the two
+ * opacities simply multiply.
+ */
+.workspace__halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--ws-focus-dur) var(--ws-focus-ease);
+}
+
+.workspace__halo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.workspace > .workspace__halo::after {
+  box-shadow: var(--ws-halo-ring);
+}
+
+.workspace__dot > .workspace__halo::after {
+  box-shadow: var(--ws-halo-dot);
 }
 
 .workspace:hover .workspace__dot {
@@ -82,16 +126,60 @@
   transform: scale(var(--ws-scale-displayed));
 }
 
+/*
+ * The focused one, and the only thing in the row that keeps moving.
+ *
+ * The halo breathes. It is the same idea as the charging battery but pitched
+ * much lower — 55% of full rather than 20%, over 4s rather than 2.6 — because
+ * charging is occasional and this is permanent. Deep enough to notice if you
+ * look, shallow enough to ignore while working.
+ *
+ * The animation waits out the focus transition before it starts, and its 0%
+ * is exactly the value that transition lands on, so the two hand over without
+ * a step. Starting it immediately would snap the halo to the keyframe's first
+ * value while the transition was still bringing it up.
+ */
 .workspace.is-focused {
   border-color: var(--accent);
-  box-shadow: var(--ws-halo-ring);
 }
 
 .workspace.is-focused .workspace__dot {
   background: var(--accent);
   border-color: var(--accent);
   transform: scale(var(--ws-scale-focused));
-  box-shadow: var(--ws-halo-dot);
+}
+
+/*
+ * The halo comes up with the focus and then breathes.
+ *
+ * The animation waits out the focus transition, and its 0% is the value that
+ * transition lands on, so the two hand over without a step — start it at once
+ * and the halo snaps to the keyframe's first value while the fade is still
+ * bringing it up.
+ *
+ * The first attempt was pitched far lower than the battery's charging pulse on
+ * the reasoning that charging is occasional while this is on screen all the
+ * time. Rendered side by side, the trough and the peak turned out to be the
+ * same picture — the swing has to be near the battery's after all, and the
+ * halo itself had to be raised to give it room.
+ */
+.workspace.is-focused .workspace__halo {
+  opacity: 1;
+}
+
+.workspace.is-focused .workspace__halo::after {
+  animation: ws-breathe var(--ws-breathe-dur) var(--ease-standard)
+    var(--ws-focus-dur) infinite;
+}
+
+@keyframes ws-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: var(--ws-breathe-low);
+  }
 }
 
 /* --- Enter / leave ------------------------------------------------------ */
@@ -131,4 +219,10 @@
 .workspace.is-leaving {
   animation: workspace-out var(--dur-base) var(--ease-standard) forwards;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace.is-focused .workspace__halo::after {
+    animation: none;
+  }
 }

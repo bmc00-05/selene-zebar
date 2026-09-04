@@ -88,12 +88,25 @@ function createIndicator(workspace, glazewm) {
   const dot = document.createElement('span');
   dot.className = 'workspace__dot';
 
-  indicator.append(dot);
+  // One halo layer per ring, so focus can fade it while its own inner layer
+  // breathes. The two effects need separate elements: an animation and a
+  // transition on the same opacity fight, and removing the animation on
+  // unfocus takes the halo out in a single frame instead of fading it.
+  indicator.append(halo(), dot);
+  dot.append(halo());
   indicator.addEventListener('click', () =>
     glazewm.runCommand(`focus --workspace ${workspace.name}`),
   );
 
   return indicator;
+}
+
+/** An empty layer; workspaces.css gives it the shadow its parent calls for. */
+function halo() {
+  const el = document.createElement('span');
+  el.className = 'workspace__halo';
+  el.ariaHidden = 'true';
+  return el;
 }
 
 function updateIndicator(indicator, workspace) {
