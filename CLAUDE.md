@@ -2,6 +2,35 @@
 
 GlazeWM 위에서 쓸 Zebar 상태바를 직접 만든다. 개인용이자 GitHub 포트폴리오.
 
+## 명령
+
+| 목적          | 명령                                                         |
+| ------------- | ------------------------------------------------------------ |
+| 의존성 설치   | `pnpm install`                                               |
+| 포맷 검사     | `pnpm format:check`                                          |
+| 포맷 적용     | `pnpm format`                                                |
+| Zebar 로 링크 | `pnpm run link` (관리자 PowerShell, `-DryRun` 으로 미리보기) |
+| 바 띄우기     | 아래 참조 — `Start-Process` 로 분리해서 띄운다               |
+| 바 내리기     | `Get-Process zebar \| Stop-Process -Force`                   |
+
+```powershell
+Start-Process "C:\Program Files\glzr.io\Zebar\zebar.exe" `
+  -ArgumentList 'start-widget-preset','--pack','selene-zebar','--widget-name','bar','--preset','default'
+```
+
+**빌드도 테스트도 없다.** Zebar 가 이 디렉터리를 WebView2 에 그대로 서빙하므로
+번들러가 없고, 테스트 러너도 아직 도입하지 않았다. 코드를 고친 뒤의 검증은
+`pnpm format:check` 와 바를 실제로 띄워보는 것 둘이다.
+
+이 명령이 이 모양인 이유 둘. 첫째, `start-widget-preset` 은 Zebar 가 떠 있지
+않으면 데몬을 포그라운드로 붙잡고 반환하지 않는다 — 그냥 실행하면 호출한
+터미널이 멈추고, 그 터미널을 끊는 순간 위젯 창까지 같이 죽는다. 둘째,
+`zebar startup` 을 먼저 띄우면 안 된다. `settings.json` 이 아직 `glzr-io.starter`
+를 가리켜서 기본 바가 같이 뜨고 우리 바와 겹친다.
+
+`zpack.json` 을 고쳤으면 Zebar 를 내렸다 다시 띄워야 반영된다. HTML · CSS · JS
+수정은 위젯 리로드(우클릭 메뉴)만으로 반영된다.
+
 ## 이 프로젝트를 시작한 이유
 
 현재 상태바는 **YASB**(Python/PyQt6)를 쓰고 있고 잘 동작한다. 그럼에도 옮기는 이유는
@@ -19,12 +48,12 @@ Zebar 는 Tauri 창 안에서 **WebView2(Chromium)** 가 렌더링한다. 즉 �
 
 ## 환경
 
-| | |
-|---|---|
-| Zebar | 3.3.1 (winget `glzr-io.zebar`), 설치 완료 |
-| GlazeWM | 3.10.1 (winget `glzr-io.glazewm`) |
-| Node / pnpm | v24.11.1 / 11.18.0 (npm 11.6.2, yarn 1.22.22 도 있음) |
-| OS | Windows 11, 삼성 Galaxy Book, 단일 모니터 1920x1080 @ DPI 1.25 |
+|             |                                                                |
+| ----------- | -------------------------------------------------------------- |
+| Zebar       | 3.3.1 (winget `glzr-io.zebar`), 설치 완료                      |
+| GlazeWM     | 3.10.1 (winget `glzr-io.glazewm`)                              |
+| Node / pnpm | v24.11.1 / 11.18.0 (npm 11.6.2, yarn 1.22.22 도 있음)          |
+| OS          | Windows 11, 삼성 Galaxy Book, 단일 모니터 1920x1080 @ DPI 1.25 |
 
 ## 디렉터리 구조와 링크 전략
 
@@ -63,16 +92,16 @@ Zebar 는 `~/.glzr/zebar/` 아래에서 `zpack.json` 이 있는 디렉터리를 
 이 바가 표시할 워크스페이스 배치다. 부팅 시 `startup-layout.ps1` 이 워크스페이스 순서대로
 하나씩 띄운다(창이 실제로 잡힌 걸 확인하고 다음으로 넘어감).
 
-| WS | 내용 |
-|---|---|
-| 1 | Chrome (Profile 1, 개인) |
-| 2 | Claude Desktop + Notion |
-| 3 | VS Code — `C:\dev\dotfiles` (창 제목 `ORCH` 접두어로 식별) |
-| 4 | 그 외 모든 VS Code 창 |
-| 5 | Windows Terminal(`--title Deploy`) + VS Code Remote SSH |
-| 6 | Discord(좌) + 카카오톡(우 40%) |
-| 7 | Chrome (Profile 3, 학교) + Gemini PWA(우 40%) |
-| 8 | YouTube Music PWA |
+| WS  | 내용                                                       |
+| --- | ---------------------------------------------------------- |
+| 1   | Chrome (Profile 1, 개인)                                   |
+| 2   | Claude Desktop + Notion                                    |
+| 3   | VS Code — `C:\dev\dotfiles` (창 제목 `ORCH` 접두어로 식별) |
+| 4   | 그 외 모든 VS Code 창                                      |
+| 5   | Windows Terminal(`--title Deploy`) + VS Code Remote SSH    |
+| 6   | Discord(좌) + 카카오톡(우 40%)                             |
+| 7   | Chrome (Profile 3, 학교) + Gemini PWA(우 40%)              |
+| 8   | YouTube Music PWA                                          |
 
 ## 관련 저장소
 
@@ -82,8 +111,5 @@ Zebar 는 `~/.glzr/zebar/` 아래에서 `zpack.json` 이 있는 디렉터리를 
 
 ## 작업 시 주의
 
-- **OneDrive 는 쓰지 않는다.** 문제가 생겨도 OneDrive 를 켜는 방향으로 해결하지 말 것.
-  경로가 필요하면 로컬 경로를 쓴다.
 - 앱 자동 실행은 GlazeWM 이 소유한다. Windows 시작 프로그램에는 GlazeWM 만 있고
   나머지는 `startup-layout.ps1` 이 띄운다.
-- 사용자와는 한국어로 대화한다.
