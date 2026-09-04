@@ -7,6 +7,7 @@
  * network after the first run.
  */
 import * as zebar from 'https://esm.sh/zebar@3.3';
+import { mountActiveWindow } from './components/active-window.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
@@ -18,6 +19,11 @@ const els = {
   brand: document.querySelector('.brand'),
   menu: document.querySelector('#bar-menu'),
 };
+
+const updateActiveWindow = mountActiveWindow(
+  document.querySelector('#active-window'),
+  zebar,
+);
 
 /** name -> the indicator element currently on screen for that workspace. */
 const indicators = new Map();
@@ -40,6 +46,8 @@ function render({ glazewm }) {
   if (glazewm) {
     renderWorkspaces(glazewm);
   }
+
+  updateActiveWindow(glazewm?.focusedContainer ?? null);
 }
 
 /**

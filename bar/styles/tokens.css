@@ -146,6 +146,14 @@
   --menu-window-h: 220px;
   --menu-radius: 10px;
 
+  /* Focused-window readout. 16px keeps the icon on the pixel grid and at the
+   * same optical size as the mark and the workspace ring. `--aw-max-w` is where
+   * long titles start to ellipsise; YASB cut at 20 characters, but width is the
+   * better unit when Korean and Latin titles mix. */
+  --aw-icon: 16px;
+  --aw-max-w: 320px;
+  --aw-icon-saturate: 0.55;
+
   /* --- Motion ------------------------------------------------------------
    * The reason this project exists: a bar that can actually animate.
    *

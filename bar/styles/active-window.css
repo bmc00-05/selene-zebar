@@ -1,0 +1,71 @@
+/*
+ * Focused-window readout: the window's icon and its title, centred.
+ *
+ * The title fades between windows rather than snapping. Two spans sit on the
+ * same grid cell; active-window.js writes the incoming title into whichever
+ * is hidden and flips which one is `.is-current`, so the outgoing one fades
+ * under the incoming one. Ellipsis lives on the spans, not the container,
+ * because overflow has to be clipped on the element that holds the text.
+ */
+
+.active-window {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: var(--aw-max-w);
+  min-width: 0;
+}
+
+.active-window__icon {
+  flex: none;
+  width: var(--aw-icon);
+  height: var(--aw-icon);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  /* The extracted icon is the only saturated colour on a one-hue bar. Pulling
+   * its chroma down keeps it recognisable without letting it shout. */
+  filter: saturate(var(--aw-icon-saturate));
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+.active-window__icon.is-loaded {
+  opacity: 1;
+}
+
+/* Shown when the window has no icon to give. Same box as the icon so the title
+ * does not shift between the two. */
+.active-window__fallback {
+  flex: none;
+  width: var(--aw-icon);
+  height: var(--aw-icon);
+  color: var(--fg-muted);
+}
+
+/* `hidden` is an HTML attribute; the UA stylesheet does not apply it to an
+ * inline <svg>, which is in the SVG namespace. Without this the glyph sat next
+ * to the real icon even with the attribute set. */
+.active-window__fallback[hidden] {
+  display: none;
+}
+
+.active-window__title {
+  display: grid;
+  min-width: 0;
+  color: var(--fg);
+}
+
+.active-window__title > span {
+  grid-area: 1 / 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+.active-window__title > span.is-current {
+  opacity: 1;
+}
