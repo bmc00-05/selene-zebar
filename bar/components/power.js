@@ -46,13 +46,18 @@ export function mountPower(root, zebar) {
 
   let holdTimer = null;
 
-  // Full screen is the only claim that also moves the window, and the only one
-  // that needs focus: the widget is configured `focused: false`, so without
-  // asking the window never takes focus and Escape has nothing to close.
-  const grown = growWindowWhileOpen(overlay, widget, {
-    fullScreen: true,
-    focus: true,
-  });
+  // Full screen is the only claim that also moves the window.
+  //
+  // It used to ask for focus as well, because the widget is configured
+  // `focused: false` and Escape needs a focused window. That call could never
+  // have worked: Zebar's ACL denies `plugin:window|set_focus` to widgets —
+  // "Command plugin:window|set_focus not allowed by ACL" — and WidgetPrivileges
+  // has only `shellCommands`, so there is nothing to grant in zpack.json.
+  //
+  // Nothing was broken by removing it. The overlay opens only from a click on
+  // the button, and that click focuses the window on its own; the failing call
+  // just threw an unhandled rejection on every open.
+  const grown = growWindowWhileOpen(overlay, widget, { fullScreen: true });
 
   overlay.addEventListener('beforetoggle', event => {
     if (event.newState !== 'open') {

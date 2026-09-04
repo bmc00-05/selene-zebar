@@ -45,9 +45,6 @@ let pending = null;
  * @param {number} [spec.height]      logical height, for a panel that hangs
  *                                    off the bar
  * @param {boolean} [spec.fullScreen] cover the screen, moving the window too
- * @param {boolean} [spec.focus]      take focus once applied — a widget
- *                                    configured `focused: false` never gets it
- *                                    otherwise, and Escape has nothing to close
  * @returns {{ restoreNow: () => void }}
  */
 export function growWindowWhileOpen(el, widget, spec) {
@@ -127,9 +124,5 @@ async function apply() {
       width: window.innerWidth,
       height: Math.max(...specs.map(spec => spec.height ?? 0)),
     });
-  }
-
-  if (specs.some(spec => spec.focus)) {
-    await win.setFocus();
   }
 }
