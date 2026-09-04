@@ -7,8 +7,18 @@
  * it — the element is already a button.
  */
 
-/** What the bar shows: `Fri 4 Sep 17:04`. HH is what makes it 24-hour. */
-export const CLOCK_FORMAT = 'EEE d MMM HH:mm';
+/**
+ * What the bar shows: `Fri, 04 Sep 17:04`. HH is what makes it 24-hour.
+ *
+ * `dd`, not `d`: the day keeps two digits so the clock does not widen on the
+ * 10th of every month. This sits in the right-hand group, which is anchored to
+ * the right edge, so a wider clock pushes the volume and RAM readouts left —
+ * measured at 7.78px for `4 Sep` -> `14 Sep`. Weekday and month names still
+ * vary by a few px because the letters are proportional; that happens once a
+ * day at midnight and is not worth a fixed-width font. The comma is taste:
+ * with two three-letter tokens in a row, it marks where the weekday ends.
+ */
+export const CLOCK_FORMAT = 'EEE, dd MMM HH:mm';
 
 /**
  * Wires the clock into `root` and returns the function that updates it.
