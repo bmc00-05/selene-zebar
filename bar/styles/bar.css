@@ -67,13 +67,18 @@ body {
   background: var(--bar-bg);
   border: 1px solid var(--bar-border);
   border-radius: var(--radius-bar);
-  /* Blurs whatever the window sits over — the wallpaper, since GlazeWM keeps
-   * windows out of the reserved strip. Currently a no-op here: this desktop's
-   * wallpaper is a flat #131020, and blurring one colour returns it unchanged.
-   * It earns its keep on a busy wallpaper, where the blur averages the detail
-   * into a broad tone the text can sit on predictably. `saturate` offsets the
-   * grey cast that averaging leaves behind. */
-  backdrop-filter: blur(16px) saturate(120%);
+  /* No backdrop-filter, on purpose. There used to be a `blur(16px)
+   * saturate(120%)` here for busy wallpapers, and on this one it did nothing
+   * visible: the strip the bar sits over is a single flat colour (pixel
+   * variance 0 across the top 50px of the wallpaper), and a screen capture
+   * with the filter on and off differed only where the battery halo happened
+   * to be mid-breath. What it did cost was CPU — with any animation running,
+   * the filter re-ran every frame and added 5.8 points of one core (13.5% ->
+   * 7.7%) for that invisible result.
+   *
+   * If a wallpaper with detail under the bar ever comes back, so can the
+   * filter; but measure it, because on this GPU any per-frame filter over a
+   * 1920px strip is the most expensive line in the stylesheet. */
 }
 
 .bar__region {
