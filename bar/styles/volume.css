@@ -1,0 +1,63 @@
+/*
+ * Volume readout.
+ *
+ * Every part of the icon is in the markup and the state decides which parts
+ * are lit. Fading opacity is what lets a volume change read as the arcs coming
+ * up rather than as the icon being swapped, and it keeps the drawing out of
+ * JavaScript — the same division the battery and the RAM ring use.
+ */
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-item);
+  color: var(--fg-soft);
+  transition: color var(--dur-base) var(--ease-standard);
+}
+
+.volume__icon {
+  display: block;
+  flex: none;
+  width: var(--vol-icon);
+  height: var(--vol-icon);
+}
+
+.volume__cone {
+  fill: currentColor;
+}
+
+.volume__wave,
+.volume__cross {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+/* Quiet lights the near arc, loud adds the far one. Nothing lights at zero:
+ * a speaker on its own is the picture of no sound, which is different from
+ * muted and has to look different. */
+.volume[data-state='low'] .volume__wave--near,
+.volume[data-state='high'] .volume__wave--near,
+.volume[data-state='high'] .volume__wave--far {
+  opacity: 1;
+}
+
+.volume[data-state='muted'] .volume__cross {
+  opacity: 1;
+}
+
+/* Muted is the one state that is not about how loud it is, so it steps back
+ * rather than changing hue — the same brightness signal the rest of the bar
+ * uses, and it leaves --warn and --alert meaning danger alone. */
+.volume[data-state='muted'] {
+  color: var(--fg-muted);
+}
+
+.volume__label {
+  /* The digits change under an icon that does not move; tabular figures stop
+   * the readout from breathing, as on the clock and the RAM ring. */
+  font-variant-numeric: tabular-nums;
+}

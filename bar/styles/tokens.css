@@ -247,6 +247,10 @@
   --battery-glow-width: 2;
   --battery-glow-blur: 2px;
 
+  /* Volume. 16px like the mark, the window icon and the RAM ring, so the row
+   * shares one optical size and lands on whole device pixels at 1.25. */
+  --vol-icon: 16px;
+
   /* RAM ring. 16px puts it on the pixel grid and at the same optical size as
    * the mark, the window icon and the workspace ring. r=6 with a 2-wide stroke
    * makes the outer diameter 14, leaving 1 of margin inside the 16 box.

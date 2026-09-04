@@ -21,6 +21,7 @@ import { mountClock, CLOCK_FORMAT } from './components/clock.js';
 import { mountCalendar } from './components/calendar.js';
 import { mountMemory } from './components/memory.js';
 import { mountMedia } from './components/media.js';
+import { mountVolume } from './components/volume.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
@@ -35,6 +36,9 @@ const providers = zebar.createProviderGroup({
   // No interval to set: MediaProviderConfig is `{ type: 'media' }` alone. It
   // emits about every eight seconds and immediately on play/pause.
   media: { type: 'media' },
+  // Also no interval, and none is wanted: Windows pushes volume and mute
+  // changes, and they arrive within two seconds of the system slider moving.
+  audio: { type: 'audio' },
 });
 
 const offline = document.querySelector('#glazewm-offline');
@@ -48,6 +52,7 @@ const updates = [
   mountMedia(document.querySelector('#media'), zebar),
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
+  mountVolume(document.querySelector('#volume'), zebar),
   mountMemory(document.querySelector('#memory'), zebar),
   mountClock(document.querySelector('#clock'), zebar),
   mountCalendar(document.querySelector('#calendar'), zebar),

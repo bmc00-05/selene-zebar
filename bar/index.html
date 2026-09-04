@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./styles/workspaces.css" />
     <link rel="stylesheet" href="./styles/media.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
+    <link rel="stylesheet" href="./styles/volume.css" />
     <link rel="stylesheet" href="./styles/memory.css" />
     <link rel="stylesheet" href="./styles/clock.css" />
     <link rel="stylesheet" href="./styles/calendar.css" />
@@ -53,8 +54,8 @@
         <div class="workspaces" id="workspaces" hidden></div>
 
         <!--
-          The equaliser is the play indicator: it runs while playing and
-          freezes where it stands when paused, so no separate glyph is needed.
+          The equaliser is the play indicator: it runs while playing and lies
+          flat when nothing is, so no separate glyph is needed.
 
           The label scrolls only when it does not fit; media.js measures that
           and appends the second copy. Capped in CSS because this region
@@ -118,10 +119,36 @@
 
       <div class="bar__region bar__region--right">
         <!--
-          Leftmost of the right-hand group on purpose. This region is anchored
-          to the right edge, so a width change travels leftwards only: measured,
-          the percentage going from 8% to 100% moves nothing at all here, where
-          in any other slot it shifted the clock by 13px.
+          Every part of the speaker is drawn here and the state lights the ones
+          it wants; see volume.css. Muted and zero are different pictures on
+          purpose — a muted device at 40% is silent, and the number alone
+          cannot say that.
+        -->
+        <div class="volume" id="volume" hidden>
+          <svg class="volume__icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path class="volume__cone" d="M2 6h2.6L8 3.1v9.8L4.6 10H2z" />
+            <path
+              class="volume__wave volume__wave--near"
+              d="M10.3 6.3a2.4 2.4 0 0 1 0 3.4"
+            />
+            <path
+              class="volume__wave volume__wave--far"
+              d="M12.3 4.6a5 5 0 0 1 0 6.8"
+            />
+            <path
+              class="volume__cross"
+              d="M10.6 6.4 14.4 9.6M14.4 6.4 10.6 9.6"
+            />
+          </svg>
+          <span class="volume__label"></span>
+        </div>
+
+        <!--
+          Near the front of the right-hand group on purpose. This region is
+          anchored to the right edge, so a width change travels leftwards only:
+          measured, the percentage going from 8% to 100% moved the clock by 13px
+          from a middle slot and nothing at all from here. Only the volume sits
+          further left, and it is the one thing this can push.
 
           `pathLength` normalises the circumference to 100, so the arc length in
           memory.css is a plain percentage rather than a fraction of 2*pi*r.
