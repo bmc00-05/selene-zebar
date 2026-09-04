@@ -167,9 +167,12 @@
   opacity: 1;
 }
 
+/* Stepped, not eased — see --breathe-steps in tokens.css: every frame the
+ * value does not change is a frame the compositor does not draw, and that is
+ * the difference between ~8% and ~4% of a core for a halo that never stops. */
 .workspace.is-focused .workspace__halo::after {
-  animation: ws-breathe var(--ws-breathe-dur) var(--ease-standard)
-    var(--ws-focus-dur) infinite;
+  animation: ws-breathe var(--ws-breathe-dur)
+    steps(var(--breathe-steps), jump-none) var(--ws-focus-dur) infinite;
 }
 
 @keyframes ws-breathe {

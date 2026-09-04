@@ -117,7 +117,9 @@
  * be noticed on a glance, not to pull the eye. Opacity animates on the
  * compositor, so nothing re-lays-out per frame. */
 .battery[data-state='charging'] .battery__glow {
-  animation: battery-breathe 2.6s var(--ease-standard) infinite;
+  /* Stepped for the same reason as the workspace halo — see --breathe-steps. */
+  animation: battery-breathe 2.6s steps(var(--breathe-steps), jump-none)
+    infinite;
 }
 
 /* Low and critical, in the two colours the RAM ring also uses. Only the signal

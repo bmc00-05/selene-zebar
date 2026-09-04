@@ -312,6 +312,30 @@
   --dur-base: 220ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-out-back: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* What animation costs here, measured, because it is not what one expects.
+   *
+   * On this machine a single 16px element fading at 60fps costs about 8% of
+   * one core — in Zebar and in a plain Edge tab alike (8.8-10.8% there). It
+   * is not the transparent window (opaque: 16.2%, transparent: 17.8%), not
+   * the element's size (a 2x2px dot costs the same as the halo), not GPU
+   * acceleration (D3D11, compositing enabled). It is the per-frame cost of
+   * Chromium's compositor on this Intel GPU: roughly 1.5ms of CPU for every
+   * frame it produces, whatever is in it. The same thing made VS Code's
+   * blinking cursor famous for eating 13%.
+   *
+   * So the only lever is the number of frames, and the compositor does not
+   * draw a frame when the animated value has not changed. A breath eased over
+   * 3s changes every frame; the same breath in steps changes only at the
+   * steps. Measured on the focused halo: continuous 7.7-14%, steps(20) 4.0-
+   * 4.9%, steps(6) 1.5-2.4%, stopped 0.7-1.8%.
+   *
+   * 20 steps over a 3s breath is a 3% opacity change every 150ms, which the
+   * eye does not pick apart; 6 steps shows the stairs. Applied to the two
+   * halos that breathe. Not to the equaliser — seven bars on seven phases
+   * change on nearly every frame anyway — and not to the marquee, which has to
+   * glide. */
+  --breathe-steps: 20;
 }
 
 @media (prefers-reduced-motion: reduce) {
