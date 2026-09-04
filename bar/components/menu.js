@@ -12,7 +12,7 @@
  * measured before and after: workspace y=55 h=1020 either way.
  */
 
-import { readPx } from '../lib/css.js';
+import { readMs, readPx } from '../lib/css.js';
 
 /**
  * Wires the menu behind `root` and returns the function that updates it.
@@ -33,6 +33,7 @@ export function mountMenu(root, zebar) {
   // Held so a click can reach runCommand. The menu's whole update is keeping
   // this current — nothing about the panel itself changes on a provider tick.
   let latest = {};
+  let shrink = null;
 
   const resize = height =>
     widget.tauriWindow.setSize({
@@ -46,7 +47,33 @@ export function mountMenu(root, zebar) {
   root.addEventListener('beforetoggle', event => {
     const isOpening = event.newState === 'open';
     trigger.setAttribute('aria-expanded', String(isOpening));
-    resize(isOpening ? openHeight : barHeight);
+
+    if (isOpening) {
+      clearTimeout(shrink);
+      resize(openHeight);
+      return;
+    }
+
+    // The panel is still on screen for the length of its exit. Shrinking the
+    // window now leaves `position-area: bottom` no room below the mark, so
+    // position-try-fallbacks relocates the panel on top of the bar: measured, it
+    // jumped from y=36 to y=6 and painted 34px of opaque menu over the plate.
+    // So the window waits until the panel is gone: one frame past the discrete
+    // `display` transition in brand.css.
+    const gone = readMs('--dur-base') + 20;
+
+    clearTimeout(shrink);
+    shrink = setTimeout(() => {
+      // Opening another popover closes this one, and the open arrives first, so
+      // shrinking regardless would pull the window out from under the panel
+      // that just opened. Only the last popover standing puts the window back.
+      const another = [...document.querySelectorAll(':popover-open')].some(
+        el => el !== root,
+      );
+      if (!another && !root.matches(':popover-open')) {
+        resize(barHeight);
+      }
+    }, gone);
   });
 
   // Light dismiss only covers clicks this window receives. Clicking another

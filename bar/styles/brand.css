@@ -69,29 +69,54 @@
   overflow: visible;
 }
 
-.menu:popover-open {
-  /* Grid rather than block so the rule and items share one gap. */
-  display: grid;
+/* Grid rather than block so the rule and items share one gap. The gap sits on
+ * the base rule, not here: `display` is held through the close by
+ * allow-discrete but nothing else in this rule is, so a gap declared here would
+ * collapse to 0 on the first frame of the fade and shift every item. */
+.menu {
   gap: 1px;
 }
 
-/* Closed -> open is a discrete state change, so the panel gets the same spring
- * the workspace indicators use when they arrive. */
+.menu:popover-open {
+  display: grid;
+}
+
+/*
+ * Open and close, both directions.
+ *
+ * The closed state has to be written out. @starting-style only says where the
+ * panel comes from, so with `opacity: 1` as the resting rule the panel held at
+ * full opacity for the whole discrete `display` window and then vanished. That
+ * was visible: menu.js shrank the window at the same moment, position-area
+ * found no room below the mark, and 34px of fully opaque panel was drawn on top
+ * of the bar until display flipped. Stating the closed state gives it an exit;
+ * menu.js waits for that exit before shrinking.
+ *
+ * `display` and `overlay` run for --dur-base rather than --dur-fast so the
+ * slower of the two properties, transform, is not cut off mid-flight.
+ */
+.menu {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transition:
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-out-back),
+    overlay var(--dur-base) allow-discrete,
+    display var(--dur-base) allow-discrete;
+}
+
+.menu:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+/* Where it comes from on the way in — the same spring the workspace indicators
+ * use when they arrive. */
 @starting-style {
   .menu:popover-open {
     opacity: 0;
     transform: translateY(-4px) scale(0.98);
   }
-}
-
-.menu {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity var(--dur-fast) var(--ease-standard),
-    transform var(--dur-base) var(--ease-out-back),
-    overlay var(--dur-fast) allow-discrete,
-    display var(--dur-fast) allow-discrete;
 }
 
 .menu__title {

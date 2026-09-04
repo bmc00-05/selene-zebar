@@ -57,27 +57,46 @@
   background: var(--power-scrim);
   color: var(--fg);
   overflow: hidden;
-}
-
-.power__overlay:popover-open {
-  display: grid;
+  /* Centring belongs here, not in the :popover-open rule below. `display` is
+   * held through the close by allow-discrete, but nothing else in that rule is:
+   * putting place-items there dropped it to `normal` on the first frame of the
+   * fade, and the buttons sat in the top-left corner for the whole 220ms —
+   * measured jumping from x=510,y=372 to 0,0. */
   place-items: center;
 }
 
-/* Fades in as one piece. @starting-style gives the opening frame something to
- * animate from, and allow-discrete keeps display and overlay in step with it. */
-@starting-style {
-  .power__overlay:popover-open {
-    opacity: 0;
-  }
+/* Only the display flip, which is what the popover actually toggles. */
+.power__overlay:popover-open {
+  display: grid;
 }
 
+/*
+ * Fades as one piece, both directions.
+ *
+ * The closed state has to be written out. @starting-style only says where the
+ * scrim comes from, so with `opacity: 1` as the resting rule it stayed fully
+ * opaque for the whole discrete `display` window. That was the worst of the
+ * three panels: power.js put the window back to the bar strip at the same
+ * moment, and a scrim at `height: 100%` then covered the entire bar — 40px of
+ * flat scrim over the plate, measured at opacity 1 for 167ms. Stating the
+ * closed state gives it an exit; power.js waits for that exit before restoring.
+ */
 .power__overlay {
-  opacity: 1;
+  opacity: 0;
   transition:
     opacity var(--dur-base) var(--ease-standard),
     overlay var(--dur-base) allow-discrete,
     display var(--dur-base) allow-discrete;
+}
+
+.power__overlay:popover-open {
+  opacity: 1;
+}
+
+@starting-style {
+  .power__overlay:popover-open {
+    opacity: 0;
+  }
 }
 
 .power__actions {
