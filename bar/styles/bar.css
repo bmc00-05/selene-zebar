@@ -6,6 +6,27 @@
   box-sizing: border-box;
 }
 
+/*
+ * Make `hidden` actually hide.
+ *
+ * The browser's own rule is `[hidden] { display: none }`, and any author rule
+ * that sets display beats it — every widget here says `display: flex`, so every
+ * `root.hidden = true` in the components was doing nothing at all. Measured
+ * with the attribute forced on: workspaces 192x16, active-window 320x16,
+ * battery 66x20 and the rest all still drawn. The one that worked was the
+ * clock, and only because it happens not to declare a display.
+ *
+ * The symptom was the media widget: when playback ended it stayed on the bar as
+ * an equaliser lying flat next to nothing, doing nothing.
+ *
+ * !important is the point rather than a shortcut — `hidden` has to outrank a
+ * component's own layout, and requiring each component to remember
+ * `.thing[hidden]` is how this comes back with the next widget.
+ */
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   height: 100%;
