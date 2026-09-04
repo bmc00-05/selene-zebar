@@ -81,18 +81,24 @@
 
 /* --- States -------------------------------------------------------------- */
 
-/* Charging: the fill takes the accent and keeps rising past the real level,
- * which reads as going somewhere rather than sitting still. */
+/* Charging: the fill takes the accent and otherwise stays exactly where the
+ * charge is.
+ *
+ * It used to climb past the real level and fall back, which said "going
+ * somewhere" but at the cost of the gauge never showing the truth — and a
+ * needle sliding in and out of a 24px box at the edge of vision is hard to
+ * stop watching. The movement moved to the halo instead: the light breathes,
+ * the level stays still and stays readable. */
 .battery[data-state='charging'] .battery__fill {
   fill: var(--accent);
-  animation: battery-charging 2.4s var(--ease-standard) infinite;
 }
 
 /* A halo means "on mains", which covers charging and full alike. The provider
- * reports no power-connected flag at all — a battery sitting at 100% with the
- * charger in reads as `full`, not `charging`, because no current is actually
- * flowing. Treating both as plugged in matches what the halo is there to say,
- * and `full` does not persist on battery for long anyway.
+ * does carry an `isCharging` flag, but it answers "is current flowing", not
+ * "is the charger in": a battery sitting at 100% with the cable attached reads
+ * as `full` with isCharging false, because nothing is being pushed into it.
+ * Treating both states as plugged in is what the halo is there to say, and
+ * `full` does not persist on battery for long anyway.
  *
  * The same word this bar already uses for "active" on the focused workspace,
  * reused rather than inventing a charging-only mark. drop-shadow, not
@@ -101,6 +107,17 @@
 .battery[data-state='charging'] .battery__glow,
 .battery[data-state='full'] .battery__glow {
   opacity: 1;
+}
+
+/* Only while current is actually flowing does the halo breathe. Full on mains
+ * holds it steady, so the two states are told apart by whether the light moves
+ * rather than by whether it is there.
+ *
+ * Slower than anything else in the bar and it never goes out: this is meant to
+ * be noticed on a glance, not to pull the eye. Opacity animates on the
+ * compositor, so nothing re-lays-out per frame. */
+.battery[data-state='charging'] .battery__glow {
+  animation: battery-breathe 2.6s var(--ease-standard) infinite;
 }
 
 /* Low and critical, in the two colours the RAM ring also uses. Only the signal
@@ -144,15 +161,13 @@
   color: var(--fg-muted);
 }
 
-@keyframes battery-charging {
-  from {
-    transform: scaleX(var(--battery-level, 0));
+@keyframes battery-breathe {
+  0%,
+  100% {
+    opacity: 0.2;
   }
-  60% {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(var(--battery-level, 0));
+  50% {
+    opacity: 1;
   }
 }
 
@@ -163,7 +178,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .battery[data-state='charging'] .battery__fill,
+  .battery[data-state='charging'] .battery__glow,
   .battery[data-state='critical'] .battery__gauge,
   .battery[data-state='critical'] .battery__label {
     animation: none;

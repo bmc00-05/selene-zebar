@@ -24,7 +24,10 @@ import { mountMedia } from './components/media.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
-  battery: { type: 'battery' },
+  // A second, not the default. Plugging the charger in should register as
+  // something that just happened; on the default the state could sit stale for
+  // several seconds, which read as the bar not noticing.
+  battery: { type: 'battery', refreshInterval: 1000 },
   date: { type: 'date', formatting: CLOCK_FORMAT },
   // Five seconds is also the default; stated so the interval is a decision in
   // the file rather than something inherited silently.
