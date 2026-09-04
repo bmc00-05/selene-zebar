@@ -31,8 +31,16 @@
   /* --- Semantic roles --------------------------------------------------- */
   --accent: var(--sl-glow);
   --accent-soft: var(--sl-halo);
-  --bar-bg: color-mix(in srgb, var(--sl-night) 92%, transparent);
-  --bar-border: var(--sl-dusk);
+  /* 88% is a floor, not a taste call. The bar is meant to sit on wallpapers we
+   * have never seen, and a white one is the worst case: the plate composites
+   * up towards it and every text colour loses contrast against it. At 88% the
+   * dimmest text role (--fg-muted, an empty workspace number) still clears
+   * WCAG AA there at 4.82:1; at 85% it drops to 4.35 and fails. */
+  --bar-bg: color-mix(in srgb, var(--sl-night) 88%, transparent);
+  /* A rim rather than a line: light borrowed from the foreground at low
+   * opacity, so it reads as the edge catching light instead of a drawn
+   * outline. A solid ramp colour looks like a box at this size. */
+  --bar-border: color-mix(in srgb, var(--sl-silver) 10%, transparent);
   --fg: var(--sl-silver);
   --fg-soft: var(--sl-soft);
   --fg-muted: var(--sl-mist);
@@ -47,11 +55,37 @@
   --fs-base: 12px;
   --fs-icon: 14px;
 
-  /* --- Metrics ----------------------------------------------------------- */
-  --bar-height: 38px;
-  --bar-pad-x: 10px;
+  /* --- Metrics -----------------------------------------------------------
+   * Every gap around the bar is 4px, but two different systems produce them,
+   * because GlazeWM only positions ordinary windows — the bar is an appbar
+   * that reserves screen space, so GlazeWM never moves it:
+   *
+   *     screen edge -> bar        us, via --bar-inset-*
+   *     bar -> windows            GlazeWM, via gaps.outer_gap.top
+   *     screen edge -> windows    GlazeWM, via gaps.outer_gap.left/right
+   *
+   * Change one and the other three stop matching. GlazeWM's side is
+   * `gaps.outer_gap` in dotfiles/glazewm/config.yaml, currently 4px all round.
+   *
+   * There is no bottom inset: the gap under the bar is GlazeWM's to give.
+   * Reserving one here too is what stacked 18px of dead space before. So the
+   * preset height in zpack.json covers exactly two bands:
+   *
+   *     --bar-inset-y  +  the bar itself
+   *          4px       +       36px       = 40px
+   *
+   * Both are multiples of 4 on purpose. This monitor runs at 1.25 (= 5/4), so
+   * only multiples of 4 land on whole device pixels; 35px would come out at
+   * 43.75 and soften the rim.
+   *
+   * `--bar-pad-x` is inside the bar, where GlazeWM cannot reach; at 0 the
+   * leftmost glyph sits flush against the plate edge. */
+  --bar-inset-x: 4px;
+  --bar-inset-y: 4px;
+  --bar-pad-x: 4px;
   --gap-group: 12px;
   --gap-item: 6px;
+  --radius-bar: 10px;
   --radius-pill: 8px;
 
   /* --- Motion ------------------------------------------------------------

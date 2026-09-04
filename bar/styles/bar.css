@@ -24,6 +24,16 @@ body {
   user-select: none;
 }
 
+/* Insets the bar from the screen edges GlazeWM cannot reach. No bottom value —
+ * the gap under the bar is GlazeWM's outer_gap.top, and reserving one here too
+ * is what stacked two gaps into dead space.
+ *
+ * On body alone, never on `html, body`: body nests inside html, so a shared
+ * rule applies the padding twice and every inset comes out doubled. */
+body {
+  padding: var(--bar-inset-y) var(--bar-inset-x) 0;
+}
+
 /* Nerd Font glyphs do not exist in Inter, so icons opt into their own family. */
 .icon {
   font-family: var(--font-icon);
@@ -36,11 +46,20 @@ body {
   /* Center stays optically centred regardless of how wide left/right grow. */
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  /* Stays a percentage so the preset height in zpack.json is the only place
+   * the bar's size is written down. */
   height: 100%;
   padding: 0 var(--bar-pad-x);
   background: var(--bar-bg);
-  border-bottom: 1px solid var(--bar-border);
-  backdrop-filter: blur(12px);
+  border: 1px solid var(--bar-border);
+  border-radius: var(--radius-bar);
+  /* Blurs whatever the window sits over — the wallpaper, since GlazeWM keeps
+   * windows out of the reserved strip. Currently a no-op here: this desktop's
+   * wallpaper is a flat #131020, and blurring one colour returns it unchanged.
+   * It earns its keep on a busy wallpaper, where the blur averages the detail
+   * into a broad tone the text can sit on predictably. `saturate` offsets the
+   * grey cast that averaging leaves behind. */
+  backdrop-filter: blur(16px) saturate(120%);
 }
 
 .bar__region {
