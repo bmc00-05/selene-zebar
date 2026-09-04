@@ -1,13 +1,16 @@
 /*
- * Workspace pills.
+ * Workspace indicators.
  *
- * Three things happen here that a Qt stylesheet cannot do, and they are the
- * reason the bar moved to a WebView:
- *   1. pills grow in and collapse out via @keyframes when GlazeWM creates or
- *      destroys a workspace,
- *   2. the focused pill widens to reveal its label using the grid 0fr -> 1fr
- *      trick, which animates an auto-sized element without a hardcoded width,
- *   3. a single indicator slides between states with a transition.
+ * Two independent signals, so neither has to encode the other:
+ *   the inner dot  -> hollow when the workspace is empty, filled and larger the
+ *                     closer it is to being the one in front
+ *   the outer ring -> only the focused workspace wears one, with a halo
+ * There are no numbers; the tooltip carries the name and position carries the
+ * rest, which is the trade for a row that reads as texture rather than text.
+ *
+ * The dot never changes its box. All four states are the same 8px element at a
+ * different `transform: scale()`, which is what keeps the growth steady — see
+ * the note on --ws-dot in tokens.css for why width and height could not.
  */
 
 .workspaces {
@@ -18,106 +21,106 @@
 
 .workspace {
   display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  height: 22px;
-  padding: 0 8px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--pill-bg);
-  color: var(--fg-muted);
-  font: inherit;
-  font-variant-numeric: tabular-nums;
+  place-items: center;
+  width: var(--ws-hit);
+  height: var(--ws-hit);
+  padding: 0;
+  background: none;
+  /* The ring is always in the box so the layout never shifts when it lights
+   * up — only its colour and shadow change. */
+  border: var(--ws-ring-width) solid transparent;
+  border-radius: 50%;
   cursor: pointer;
-  overflow: hidden;
   transition:
-    background-color var(--dur-base) var(--ease-standard),
-    color var(--dur-base) var(--ease-standard),
-    padding var(--dur-base) var(--ease-standard);
+    border-color var(--dur-base) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
 }
 
-.workspace:hover {
-  background: var(--pill-bg-hover);
-  color: var(--fg);
+.workspace__dot {
+  width: var(--ws-dot);
+  height: var(--ws-dot);
+  border: var(--ws-ring-width) solid var(--fg-muted);
+  border-radius: 50%;
+  /* Empty by default: an outline with nothing in it. */
+  background: transparent;
+  transform: scale(var(--ws-scale-empty));
+  /* box-shadow rides along so the halo arrives with the growth. Left out, the
+   * glow snapped on at frame one while the dot was still small, and the two
+   * arriving separately is most of what read as a bounce. */
+  transition:
+    transform var(--dur-base) var(--ease-standard),
+    background-color var(--dur-base) var(--ease-standard),
+    border-color var(--dur-base) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard);
+}
+
+.workspace:hover .workspace__dot {
+  border-color: var(--fg);
+}
+
+.workspace:active {
+  transform: scale(0.88);
 }
 
 /* Has windows, but is not the workspace being shown. */
-.workspace.is-occupied {
-  color: var(--fg-soft);
+.workspace.is-occupied .workspace__dot {
+  background: var(--fg-soft);
+  border-color: var(--fg-soft);
+  transform: scale(var(--ws-scale-occupied));
 }
 
-/* Visible on some monitor, without keyboard focus. */
+/* Visible on some monitor, without keyboard focus. Only reachable with more
+ * than one monitor attached. */
 .workspace.is-displayed {
-  background: color-mix(in srgb, var(--accent) 18%, var(--pill-bg));
-  color: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent-soft) 45%, transparent);
+}
+
+.workspace.is-displayed .workspace__dot {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  transform: scale(var(--ws-scale-displayed));
 }
 
 .workspace.is-focused {
+  border-color: var(--accent);
+  box-shadow: var(--ws-halo-ring);
+}
+
+.workspace.is-focused .workspace__dot {
   background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 600;
-  padding-inline: 10px;
-}
-
-/* --- The expanding label ------------------------------------------------ */
-
-.workspace__label {
-  display: grid;
-  grid-template-columns: 0fr;
-  /* Collapsed pills must not contribute width from a label nobody can see. */
-  opacity: 0;
-  transition:
-    grid-template-columns var(--dur-base) var(--ease-out-back),
-    opacity var(--dur-base) var(--ease-standard);
-}
-
-.workspace.is-focused .workspace__label {
-  grid-template-columns: 1fr;
-  opacity: 1;
-}
-
-.workspace__label > span {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  /* Keeps the text off the number while the column is open, and folds to zero
-   * as it closes, so the collapse reads as a single motion. */
-  padding-left: 6px;
-}
-
-.workspace.is-focused .workspace__label > span {
-  transition: padding-left var(--dur-base) var(--ease-out-back);
+  border-color: var(--accent);
+  transform: scale(var(--ws-scale-focused));
+  box-shadow: var(--ws-halo-dot);
 }
 
 /* --- Enter / leave ------------------------------------------------------ */
 
+/* Fixed-size circles, so these close a width rather than a max-width, and the
+ * negative margin lets the row swallow the gap as the circle disappears. The
+ * overshoot easing stays here: a workspace appearing is a discrete event where
+ * a little spring reads as arrival, unlike the focus change above. */
 @keyframes workspace-in {
   from {
-    max-width: 0;
-    padding-inline: 0;
+    width: 0;
     margin-right: calc(-1 * var(--gap-item));
     opacity: 0;
-    transform: scale(0.7);
   }
   to {
-    max-width: 6rem;
+    width: var(--ws-hit);
     opacity: 1;
-    transform: scale(1);
   }
 }
 
 @keyframes workspace-out {
   from {
-    max-width: 6rem;
+    width: var(--ws-hit);
     opacity: 1;
-    transform: scale(1);
   }
   to {
-    max-width: 0;
-    padding-inline: 0;
+    width: 0;
     margin-right: calc(-1 * var(--gap-item));
     opacity: 0;
-    transform: scale(0.7);
   }
 }
 

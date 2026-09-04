@@ -54,7 +54,7 @@ bar/
   styles/
     tokens.css          the Selene colour ramp, typography, metrics, motion
     bar.css             reset and the three-region shell
-    workspaces.css      workspace pills
+    workspaces.css      workspace indicators
 scripts/link.ps1        symlink into ~/.glzr/zebar
 ```
 

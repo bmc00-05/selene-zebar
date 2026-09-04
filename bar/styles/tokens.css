@@ -46,8 +46,16 @@
   --fg-muted: var(--sl-mist);
   /* Text sitting on top of --accent, not on the bar. */
   --on-accent: var(--sl-void);
-  --pill-bg: var(--sl-haze);
-  --pill-bg-hover: var(--sl-ash);
+  /* Two layers rather than one wide blur. A single large blur bright enough to
+   * notice also swallows the ring it is meant to light; the tight inner shadow
+   * keeps the stroke crisp while the wide one carries the bloom. A moon's halo
+   * falls off the same way — bright at the rim, thin further out. */
+  --ws-halo-ring:
+    0 0 3px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 0 10px color-mix(in srgb, var(--accent) 28%, transparent);
+  --ws-halo-dot:
+    0 0 3px color-mix(in srgb, var(--accent) 80%, transparent),
+    0 0 9px color-mix(in srgb, var(--accent) 40%, transparent);
 
   /* --- Typography -------------------------------------------------------- */
   --font-body: 'Inter', 'Segoe UI Variable', 'Segoe UI', sans-serif;
@@ -86,7 +94,30 @@
   --gap-group: 12px;
   --gap-item: 6px;
   --radius-bar: 10px;
-  --radius-pill: 8px;
+
+  /* Workspace indicators. `--ws-hit` is the click target and also the ring; the
+   * dot keeps one box and changes scale, so the four states read as one dot
+   * growing rather than four different dots.
+   *
+   * Scale, not width and height. Animating the box re-runs layout every frame
+   * and the dot's top and bottom edges round to the device grid independently,
+   * so the circle drifts a pixel one way and back — it looked like the dot was
+   * bouncing. A transform is composited about the element's own centre, so the
+   * growth is exactly symmetric and nothing re-rounds mid-flight.
+   *
+   * 16 and 8 are multiples of 4 because this monitor scales by 1.25 (= 5/4);
+   * only multiples of 4 land on whole device pixels. 18 and 7 did not, which
+   * left the dot visibly off-centre inside its ring. `--ws-ring-width` is
+   * 0.8px for the same reason — exactly one device pixel. */
+  --ws-hit: 16px;
+  --ws-dot: 8px;
+  --ws-ring-width: 0.8px;
+
+  /* Rendered dot = --ws-dot x scale: 5px, 6px, 7px, 8px. */
+  --ws-scale-empty: 0.625;
+  --ws-scale-occupied: 0.75;
+  --ws-scale-displayed: 0.875;
+  --ws-scale-focused: 1;
 
   /* --- Motion ------------------------------------------------------------
    * The reason this project exists: a bar that can actually animate.

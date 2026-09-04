@@ -17,8 +17,8 @@ const els = {
   offline: document.querySelector('#glazewm-offline'),
 };
 
-/** name -> the pill element currently on screen for that workspace. */
-const pills = new Map();
+/** name -> the indicator element currently on screen for that workspace. */
+const indicators = new Map();
 
 providers.onOutput(() => render(providers.outputMap));
 render(providers.outputMap);
@@ -33,11 +33,11 @@ function render({ glazewm }) {
 }
 
 /**
- * Reconciles the pill list against the provider output by workspace name.
+ * Reconciles the indicator list against the provider output by workspace name.
  *
  * A wholesale re-render would restart every animation on each provider tick
- * (GlazeWM emits on focus changes, window moves, tiling changes), so pills are
- * matched by key: survivors are updated in place, newcomers animate in, and
+ * (GlazeWM emits on focus changes, window moves, tiling changes), so indicators
+ * are matched by key: survivors are updated in place, newcomers animate in, and
  * departures animate out before they are removed.
  */
 function renderWorkspaces(glazewm) {
@@ -47,84 +47,75 @@ function renderWorkspaces(glazewm) {
   workspaces.forEach((workspace, index) => {
     seen.add(workspace.name);
 
-    let pill = pills.get(workspace.name);
+    let indicator = indicators.get(workspace.name);
 
-    if (!pill) {
-      pill = createPill(workspace, glazewm);
-      pills.set(workspace.name, pill);
-      pill.classList.add('is-entering');
-      pill.addEventListener(
+    if (!indicator) {
+      indicator = createIndicator(workspace, glazewm);
+      indicators.set(workspace.name, indicator);
+      indicator.classList.add('is-entering');
+      indicator.addEventListener(
         'animationend',
-        () => pill.classList.remove('is-entering'),
+        () => indicator.classList.remove('is-entering'),
         { once: true },
       );
     }
 
-    updatePill(pill, workspace);
+    updateIndicator(indicator, workspace);
 
     // Keep DOM order in sync with GlazeWM's ordering. Re-inserting an element
     // at the position it already holds is a no-op, so this does not restart
     // the enter animation.
     const atIndex = els.workspaces.children[index];
-    if (atIndex !== pill) {
-      els.workspaces.insertBefore(pill, atIndex ?? null);
+    if (atIndex !== indicator) {
+      els.workspaces.insertBefore(indicator, atIndex ?? null);
     }
   });
 
-  for (const [name, pill] of pills) {
+  for (const [name, indicator] of indicators) {
     if (seen.has(name)) {
       continue;
     }
 
-    pills.delete(name);
-    pill.classList.add('is-leaving');
-    pill.addEventListener('animationend', () => pill.remove(), { once: true });
+    indicators.delete(name);
+    indicator.classList.add('is-leaving');
+    indicator.addEventListener('animationend', () => indicator.remove(), {
+      once: true,
+    });
   }
 }
 
-function createPill(workspace, glazewm) {
-  const pill = document.createElement('button');
-  pill.className = 'workspace';
-  pill.type = 'button';
+function createIndicator(workspace, glazewm) {
+  const indicator = document.createElement('button');
+  indicator.className = 'workspace';
+  indicator.type = 'button';
 
-  const name = document.createElement('span');
-  name.className = 'workspace__name';
+  // The button itself is the outer ring; this is the dot inside it.
+  const dot = document.createElement('span');
+  dot.className = 'workspace__dot';
 
-  const label = document.createElement('span');
-  label.className = 'workspace__label';
-  label.append(document.createElement('span'));
-
-  pill.append(name, label);
-  pill.addEventListener('click', () =>
+  indicator.append(dot);
+  indicator.addEventListener('click', () =>
     glazewm.runCommand(`focus --workspace ${workspace.name}`),
   );
 
-  return pill;
+  return indicator;
 }
 
-function updatePill(pill, workspace) {
-  const name = workspace.name;
-  const label = workspace.displayName ?? '';
+function updateIndicator(indicator, workspace) {
   // A workspace with no windows reads as empty even while it is displayed.
   const isOccupied = workspace.children.length > 0;
 
-  pill.classList.toggle('is-focused', workspace.hasFocus);
-  pill.classList.toggle(
+  indicator.classList.toggle('is-focused', workspace.hasFocus);
+  indicator.classList.toggle(
     'is-displayed',
     workspace.isDisplayed && !workspace.hasFocus,
   );
-  pill.classList.toggle('is-occupied', isOccupied && !workspace.isDisplayed);
-  pill.title = label || `Workspace ${name}`;
+  indicator.classList.toggle(
+    'is-occupied',
+    isOccupied && !workspace.isDisplayed,
+  );
 
-  const nameEl = pill.querySelector('.workspace__name');
-  if (nameEl.textContent !== name) {
-    nameEl.textContent = name;
-  }
-
-  // The label element stays in the DOM even when empty so the collapsed pill
-  // keeps a stable box to animate from.
-  const labelEl = pill.querySelector('.workspace__label > span');
-  if (labelEl.textContent !== label) {
-    labelEl.textContent = label;
-  }
+  // Nothing on screen names the workspace any more, so the tooltip is the only
+  // way to tell which is which beyond position.
+  indicator.title = workspace.displayName || `Workspace ${workspace.name}`;
 }
