@@ -11,6 +11,8 @@
  * when it lands.
  */
 
+import { readMs } from '../lib/css.js';
+
 /** Processes that host PWAs. Their windows share a process but not an icon. */
 const PWA_HOSTS = new Set(['chrome', 'msedge']);
 
@@ -187,12 +189,4 @@ function cacheKey(container) {
   return PWA_HOSTS.has(container.processName)
     ? `${container.processName}:${container.handle}`
     : container.processName;
-}
-
-/** Reads a duration token off :root, so the number stays in tokens.css. */
-function readMs(name) {
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-  return value.endsWith('ms') ? parseFloat(value) : parseFloat(value) * 1000;
 }

@@ -64,11 +64,14 @@
   --menu-item-hover: var(--sl-ash);
   --menu-shadow: 0 8px 24px color-mix(in srgb, var(--sl-void) 70%, transparent);
 
-  /* --- Typography -------------------------------------------------------- */
+  /* --- Typography ---------------------------------------------------------
+   * No icon font. Every mark in this bar is a drawn SVG — the moon, the
+   * battery, the power symbol, the window glyph. That started when the Nerd
+   * Font codepoint for a crescent turned out to render an arrow in the
+   * installed version, and it has held since: a drawn shape cannot drift
+   * between font releases and needs nothing installed to show up. */
   --font-body: 'Inter', 'Segoe UI Variable', 'Segoe UI', sans-serif;
-  --font-icon: 'JetBrainsMono NFP', 'JetBrainsMono Nerd Font', monospace;
   --fs-base: 12px;
-  --fs-icon: 14px;
 
   /* --- Metrics -----------------------------------------------------------
    * Every gap around the bar is 4px, but two different systems produce them,

@@ -12,6 +12,8 @@
  * measured before and after: workspace y=55 h=1020 either way.
  */
 
+import { readPx } from '../lib/css.js';
+
 /**
  * Wires the menu behind `root` and returns the function that updates it.
  *
@@ -74,12 +76,4 @@ export function mountMenu(root, zebar) {
   return function update(output) {
     latest = output;
   };
-}
-
-/** Reads a length token off :root so the number stays in tokens.css. */
-function readPx(name) {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(
-    name,
-  );
-  return parseFloat(value);
 }

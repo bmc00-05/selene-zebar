@@ -11,6 +11,8 @@
  * than a click. Lock and sleep go straight through.
  */
 
+import { readMs } from '../lib/css.js';
+
 /**
  * Windows, at the far end of shellExec. Each is registered in zpack.json under
  * `privileges.shellCommands` with an argsRegex that admits these exact strings
@@ -142,12 +144,4 @@ export function mountPower(root, zebar) {
   // Nothing here depends on provider output; the contract is the same shape
   // regardless, as with mountWorkspaces and its unused zebar argument.
   return function update() {};
-}
-
-/** Reads a duration token off :root, so the number stays in tokens.css. */
-function readMs(name) {
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-  return value.endsWith('ms') ? parseFloat(value) : parseFloat(value) * 1000;
 }

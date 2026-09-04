@@ -34,13 +34,6 @@ body {
   padding: var(--bar-inset-y) var(--bar-inset-x) 0;
 }
 
-/* Nerd Font glyphs do not exist in Inter, so icons opt into their own family. */
-.icon {
-  font-family: var(--font-icon);
-  font-size: var(--fs-icon);
-  line-height: 1;
-}
-
 .bar {
   display: grid;
   /* Center stays optically centred regardless of how wide left/right grow. */
@@ -79,17 +72,6 @@ body {
 
 .bar__region--right {
   justify-self: end;
-}
-
-/* Selene mark — the moon the project is named after. */
-.brand {
-  color: var(--accent);
-  opacity: 0.9;
-  transition: opacity var(--dur-fast) var(--ease-standard);
-}
-
-.brand:hover {
-  opacity: 1;
 }
 
 /* Shown only while the GlazeWM provider has produced nothing yet. */
