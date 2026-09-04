@@ -21,7 +21,7 @@ const ICON_SCRIPT = 'scripts/window-icon.ps1';
  *
  * @param {HTMLElement} root  the .active-window element
  * @param {object} zebar      the zebar module (for shellExec and currentWidget)
- * @returns {(container: object | null) => void}
+ * @returns {(output: object) => void}
  */
 export function mountActiveWindow(root, zebar) {
   const els = {
@@ -43,7 +43,9 @@ export function mountActiveWindow(root, zebar) {
   let shownKey = null;
   let activeSlot = 0;
 
-  return function update(container) {
+  return function update({ glazewm }) {
+    const container = glazewm?.focusedContainer;
+
     if (!container || container.type !== 'window') {
       root.hidden = true;
       shownTitle = null;
