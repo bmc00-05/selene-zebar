@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "PowerShell(pnpm format)",
+      "PowerShell(pnpm format:check)",
+      "PowerShell(pnpm install)"
+    ]
+  }
+}
