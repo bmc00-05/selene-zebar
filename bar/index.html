@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./styles/brand.css" />
     <link rel="stylesheet" href="./styles/workspaces.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
+    <link rel="stylesheet" href="./styles/battery.css" />
   </head>
   <body>
     <div class="bar">
@@ -86,7 +87,57 @@
         </div>
       </div>
 
-      <div class="bar__region bar__region--right"></div>
+      <div class="bar__region bar__region--right">
+        <div class="battery" id="battery" hidden>
+          <!--
+            32x20 so it lands on whole device pixels at this display's 1.25
+            scale. The battery itself is only 24x12 of that; the rest is margin
+            the halo needs, because an SVG clips to its own box and a
+            drop-shadow with nowhere to spread simply does not appear.
+
+            The fill is drawn at full width and squeezed by a transform rather
+            than resized — see battery.css.
+          -->
+          <svg class="battery__gauge" viewBox="0 0 32 20" aria-hidden="true">
+            <!--
+              The halo. A blurred copy of the shell outline, drawn underneath
+              everything else and only when on mains.
+
+              It is a separate shape rather than a filter on the <svg>, because
+              a drop-shadow falls behind the filled parts too — the fill and the
+              terminal each cast one inward, the glow pooled inside the case and
+              the boundary between case and gauge went muddy. Blurring an
+              outline leaves the interior alone.
+            -->
+            <rect
+              class="battery__glow"
+              x="4.5"
+              y="5.5"
+              width="20"
+              height="9"
+              rx="2.5"
+            />
+            <rect
+              class="battery__fill"
+              x="6"
+              y="7"
+              width="17"
+              height="6"
+              rx="1"
+            />
+            <rect
+              class="battery__shell"
+              x="4.5"
+              y="5.5"
+              width="20"
+              height="9"
+              rx="2.5"
+            />
+            <path class="battery__terminal" d="M26 8.5h1a1 1 0 0 1 0 3h-1z" />
+          </svg>
+          <span class="battery__label"></span>
+        </div>
+      </div>
     </div>
 
     <!--

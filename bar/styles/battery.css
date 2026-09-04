@@ -1,0 +1,169 @@
+/*
+ * Battery gauge.
+ *
+ * The fill scales rather than resizes. Animating a width would re-round the
+ * rect's edges to the device grid every frame, the same thing that made the
+ * workspace dot wobble; a transform is composited about a fixed origin, so the
+ * level slides cleanly. battery.js only ever sets --battery-level to 0..1.
+ *
+ * Every state is one value of [data-state], which keeps this a flat list
+ * instead of a matrix of combinations. The warning is brightness — the bar has
+ * one hue and a red would be the only thing in it that does not.
+ */
+
+.battery {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.battery__gauge {
+  flex: none;
+  width: var(--battery-w);
+  height: var(--battery-h);
+  /* Both the shell and the terminal inherit this; the fill overrides it. */
+  color: var(--fg-muted);
+  transition: color var(--dur-base) var(--ease-standard);
+}
+
+.battery__shell,
+.battery__terminal {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+/* Sits under the drawing and is off until the battery is on mains. Blurring a
+ * stroked outline puts the light on the case's edge and nowhere else; the SVG
+ * box is oversized (32x20 for a 24x12 battery) purely so this has room to
+ * spread instead of being clipped. */
+.battery__glow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: var(--battery-glow-width);
+  filter: blur(var(--battery-glow-blur));
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+.battery__terminal {
+  fill: currentColor;
+}
+
+.battery__fill {
+  fill: var(--fg-soft);
+  /* Anchored to the rect's own left edge, not the viewBox origin. `left`
+   * resolves against the SVG user-space origin at x=0, and the rect starts at
+   * x=2, so scaling would have slid the fill out of the shell — at 10% it
+   * landed left of the outline instead of inside it.
+   *
+   * The rect is drawn at full width and squeezed by the transform rather than
+   * resized: animating the width re-rounds its edges to the device grid every
+   * frame, the same thing that made the workspace dot wobble. */
+  transform: scaleX(var(--battery-level, 0));
+  transform-origin: 6px center;
+  transition:
+    transform var(--dur-base) var(--ease-standard),
+    fill var(--dur-base) var(--ease-standard);
+}
+
+.battery__label {
+  color: var(--fg);
+  /* Digits keep one width, so 9% -> 10% -> 100% does not jiggle the row. */
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur-base) var(--ease-standard);
+}
+
+/* --- States -------------------------------------------------------------- */
+
+/* Charging: the fill takes the accent and keeps rising past the real level,
+ * which reads as going somewhere rather than sitting still. */
+.battery[data-state='charging'] .battery__fill {
+  fill: var(--accent);
+  animation: battery-charging 2.4s var(--ease-standard) infinite;
+}
+
+/* A halo means "on mains", which covers charging and full alike. The provider
+ * reports no power-connected flag at all — a battery sitting at 100% with the
+ * charger in reads as `full`, not `charging`, because no current is actually
+ * flowing. Treating both as plugged in matches what the halo is there to say,
+ * and `full` does not persist on battery for long anyway.
+ *
+ * The same word this bar already uses for "active" on the focused workspace,
+ * reused rather than inventing a charging-only mark. drop-shadow, not
+ * box-shadow: the glow has to follow the battery outline, not the invisible
+ * rectangle around the SVG. */
+.battery[data-state='charging'] .battery__glow,
+.battery[data-state='full'] .battery__glow {
+  opacity: 1;
+}
+
+/* Low. The gauge is now the brightest thing on the right, which is the
+ * warning; nothing changes hue. */
+.battery[data-state='low'] .battery__gauge,
+.battery[data-state='critical'] .battery__gauge {
+  color: var(--accent);
+}
+
+.battery[data-state='low'] .battery__fill,
+.battery[data-state='critical'] .battery__fill {
+  fill: var(--accent);
+}
+
+.battery[data-state='low'] .battery__label,
+.battery[data-state='critical'] .battery__label {
+  color: var(--accent);
+}
+
+/* Critical also breathes, deeply and faster than the rest of the bar moves.
+ *
+ * Deliberately a pulse and not a blink. Every other movement here is
+ * continuous, so an on/off flash would be the one thing that steps; and this
+ * signal stays up until the charger goes in, where something jumping at the
+ * edge of vision stops being urgent and becomes noise you learn to ignore.
+ * A hard blink also runs into the photosensitivity limits WCAG sets on
+ * flashing. Going deeper — down to 0.25 — buys the urgency instead. */
+.battery[data-state='critical'] .battery__gauge {
+  animation: battery-pulse 1.2s ease-in-out infinite;
+}
+
+.battery[data-state='critical'] .battery__label {
+  animation: battery-pulse 1.2s ease-in-out infinite;
+}
+
+/* Nothing to report: no fill, and the number steps back with it. */
+.battery[data-state='empty'] .battery__fill,
+.battery[data-state='unknown'] .battery__fill {
+  fill: none;
+}
+
+.battery[data-state='empty'] .battery__label,
+.battery[data-state='unknown'] .battery__label {
+  color: var(--fg-muted);
+}
+
+@keyframes battery-charging {
+  from {
+    transform: scaleX(var(--battery-level, 0));
+  }
+  60% {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(var(--battery-level, 0));
+  }
+}
+
+@keyframes battery-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battery[data-state='charging'] .battery__fill,
+  .battery[data-state='critical'] .battery__gauge,
+  .battery[data-state='critical'] .battery__label {
+    animation: none;
+  }
+}

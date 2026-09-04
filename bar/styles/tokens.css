@@ -154,6 +154,18 @@
   --aw-max-w: 320px;
   --aw-icon-saturate: 0.55;
 
+  /* Battery gauge. Multiples of 4, so 40x25 whole device pixels at 1.25. The
+   * battery drawing is 24x12 of that; the surplus is room for the halo to
+   * spread, since an SVG clips to its own box. */
+  --battery-w: 32px;
+  --battery-h: 20px;
+  /* The mains halo, in SVG user units. It is a blurred copy of the case
+   * outline, not a drop-shadow on the whole gauge: a shadow falls behind the
+   * filled bar too, so the glow pooled inside the case and blurred the edge
+   * between case and gauge. */
+  --battery-glow-width: 2;
+  --battery-glow-blur: 2px;
+
   /* --- Motion ------------------------------------------------------------
    * The reason this project exists: a bar that can actually animate.
    *

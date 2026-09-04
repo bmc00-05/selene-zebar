@@ -15,9 +15,11 @@ import * as zebar from 'https://esm.sh/zebar@3.3';
 import { mountWorkspaces } from './components/workspaces.js';
 import { mountActiveWindow } from './components/active-window.js';
 import { mountMenu } from './components/menu.js';
+import { mountBattery } from './components/battery.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
+  battery: { type: 'battery' },
 });
 
 const offline = document.querySelector('#glazewm-offline');
@@ -30,6 +32,7 @@ const updates = [
   mountWorkspaces(document.querySelector('#workspaces'), zebar),
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
+  mountBattery(document.querySelector('#battery'), zebar),
 ];
 
 providers.onOutput(() => render(providers.outputMap));
