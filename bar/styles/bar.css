@@ -46,9 +46,9 @@ body {
   /* Center stays optically centred regardless of how wide left/right grow. */
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  /* Stays a percentage so the preset height in zpack.json is the only place
-   * the bar's size is written down. */
-  height: 100%;
+  /* Fixed, not 100%. The window grows while the menu is open, and a percentage
+   * would stretch the bar along with it. */
+  height: var(--bar-height);
   padding: 0 var(--bar-pad-x);
   background: var(--bar-bg);
   border: 1px solid var(--bar-border);

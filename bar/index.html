@@ -7,13 +7,41 @@
 
     <link rel="stylesheet" href="./styles/tokens.css" />
     <link rel="stylesheet" href="./styles/bar.css" />
+    <link rel="stylesheet" href="./styles/brand.css" />
     <link rel="stylesheet" href="./styles/workspaces.css" />
   </head>
   <body>
     <div class="bar">
       <div class="bar__region bar__region--left">
-        <!-- nf-md-moon_waning_crescent -->
-        <span class="brand icon" title="selene-zebar">&#xf09b0;</span>
+        <button
+          class="brand"
+          type="button"
+          popovertarget="bar-menu"
+          aria-label="selene-zebar menu"
+        >
+          <!--
+            The mark, drawn rather than borrowed. A Nerd Font glyph used to sit
+            here and rendered as an arrow: those codepoints move between font
+            versions, and anyone without the font sees a box.
+
+            The crescent is one disc with a second disc masked out of it. Moving
+            `cx`/`cy` on the cutting circle changes the phase — pull it right for
+            a thinner crescent, left for a fuller moon.
+          -->
+          <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true">
+            <mask id="selene-crescent">
+              <rect width="24" height="24" fill="black" />
+              <circle cx="12" cy="12" r="9" fill="white" />
+              <circle cx="17.5" cy="8.5" r="8.5" fill="black" />
+            </mask>
+            <rect
+              width="24"
+              height="24"
+              fill="currentColor"
+              mask="url(#selene-crescent)"
+            />
+          </svg>
+        </button>
 
         <div class="workspaces" id="workspaces" hidden></div>
         <span class="offline" id="glazewm-offline">GlazeWM offline</span>
@@ -22,6 +50,29 @@
       <div class="bar__region bar__region--center"></div>
 
       <div class="bar__region bar__region--right"></div>
+    </div>
+
+    <!--
+      The widget window is only as tall as the bar, so a menu drawn below it
+      would be clipped at the window edge. bar.js grows the window while this is
+      open and shrinks it again on close; the reserved strip GlazeWM works
+      around comes from the preset in zpack.json, not the live window size, so
+      nothing on the desktop moves.
+    -->
+    <div class="menu" id="bar-menu" popover>
+      <p class="menu__title">
+        selene<span class="menu__title-dim">-zebar</span>
+      </p>
+      <button class="menu__item" type="button" data-action="reload-bar">
+        Reload bar
+      </button>
+      <button class="menu__item" type="button" data-action="reload-glazewm">
+        Reload GlazeWM config
+      </button>
+      <hr class="menu__rule" />
+      <button class="menu__item" type="button" data-action="close-bar">
+        Close bar
+      </button>
     </div>
 
     <script type="module" src="./bar.js"></script>

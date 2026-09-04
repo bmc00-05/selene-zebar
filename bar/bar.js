@@ -15,13 +15,23 @@ const providers = zebar.createProviderGroup({
 const els = {
   workspaces: document.querySelector('#workspaces'),
   offline: document.querySelector('#glazewm-offline'),
+  brand: document.querySelector('.brand'),
+  menu: document.querySelector('#bar-menu'),
 };
 
 /** name -> the indicator element currently on screen for that workspace. */
 const indicators = new Map();
 
-providers.onOutput(() => render(providers.outputMap));
-render(providers.outputMap);
+/** Latest provider output, so menu actions can reach glazewm. */
+let latest = providers.outputMap;
+
+providers.onOutput(() => {
+  latest = providers.outputMap;
+  render(latest);
+});
+render(latest);
+
+setUpMenu();
 
 function render({ glazewm }) {
   els.offline.hidden = Boolean(glazewm);
@@ -118,4 +128,69 @@ function updateIndicator(indicator, workspace) {
   // Nothing on screen names the workspace any more, so the tooltip is the only
   // way to tell which is which beyond position.
   indicator.title = workspace.displayName || `Workspace ${workspace.name}`;
+}
+
+/* --- The menu behind the mark -------------------------------------------- */
+
+/**
+ * Opening and closing is the browser's job — the popover attributes in
+ * index.html handle the top layer, outside clicks and Escape. What is left here
+ * is the part only Zebar can do: the panel would be clipped at the edge of a
+ * 40px-tall window, so the window grows while the menu is open.
+ *
+ * Growing it is safe. The strip GlazeWM keeps clear comes from the preset in
+ * zpack.json, not from the live window, so nothing on the desktop shifts —
+ * measured before and after: workspace y=55 h=1020 either way.
+ */
+function setUpMenu() {
+  const widget = zebar.currentWidget();
+  const openHeight = readPx('--menu-window-h');
+  const barHeight = window.innerHeight;
+
+  const resize = height =>
+    widget.tauriWindow.setSize({
+      type: 'Logical',
+      width: window.innerWidth,
+      height,
+    });
+
+  // beforetoggle, not toggle: the window has to be tall enough before the panel
+  // is painted, or the first frame shows it cut off.
+  els.menu.addEventListener('beforetoggle', event => {
+    const isOpening = event.newState === 'open';
+    els.brand.setAttribute('aria-expanded', String(isOpening));
+    resize(isOpening ? openHeight : barHeight);
+  });
+
+  // Light dismiss only covers clicks this window receives. Clicking another
+  // application never reaches the page, so the menu would sit there open.
+  widget.tauriWindow.onFocusChanged(({ payload: focused }) => {
+    if (!focused) {
+      els.menu.hidePopover();
+    }
+  });
+
+  els.menu.addEventListener('click', event => {
+    const action = event.target.closest('[data-action]')?.dataset.action;
+
+    if (action === 'reload-bar') {
+      location.reload();
+    } else if (action === 'reload-glazewm') {
+      latest.glazewm?.runCommand('wm-reload-config');
+    } else if (action === 'close-bar') {
+      widget.close();
+    }
+
+    if (action) {
+      els.menu.hidePopover();
+    }
+  });
+}
+
+/** Reads a length token off :root so the number stays in tokens.css. */
+function readPx(name) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(
+    name,
+  );
+  return parseFloat(value);
 }

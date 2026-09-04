@@ -56,6 +56,13 @@
   --ws-halo-dot:
     0 0 3px color-mix(in srgb, var(--accent) 80%, transparent),
     0 0 9px color-mix(in srgb, var(--accent) 40%, transparent);
+  /* The menu is a panel floating over the desktop rather than part of the bar
+   * plate, so it is opaque — there is nothing behind it worth showing, and
+   * translucency over an unknown wallpaper only costs legibility. */
+  --menu-bg: var(--sl-dusk);
+  --menu-border: color-mix(in srgb, var(--sl-silver) 14%, transparent);
+  --menu-item-hover: var(--sl-ash);
+  --menu-shadow: 0 8px 24px color-mix(in srgb, var(--sl-void) 70%, transparent);
 
   /* --- Typography -------------------------------------------------------- */
   --font-body: 'Inter', 'Segoe UI Variable', 'Segoe UI', sans-serif;
@@ -90,7 +97,15 @@
    * leftmost glyph sits flush against the plate edge. */
   --bar-inset-x: 4px;
   --bar-inset-y: 4px;
-  --bar-pad-x: 4px;
+  /* The bar states its own height rather than filling the window, because the
+   * window is no longer a fixed size: it grows while the menu is open. Filling
+   * it would stretch the bar to 200-odd pixels every time the menu opened.
+   * This plus --bar-inset-y must equal the preset height in zpack.json. */
+  --bar-height: 36px;
+  /* Larger than --radius-bar, or the first glyph sits inside the corner curve
+   * and reads as crowded against the edge. Also a multiple of 4, so it lands
+   * on whole device pixels like everything else. */
+  --bar-pad-x: 12px;
   --gap-group: 12px;
   --gap-item: 6px;
   --radius-bar: 10px;
@@ -119,9 +134,25 @@
   --ws-scale-displayed: 0.875;
   --ws-scale-focused: 1;
 
+  /* The mark. 16px keeps it on the pixel grid like everything else, and matches
+   * the workspace indicators so the row shares one optical size. */
+  --brand-size: 16px;
+
+  /* Menu. `--menu-window-h` is read by bar.js: it is how tall the widget window
+   * grows while the menu is open, and must clear the bar plus the panel plus
+   * its shadow. Too small and the menu is clipped at the window edge; too large
+   * costs nothing, since the reserved strip does not follow the window. */
+  --menu-width: 190px;
+  --menu-window-h: 220px;
+  --menu-radius: 10px;
+
   /* --- Motion ------------------------------------------------------------
    * The reason this project exists: a bar that can actually animate.
-   * `--ease-out-back` gives the workspace pill its slight overshoot. */
+   *
+   * `--ease-standard` carries every continuous change — a focus moving, a
+   * colour settling. `--ease-out-back` overshoots, so it is kept for discrete
+   * arrivals only: a workspace appearing, the menu opening. Used on a focus
+   * change it reads as the dot bouncing. */
   --dur-fast: 120ms;
   --dur-base: 220ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
