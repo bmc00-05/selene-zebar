@@ -49,6 +49,7 @@ const SESSION_GRACE_MS = 2000;
 export function mountMedia(root, zebar) {
   const marquee = root.querySelector('.media__marquee');
   const track = root.querySelector('.media__track');
+  const eqBars = [...root.querySelectorAll('.media__eq i')];
 
   const panel = document.querySelector(
     `#${root.getAttribute('popovertarget')}`,
@@ -153,6 +154,14 @@ export function mountMedia(root, zebar) {
     const playbackChanged = session.isPlaying !== shownPlaying;
     if (playbackChanged) {
       shownPlaying = session.isPlaying;
+      if (!session.isPlaying) {
+        // Read where the bars actually are before the attribute below swaps
+        // their animation out; after that the heights are gone and the settle
+        // would start from the base value instead of from where they stood.
+        for (const bar of eqBars) {
+          bar.style.setProperty('--settle-from', renderedScaleY(bar));
+        }
+      }
       root.dataset.playing = String(session.isPlaying);
       // The panel is not a sibling of the button, so the state is mirrored
       // rather than reached for with a selector.
@@ -283,6 +292,17 @@ export function mountMedia(root, zebar) {
       total > 0 ? String(shown / total) : '0',
     );
   }
+}
+
+/**
+ * The vertical scale an element is rendering right now, animation included.
+ *
+ * getComputedStyle resolves a transform to `matrix(a, b, c, d, e, f)`, where d
+ * is the vertical scale; `none` means the element is at rest.
+ */
+function renderedScaleY(el) {
+  const matrix = getComputedStyle(el).transform;
+  return matrix === 'none' ? '1' : matrix.slice(7, -1).split(',')[3].trim();
 }
 
 /** Seconds as `m:ss`. */

@@ -219,6 +219,9 @@
   --media-eq-h: 16px;
   --media-eq-bar: 2.4px;
   --media-eq-gap: 1.6px;
+  /* Where the bars lie when nothing is playing. Not zero: a row of stubs still
+   * reads as a meter at rest, where nothing at all reads as a missing icon. */
+  --media-eq-floor: 0.12;
   --media-panel-w: 240px;
   --media-window-h: 220px;
   --media-rail: 4px;

@@ -138,14 +138,39 @@
   }
 }
 
-/* Paused playback freezes the bars where they stand. The state needs no
- * separate glyph — the equaliser already is the play indicator. */
+/* Paused, or nothing coming out: the bars settle to the floor.
+ *
+ * They used to freeze mid-stride with animation-play-state, which left them at
+ * whatever heights they happened to be holding — a shape indistinguishable
+ * from a quiet moment in the music. Lying flat is unmistakable, and it is the
+ * shape a real meter takes with no signal.
+ *
+ * The settle is an animation rather than a transition because a transition
+ * does not fire here: taking the running animation away and letting the base
+ * transform through changes no computed value that a transition can catch, and
+ * the bars snapped straight to the floor — measured, the first frame after the
+ * state change was already there.
+ *
+ * So the descent is explicit, and it starts from `--settle-from`, which
+ * media.js writes with the height each bar was actually rendering at the
+ * moment playback stopped. Without it the keyframe would start from the base
+ * `--lo` and jump before it fell. The state needs no separate glyph — the
+ * equaliser already is the play indicator. */
 .media[data-playing='false'] {
   color: var(--fg-muted);
 }
 
 .media[data-playing='false'] .media__eq i {
-  animation-play-state: paused;
+  animation: media-eq-settle var(--dur-base) var(--ease-standard) forwards;
+}
+
+@keyframes media-eq-settle {
+  from {
+    transform: scaleY(var(--settle-from, var(--lo)));
+  }
+  to {
+    transform: scaleY(var(--media-eq-floor));
+  }
 }
 
 /* --- Marquee ------------------------------------------------------------- */
