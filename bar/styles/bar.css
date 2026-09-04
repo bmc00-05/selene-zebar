@@ -1,0 +1,82 @@
+/* Bar shell: reset, window chrome, and the three-region layout. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  /* The Zebar window is transparent; the bar paints its own background so the
+   * rounded/edge treatment stays under our control. */
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  cursor: default;
+  user-select: none;
+}
+
+/* Nerd Font glyphs do not exist in Inter, so icons opt into their own family. */
+.icon {
+  font-family: var(--font-icon);
+  font-size: var(--fs-icon);
+  line-height: 1;
+}
+
+.bar {
+  display: grid;
+  /* Center stays optically centred regardless of how wide left/right grow. */
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 100%;
+  padding: 0 var(--bar-pad-x);
+  background: var(--bar-bg);
+  border-bottom: 1px solid var(--bar-border);
+  backdrop-filter: blur(12px);
+}
+
+.bar__region {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-group);
+  min-width: 0;
+}
+
+.bar__region--left {
+  justify-self: start;
+}
+
+.bar__region--center {
+  justify-self: center;
+}
+
+.bar__region--right {
+  justify-self: end;
+}
+
+/* Selene mark — the moon the project is named after. */
+.brand {
+  color: var(--accent);
+  opacity: 0.9;
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+
+.brand:hover {
+  opacity: 1;
+}
+
+/* Shown only while the GlazeWM provider has produced nothing yet. */
+.offline {
+  color: var(--fg-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

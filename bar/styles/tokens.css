@@ -1,0 +1,73 @@
+/*
+ * Catppuccin Mocha + the handful of derived values the bar reasons about.
+ * Everything downstream reads from here; no raw hex below this file.
+ */
+
+:root {
+  /* --- Catppuccin Mocha ------------------------------------------------- */
+  --ctp-rosewater: #f5e0dc;
+  --ctp-flamingo: #f2cdcd;
+  --ctp-pink: #f5c2e7;
+  --ctp-mauve: #cba6f7;
+  --ctp-red: #f38ba8;
+  --ctp-maroon: #eba0ac;
+  --ctp-peach: #fab387;
+  --ctp-yellow: #f9e2af;
+  --ctp-green: #a6e3a1;
+  --ctp-teal: #94e2d5;
+  --ctp-sky: #89dceb;
+  --ctp-sapphire: #74c7ec;
+  --ctp-blue: #89b4fa;
+  --ctp-lavender: #b4befe;
+
+  --ctp-text: #cdd6f4;
+  --ctp-subtext1: #bac2de;
+  --ctp-subtext0: #a6adc8;
+  --ctp-overlay2: #9399b2;
+  --ctp-overlay1: #7f849c;
+  --ctp-overlay0: #6c7086;
+  --ctp-surface2: #585b70;
+  --ctp-surface1: #45475a;
+  --ctp-surface0: #313244;
+  --ctp-base: #1e1e2e;
+  --ctp-mantle: #181825;
+  --ctp-crust: #11111b;
+
+  /* --- Semantic roles --------------------------------------------------- */
+  --accent: var(--ctp-mauve);
+  --accent-soft: var(--ctp-lavender);
+  --bar-bg: color-mix(in srgb, var(--ctp-base) 92%, transparent);
+  --bar-border: var(--ctp-surface0);
+  --fg: var(--ctp-text);
+  --fg-muted: var(--ctp-overlay1);
+  --pill-bg: var(--ctp-surface0);
+  --pill-bg-hover: var(--ctp-surface1);
+
+  /* --- Typography -------------------------------------------------------- */
+  --font-body: 'Inter', 'Segoe UI Variable', 'Segoe UI', sans-serif;
+  --font-icon: 'JetBrainsMono NFP', 'JetBrainsMono Nerd Font', monospace;
+  --fs-base: 12px;
+  --fs-icon: 14px;
+
+  /* --- Metrics ----------------------------------------------------------- */
+  --bar-height: 38px;
+  --bar-pad-x: 10px;
+  --gap-group: 12px;
+  --gap-item: 6px;
+  --radius-pill: 8px;
+
+  /* --- Motion ------------------------------------------------------------
+   * The reason this project exists: a bar that can actually animate.
+   * `--ease-out-back` gives the workspace pill its slight overshoot. */
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur-base: 1ms;
+  }
+}

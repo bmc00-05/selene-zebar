@@ -4,7 +4,8 @@
 
 Catppuccin Mocha palette, Inter typography, moonlit accents.
 
-> **Status: scaffolding.** Nothing is built yet — this repo was just initialised.
+> **Status: bar shell + workspaces.** The left region is live; centre and right
+> are still empty.
 
 ## Why
 
@@ -14,25 +15,23 @@ flexbox and grid, container queries, and DevTools for debugging.
 
 ## Requirements
 
-| | |
-|---|---|
-| [Zebar](https://github.com/glzr-io/zebar) | 3.3.1+ — `winget install -e --id glzr-io.zebar` |
-| [GlazeWM](https://github.com/glzr-io/glazewm) | 3.10+ — `winget install -e --id glzr-io.glazewm` |
-| Node | 20+ |
-| [Inter](https://github.com/rsms/inter) | body text |
-| JetBrainsMono Nerd Font | icon glyphs — `winget install -e --id DEVCOM.JetBrainsMonoNerdFont` |
+|                                               |                                                                     |
+| --------------------------------------------- | ------------------------------------------------------------------- |
+| [Zebar](https://github.com/glzr-io/zebar)     | 3.3.1+ — `winget install -e --id glzr-io.zebar`                     |
+| [GlazeWM](https://github.com/glzr-io/glazewm) | 3.10+ — `winget install -e --id glzr-io.glazewm`                    |
+| Node                                          | 20+ (tooling only — the widget itself has no build step)            |
+| [Inter](https://github.com/rsms/inter)        | body text                                                           |
+| JetBrainsMono Nerd Font                       | icon glyphs — `winget install -e --id DEVCOM.JetBrainsMonoNerdFont` |
 
 ## Install
 
-Zebar loads widget packs from `~/.glzr/zebar/`. Rather than developing in that
-directory, link this repo into it — the code stays under version control while
-Zebar reads it in place.
+Zebar discovers packs one level deep under `~/.glzr/zebar/`, taking the pack ID
+from the folder name. Rather than developing in that directory, link this repo
+into it — the code stays under version control while Zebar reads it in place.
 
 ```powershell
 # Administrator PowerShell (symlinks need elevation unless Developer Mode is on)
-New-Item -ItemType SymbolicLink `
-         -Path   "$env:USERPROFILE\.glzr\zebar\selene-zebar" `
-         -Value  "C:\dev\projects\selene-zebar"
+pnpm run link      # or: scripts/link.ps1 -DryRun to preview
 ```
 
 Then point Zebar at the pack in `~/.glzr/zebar/settings.json`:
@@ -45,12 +44,32 @@ Then point Zebar at the pack in `~/.glzr/zebar/settings.json`:
 }
 ```
 
+## Layout
+
+```
+zpack.json              pack manifest — widgets, presets, privileges
+bar/
+  index.html            the widget Zebar loads
+  bar.js                provider wiring and DOM reconciliation
+  styles/
+    tokens.css          Catppuccin Mocha + typography, metrics, motion
+    bar.css             reset and the three-region shell
+    workspaces.css      workspace pills
+scripts/link.ps1        symlink into ~/.glzr/zebar
+```
+
+There is no bundler. Zebar serves the directory to WebView2 as-is, so saving a
+file and refreshing the widget is the whole edit loop. `zebar` is imported from
+esm.sh and held by the cache rule in `zpack.json`.
+
 ## Development
 
 ```powershell
-pnpm install
-pnpm dev     # not wired up yet
+pnpm install       # prettier only
+pnpm format
 ```
+
+Right-click the bar → **Show DevTools** for the console and live style editing.
 
 ## License
 

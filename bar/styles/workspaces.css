@@ -1,0 +1,131 @@
+/*
+ * Workspace pills.
+ *
+ * Three things happen here that a Qt stylesheet cannot do, and they are the
+ * reason the bar moved to a WebView:
+ *   1. pills grow in and collapse out via @keyframes when GlazeWM creates or
+ *      destroys a workspace,
+ *   2. the focused pill widens to reveal its label using the grid 0fr -> 1fr
+ *      trick, which animates an auto-sized element without a hardcoded width,
+ *   3. a single indicator slides between states with a transition.
+ */
+
+.workspaces {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-item);
+}
+
+.workspace {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--pill-bg);
+  color: var(--fg-muted);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background-color var(--dur-base) var(--ease-standard),
+    color var(--dur-base) var(--ease-standard),
+    padding var(--dur-base) var(--ease-standard);
+}
+
+.workspace:hover {
+  background: var(--pill-bg-hover);
+  color: var(--fg);
+}
+
+/* Has windows, but is not the workspace being shown. */
+.workspace.is-occupied {
+  color: var(--ctp-subtext0);
+}
+
+/* Visible on some monitor, without keyboard focus. */
+.workspace.is-displayed {
+  background: color-mix(in srgb, var(--accent) 18%, var(--pill-bg));
+  color: var(--accent-soft);
+}
+
+.workspace.is-focused {
+  background: var(--accent);
+  color: var(--ctp-crust);
+  font-weight: 600;
+  padding-inline: 10px;
+}
+
+/* --- The expanding label ------------------------------------------------ */
+
+.workspace__label {
+  display: grid;
+  grid-template-columns: 0fr;
+  /* Collapsed pills must not contribute width from a label nobody can see. */
+  opacity: 0;
+  transition:
+    grid-template-columns var(--dur-base) var(--ease-out-back),
+    opacity var(--dur-base) var(--ease-standard);
+}
+
+.workspace.is-focused .workspace__label {
+  grid-template-columns: 1fr;
+  opacity: 1;
+}
+
+.workspace__label > span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  /* Keeps the text off the number while the column is open, and folds to zero
+   * as it closes, so the collapse reads as a single motion. */
+  padding-left: 6px;
+}
+
+.workspace.is-focused .workspace__label > span {
+  transition: padding-left var(--dur-base) var(--ease-out-back);
+}
+
+/* --- Enter / leave ------------------------------------------------------ */
+
+@keyframes workspace-in {
+  from {
+    max-width: 0;
+    padding-inline: 0;
+    margin-right: calc(-1 * var(--gap-item));
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    max-width: 6rem;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes workspace-out {
+  from {
+    max-width: 6rem;
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    max-width: 0;
+    padding-inline: 0;
+    margin-right: calc(-1 * var(--gap-item));
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+.workspace.is-entering {
+  animation: workspace-in var(--dur-base) var(--ease-out-back);
+}
+
+.workspace.is-leaving {
+  animation: workspace-out var(--dur-base) var(--ease-standard) forwards;
+  pointer-events: none;
+}

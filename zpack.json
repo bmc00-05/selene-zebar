@@ -1,0 +1,44 @@
+{
+  "$schema": "https://github.com/glzr-io/zebar/raw/v3.3.1/resources/zpack-schema.json",
+  "name": "selene-zebar",
+  "version": "0.1.0",
+  "description": "A moonlit status bar for GlazeWM. Catppuccin Mocha, Inter, hand-written CSS.",
+  "tags": ["topbar", "glazewm", "catppuccin"],
+  "previewImages": [],
+  "repositoryUrl": "https://github.com/bmc00-05/selene-zebar",
+  "widgets": [
+    {
+      "name": "bar",
+      "htmlPath": "./bar/index.html",
+      "zOrder": "top_most",
+      "shownInTaskbar": false,
+      "focused": false,
+      "resizable": false,
+      "transparent": true,
+      "includeFiles": ["bar/**/*.html", "bar/**/*.css", "bar/**/*.js"],
+      "caching": {
+        "defaultDuration": 604800,
+        "rules": []
+      },
+      "privileges": {
+        "shellCommands": []
+      },
+      "presets": [
+        {
+          "name": "default",
+          "anchor": "top_center",
+          "offsetX": "0px",
+          "offsetY": "0px",
+          "width": "100%",
+          "height": "38px",
+          "monitorSelection": { "type": "all" },
+          "dockToEdge": {
+            "enabled": true,
+            "edge": "top",
+            "windowMargin": "0px"
+          }
+        }
+      ]
+    }
+  ]
+}

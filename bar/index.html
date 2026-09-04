@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>selene-zebar</title>
+
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/bar.css" />
+    <link rel="stylesheet" href="./styles/workspaces.css" />
+  </head>
+  <body>
+    <div class="bar">
+      <div class="bar__region bar__region--left">
+        <!-- nf-md-moon_waning_crescent -->
+        <span class="brand icon" title="selene-zebar">&#xf09b0;</span>
+
+        <div class="workspaces" id="workspaces" hidden></div>
+        <span class="offline" id="glazewm-offline">GlazeWM offline</span>
+      </div>
+
+      <div class="bar__region bar__region--center"></div>
+
+      <div class="bar__region bar__region--right"></div>
+    </div>
+
+    <script type="module" src="./bar.js"></script>
+  </body>
+</html>
