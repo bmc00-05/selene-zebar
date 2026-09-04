@@ -18,13 +18,9 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
-# 작업용 문서 — 원격에는 결과물만 둔다
-# CLAUDE.md 는 에이전트에게 말하는 문체의 작업 지시서고, .claude/ 는 하네스가
-# 일회성 명령을 쌓는 허용 목록이다. 둘 다 이 머신에서만 의미가 있다.
-# 남이 읽어야 할 것 — 왜 이렇게 만들었는지, 어떻게 띄우는지 — 은 README 에 있다.
-CLAUDE.md
-.claude/
-docs/
+# 작업용 문서(CLAUDE.md · .claude/ · .notes/)는 전역 gitignore 가 막는다.
+# dotfiles 의 git/ignore 가 ~/.config/git/ignore 로 링크돼 있다. 어느
+# 프로젝트에서도 원격에 올릴 이유가 없어 저장소마다 적지 않는다.
 
 # 백업 파일
 # .bak 은 한글(HWP) 백업 확장자로 연결돼 있어, 폴더에 남으면
