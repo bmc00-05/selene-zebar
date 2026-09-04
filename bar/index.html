@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./styles/brand.css" />
     <link rel="stylesheet" href="./styles/workspaces.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
+    <link rel="stylesheet" href="./styles/clock.css" />
     <link rel="stylesheet" href="./styles/battery.css" />
     <link rel="stylesheet" href="./styles/power.css" />
   </head>
@@ -89,6 +90,11 @@
       </div>
 
       <div class="bar__region bar__region--right">
+        <!-- A button because clicking it will open a calendar. -->
+        <button class="clock" id="clock" type="button" hidden>
+          <span class="clock__label"></span>
+        </button>
+
         <div class="battery" id="battery" hidden>
           <!--
             32x20 so it lands on whole device pixels at this display's 1.25

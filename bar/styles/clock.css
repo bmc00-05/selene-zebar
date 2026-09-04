@@ -1,0 +1,27 @@
+/*
+ * Clock.
+ *
+ * A button rather than a span, because clicking it will open a calendar and
+ * the element that does that should be one from the start — swapping the tag
+ * later would mean re-deciding focus, hover and keyboard behaviour at once.
+ */
+
+.clock {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  /* The minute digits change under a fixed-width clock; tabular figures stop
+   * that from nudging the battery beside it. */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-base) var(--ease-standard);
+}
+
+.clock:hover,
+.clock:focus-visible {
+  color: var(--accent);
+  outline: none;
+}

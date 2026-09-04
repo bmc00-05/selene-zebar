@@ -1,0 +1,62 @@
+/**
+ * The clock, to the left of the battery.
+ *
+ * Two formats from one provider tick: the bar shows the short one, the tooltip
+ * carries the year and the full weekday for when the short one is not enough.
+ * A calendar panel on click is the obvious next step and this leaves room for
+ * it — the element is already a button.
+ */
+
+/** What the bar shows: `Fri 4 Sep 17:04`. HH is what makes it 24-hour. */
+export const CLOCK_FORMAT = 'EEE d MMM HH:mm';
+
+/**
+ * Wires the clock into `root` and returns the function that updates it.
+ *
+ * @param {HTMLElement} root  the .clock element
+ * @returns {(output: object) => void}
+ */
+export function mountClock(root) {
+  const label = root.querySelector('.clock__label');
+
+  let shownText = null;
+  let shownTooltipDay = null;
+
+  return function update({ date }) {
+    if (!date) {
+      root.hidden = true;
+      shownText = null;
+      shownTooltipDay = null;
+      return;
+    }
+
+    root.hidden = false;
+
+    // The provider ticks every second but the display is only accurate to the
+    // minute, so most ticks have nothing to say. Comparing first keeps 59 out
+    // of 60 of them from touching the DOM.
+    if (date.formatted !== shownText) {
+      shownText = date.formatted;
+      label.textContent = date.formatted;
+    }
+
+    // The tooltip only changes at midnight; rebuilding it every second would
+    // be the same waste one level down.
+    const day = date.iso.slice(0, 10);
+    if (day !== shownTooltipDay) {
+      shownTooltipDay = day;
+      root.title = fullDate(new Date(date.iso));
+    }
+  };
+}
+
+/**
+ * The long form, in whatever the system locale is — this is the line that says
+ * what the short one leaves out, so it is worth reading in the reader's own
+ * language rather than the bar's abbreviated English.
+ */
+function fullDate(when) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'full',
+  }).format(when);
+}

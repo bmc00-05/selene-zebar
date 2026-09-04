@@ -17,10 +17,12 @@ import { mountActiveWindow } from './components/active-window.js';
 import { mountMenu } from './components/menu.js';
 import { mountBattery } from './components/battery.js';
 import { mountPower } from './components/power.js';
+import { mountClock, CLOCK_FORMAT } from './components/clock.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
   battery: { type: 'battery' },
+  date: { type: 'date', formatting: CLOCK_FORMAT },
 });
 
 const offline = document.querySelector('#glazewm-offline');
@@ -33,6 +35,7 @@ const updates = [
   mountWorkspaces(document.querySelector('#workspaces'), zebar),
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
+  mountClock(document.querySelector('#clock'), zebar),
   mountBattery(document.querySelector('#battery'), zebar),
   mountPower(document.querySelector('#power'), zebar),
 ];
