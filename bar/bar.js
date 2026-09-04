@@ -18,6 +18,7 @@ import { mountMenu } from './components/menu.js';
 import { mountBattery } from './components/battery.js';
 import { mountPower } from './components/power.js';
 import { mountClock, CLOCK_FORMAT } from './components/clock.js';
+import { mountCalendar } from './components/calendar.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
@@ -36,6 +37,7 @@ const updates = [
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
   mountClock(document.querySelector('#clock'), zebar),
+  mountCalendar(document.querySelector('#calendar'), zebar),
   mountBattery(document.querySelector('#battery'), zebar),
   mountPower(document.querySelector('#power'), zebar),
 ];

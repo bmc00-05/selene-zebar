@@ -17,6 +17,8 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   cursor: pointer;
+  /* Names this element as the anchor the calendar positions against. */
+  anchor-name: --clock;
   transition: color var(--dur-base) var(--ease-standard);
 }
 

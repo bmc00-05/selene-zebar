@@ -56,9 +56,11 @@
   --ws-halo-dot:
     0 0 3px color-mix(in srgb, var(--accent) 80%, transparent),
     0 0 9px color-mix(in srgb, var(--accent) 40%, transparent);
-  /* The menu is a panel floating over the desktop rather than part of the bar
-   * plate, so it is opaque — there is nothing behind it worth showing, and
-   * translucency over an unknown wallpaper only costs legibility. */
+  /* Floating panels — the Selene menu and the calendar. These sit over the
+   * desktop rather than on the bar plate, so they are opaque: there is nothing
+   * behind them worth showing, and translucency over an unknown wallpaper only
+   * costs legibility. Named --menu-* because the menu had them first; both
+   * panels share the surface deliberately, so they read as one material. */
   --menu-bg: var(--sl-dusk);
   --menu-border: color-mix(in srgb, var(--sl-silver) 14%, transparent);
   --menu-item-hover: var(--sl-ash);
@@ -148,6 +150,26 @@
   --menu-width: 190px;
   --menu-window-h: 220px;
   --menu-radius: 10px;
+
+  /* Calendar. The panel states no width — seven columns of --cal-cell decide
+   * it — but its height has to be known here, because --cal-window-h is how
+   * tall the widget window grows and the two must agree:
+   *
+   *     padding 10 + month 26 + head 24 + 6 rows x 32 + padding 10 = 262
+   *     bar band 40 + margin 6 + 262 + room for the shadow          -> 340
+   *
+   * Six rows always, never five: a panel that changed height between months
+   * would stop matching this number. calendar.js fills the spare cells.
+   *
+   * 32 and 24 are multiples of 4 like everything else here, so they land on
+   * whole device pixels at this monitor's 1.25 scale. */
+  --cal-cell: 32px;
+  --cal-head: 24px;
+  --cal-pad: 10px;
+  --cal-window-h: 340px;
+  /* Radius of today's disc, drawn as a radial-gradient on the cell. Smaller
+   * than half the cell so neighbouring days do not touch it. */
+  --cal-today-r: 13px;
 
   /* Focused-window readout. 16px keeps the icon on the pixel grid and at the
    * same optical size as the mark and the workspace ring. `--aw-max-w` is where

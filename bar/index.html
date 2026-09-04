@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./styles/workspaces.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
     <link rel="stylesheet" href="./styles/clock.css" />
+    <link rel="stylesheet" href="./styles/calendar.css" />
     <link rel="stylesheet" href="./styles/battery.css" />
     <link rel="stylesheet" href="./styles/power.css" />
   </head>
@@ -90,8 +91,15 @@
       </div>
 
       <div class="bar__region bar__region--right">
-        <!-- A button because clicking it will open a calendar. -->
-        <button class="clock" id="clock" type="button" hidden>
+        <!-- popovertarget is the whole connection between clock and calendar;
+             neither component knows about the other in JavaScript. -->
+        <button
+          class="clock"
+          id="clock"
+          type="button"
+          popovertarget="calendar"
+          hidden
+        >
           <span class="clock__label"></span>
         </button>
 
@@ -299,6 +307,21 @@
       <button class="menu__item" type="button" data-action="close-bar">
         Close bar
       </button>
+    </div>
+
+    <!--
+      The calendar. Empty on purpose: the weekday headers depend on the locale
+      and the days on today, so calendar.js writes both. It grows the window
+      the same way the menu above does.
+    -->
+    <div class="calendar" id="calendar" popover>
+      <p class="calendar__month"></p>
+      <table class="calendar__grid">
+        <thead>
+          <tr class="calendar__head"></tr>
+        </thead>
+        <tbody class="calendar__body"></tbody>
+      </table>
     </div>
 
     <script type="module" src="./bar.js"></script>
