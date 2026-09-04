@@ -166,6 +166,24 @@
   --battery-glow-width: 2;
   --battery-glow-blur: 2px;
 
+  /* Power button and overlay. The scrim is opaque rather than blurred: a
+   * transparent window's backdrop-filter cannot reach the applications behind
+   * it on Windows, so blur left them sharp. This is what actually darkens. */
+  --power-button: 16px;
+  --power-scrim: color-mix(in srgb, var(--sl-void) 88%, transparent);
+  /* Square, and stated rather than left to the content: letting the label size
+   * decide the height produced 108.6px, which is neither square nor on the
+   * pixel grid, and would shift again if the font changed. 120 lands on
+   * 150 whole device pixels at 1.25. */
+  --power-tile: 120px;
+  --power-icon: 28px;
+  --power-gap: 12px;
+  --power-tile-pad: 16px;
+  --power-tile-gap: 12px;
+  /* How long shutdown and restart must be held. Read by power.js, so the
+   * number and the progress bar's duration cannot drift apart. */
+  --power-hold: 600ms;
+
   /* --- Motion ------------------------------------------------------------
    * The reason this project exists: a bar that can actually animate.
    *

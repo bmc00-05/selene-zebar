@@ -30,6 +30,14 @@
           {
             "program": "powershell",
             "argsRegex": "^-NoProfile -NonInteractive -ExecutionPolicy Bypass -File .*[\\\\/]window-icon\\.ps1 \\d+$"
+          },
+          {
+            "program": "shutdown",
+            "argsRegex": "^/[sr] /t 0$"
+          },
+          {
+            "program": "rundll32",
+            "argsRegex": "^(user32\\.dll,LockWorkStation|powrprof\\.dll,SetSuspendState 0,1,0)$"
           }
         ]
       },

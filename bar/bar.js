@@ -16,6 +16,7 @@ import { mountWorkspaces } from './components/workspaces.js';
 import { mountActiveWindow } from './components/active-window.js';
 import { mountMenu } from './components/menu.js';
 import { mountBattery } from './components/battery.js';
+import { mountPower } from './components/power.js';
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },
@@ -33,6 +34,7 @@ const updates = [
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
   mountBattery(document.querySelector('#battery'), zebar),
+  mountPower(document.querySelector('#power'), zebar),
 ];
 
 providers.onOutput(() => render(providers.outputMap));
