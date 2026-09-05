@@ -20,6 +20,7 @@
         "bar/**/*.css",
         "bar/**/*.js",
         "bar/**/*.ps1",
+        "bar/**/*.conf",
         "bar/**/*.woff2",
         "bar/**/*.txt"
       ],
@@ -32,6 +33,10 @@
           {
             "program": "powershell",
             "argsRegex": "^-NoProfile -NonInteractive -ExecutionPolicy Bypass -File .*[\\\\/]window-icon\\.ps1 \\d+$"
+          },
+          {
+            "program": "cava",
+            "argsRegex": "^-p .*[\\\\/]cava\\.conf$"
           },
           {
             "program": "shutdown",

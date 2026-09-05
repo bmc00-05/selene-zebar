@@ -22,6 +22,7 @@ import { mountClock, CLOCK_FORMAT } from './components/clock.js';
 import { mountCalendar } from './components/calendar.js';
 import { mountMemory } from './components/memory.js';
 import { mountMedia } from './components/media.js';
+import { mountCava } from './components/cava.js';
 import { mountVolume } from './components/volume.js';
 
 // Before anything is mounted: the stylesheets hide every widget until the root
@@ -56,6 +57,10 @@ const offline = document.querySelector('#glazewm-offline');
 const updates = [
   mountWorkspaces(document.querySelector('#workspaces'), zebar),
   mountMedia(document.querySelector('#media'), zebar),
+  // After mountMedia, and on the same element: it decides whether to drive the
+  // equaliser partly from whether the widget is on screen, which the line above
+  // has just settled for this tick.
+  mountCava(document.querySelector('#media'), zebar),
   mountActiveWindow(document.querySelector('#active-window'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
   mountVolume(document.querySelector('#volume'), zebar),

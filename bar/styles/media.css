@@ -167,6 +167,24 @@
   transform: scaleY(var(--hi));
 }
 
+/*
+ * Driven by cava instead: the same seven elements, moved by the real spectrum.
+ * components/cava.js writes `--level` per bar and sets this attribute only
+ * while frames are actually arriving — wanting cava and having it are separate
+ * facts, and this is the second one.
+ *
+ * Must stay after the rules above. `.media[data-playing='false'] .media__eq i`
+ * has exactly the same specificity, so the later rule is the only reason this
+ * wins when playback is paused.
+ *
+ * The fallback keeps the transform valid for the frame between the attribute
+ * landing and the first frame arriving.
+ */
+:root[data-cava='live'] .media__eq i {
+  animation: none;
+  transform: scaleY(var(--level, var(--media-eq-floor)));
+}
+
 /* --- Marquee ------------------------------------------------------------- */
 
 .media__marquee {

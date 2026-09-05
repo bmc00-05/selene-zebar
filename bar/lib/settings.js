@@ -25,6 +25,16 @@ const DEFAULTS = {
   /** Stop the animations that never end. See the [data-saver] rules in CSS. */
   saver: false,
 
+  /**
+   * Drive the equaliser from the real spectrum instead of the keyframes.
+   *
+   * The one setting applySettings does not publish. The others are answered by
+   * a rule; this one starts an external process that may not be there, so
+   * components/cava.js reads it here and writes what actually happened onto
+   * the root as `data-cava`. CSS switches on that, not on this.
+   */
+  cava: false,
+
   'widget:workspaces': true,
   'widget:media': true,
   'widget:active-window': true,

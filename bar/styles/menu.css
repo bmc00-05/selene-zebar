@@ -200,6 +200,23 @@
   color: var(--fg-muted);
 }
 
+/*
+ * Why a switch is not doing anything. Only cava has one of these, and it is up
+ * only while components/cava.js says the program could not be started.
+ *
+ * `margin-right: auto` rather than a place in the space-between: the note
+ * belongs to the label beside it, not to the gap before the track.
+ */
+.menu__note {
+  margin-right: auto;
+  color: var(--warn);
+  font-size: 10px;
+}
+
+:root:not([data-cava='missing']) .menu__note {
+  display: none;
+}
+
 .menu__track {
   position: relative;
   flex: none;

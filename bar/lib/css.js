@@ -33,3 +33,18 @@ export function readPx(name) {
     getComputedStyle(document.documentElement).getPropertyValue(name),
   );
 }
+
+/**
+ * Reads a unitless token off :root.
+ *
+ * Separate from readPx only in what it claims: these are ratios and counts, so
+ * a caller reading one is not asking for pixels.
+ *
+ * @param {string} name  custom property name, e.g. '--media-eq-floor'
+ * @returns {number}
+ */
+export function readNumber(name) {
+  return parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue(name),
+  );
+}

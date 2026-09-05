@@ -518,6 +518,33 @@
         </button>
       </div>
 
+      <!--
+        The equaliser normally runs on keyframes that have nothing to do with
+        the music. This hands the same seven bars to cava, which captures the
+        speakers and does the FFT that no provider here offers.
+
+        `Not found` shows when cava.js has tried and failed — cava is not
+        installed, or zpack.json does not allow it. It can only appear once an
+        attempt has been made, and an attempt only happens while the equaliser
+        is on screen, so switching this on with nothing playing says nothing
+        either way. The switch is not turned back off: that is the user's, and
+        the bar falls back to the keyframes on its own.
+      -->
+      <p class="menu__section">Media</p>
+      <button
+        class="menu__switch"
+        type="button"
+        role="switch"
+        aria-checked="false"
+        data-setting="cava"
+      >
+        <span>Live spectrum</span>
+        <span class="menu__note">Cava not found</span>
+        <span class="menu__track" aria-hidden="true">
+          <span class="menu__thumb"></span>
+        </span>
+      </button>
+
       <p class="menu__section">Motion</p>
       <!--
         Saver mode stops the animations that never end — the breathing halos,
