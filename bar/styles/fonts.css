@@ -29,4 +29,36 @@
    * a different face and then change it, which on a bar reads as a flicker. */
   font-display: block;
   src: url('../fonts/PretendardVariable.woff2') format('woff2-variations');
+
+  /*
+   * Where the baseline sits inside the line box, so that what you see is
+   * centred rather than what CSS measures.
+   *
+   * `align-items: center` centres the line box, and a line box runs ascender to
+   * descender. Those are the face's numbers, not the string's: text with no
+   * descenders — every percentage in this bar, and all Hangul — leaves that
+   * room empty and its ink rides high inside a box that is itself dead centre.
+   * Measured against the bar's middle, the volume, RAM and battery readouts all
+   * sat 0.75px high while the clock, which has a comma and a `p`, sat 0.44px
+   * low: two neighbours 1.2px out of line with each other.
+   *
+   * The baseline lands at boxCentre + (ascent - descent)/2, so this is a
+   * property of the face and belongs here rather than as an offset repeated on
+   * every label in the pack — and one that a widget added later would forget.
+   *
+   * The pair sums to Pretendard's own 115%, which is the whole trick: only the
+   * split moves, so `line-height: normal` stays 13.8px at 12px and no element
+   * changes height. What moves is the baseline, by 0.8px. That is the middle of
+   * what the three scripts want (digits +0.75, Hangul +0.69, Latin caps +0.94)
+   * and it is exactly one device pixel at this monitor's 1.25 — 11.2 x 1.25 is
+   * 14.0 — which matters, because the baseline is snapped to whole device
+   * pixels: 90% here rasterises identically to 86.67%, not halfway between.
+   *
+   * Only the bundled face carries this. If the file ever fails to load, the
+   * correction falls away with it, along with everything else the bundle was
+   * for.
+   */
+  ascent-override: 93.33%;
+  descent-override: 21.67%;
+  line-gap-override: 0%;
 }
