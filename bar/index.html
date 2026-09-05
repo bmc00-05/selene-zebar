@@ -32,21 +32,47 @@
         >
           <!--
             The mark, drawn rather than taken from an icon font, so nothing has
-            to be installed for it to show. One disc with a second disc masked
-            out of it: moving `cx`/`cy` on the cutting circle changes the phase
-            — pull it right for a thinner crescent, left for a fuller moon.
+            to be installed for it to show.
+
+            A solid disc with a round bite out of it — an eclipse rather than a
+            phase. A phase tapers to a point at both horns; this carve keeps the
+            curve of the body that made it, which is the whole character of the
+            mark.
+
+            Filled, not outlined, and that matters more than it sounds: the mark
+            sits beside a row of dots and a ring, all of them outlines and small
+            circles. An outlined mark speaks their language and disappears into
+            the row. A solid mass is the one thing in the region that is not a
+            circle drawn in line.
+
+            The bite has to break the rim — about two units here. Sealed inside,
+            the silhouette stays a full circle and the mark reads as an eye;
+            broken, the shape opens and it reads as a moon again.
+
+            There is a ceiling on the radius too. Grow it much past this and the
+            arc it cuts flattens out, the horns draw to points, and the mark
+            turns into an ordinary crescent — which throws away the one thing
+            that made it its own.
+
+            The carve sits 4.1 units from the centre at 25 degrees above the
+            horizontal. Those two numbers do separate jobs: the distance sets
+            how deep the bite goes and so how heavy the crescent is left, the
+            angle only turns it. Move the carve around a circle of that radius
+            and the weight does not change at all. Flat on the horizontal the
+            mark goes symmetric and stiff; much steeper and it starts to look
+            like it is falling over.
           -->
           <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true">
-            <mask id="selene-crescent">
+            <mask id="selene-mark">
               <rect width="24" height="24" fill="black" />
               <circle cx="12" cy="12" r="9" fill="white" />
-              <circle cx="17.5" cy="8.5" r="8.5" fill="black" />
+              <circle cx="15.72" cy="10.27" r="6.8" fill="black" />
             </mask>
             <rect
               width="24"
               height="24"
               fill="currentColor"
-              mask="url(#selene-crescent)"
+              mask="url(#selene-mark)"
             />
           </svg>
         </button>
@@ -378,24 +404,25 @@
     <div class="panel menu" id="bar-menu" popover>
       <!--
         The mark again, at the head of the panel it opens, so the panel reads
-        as belonging to the button that was pressed.
+        as belonging to the button that was pressed. Identical geometry to the
+        bar's; only the rendered size differs, and being solid it holds up small
+        without a weight to tune.
 
-        Its mask needs an id of its own: an SVG mask is looked up across the
-        whole document, and the brand's crescent already claims
-        `selene-crescent`.
+        Its mask needs an id of its own — an SVG mask is looked up across the
+        whole document, and the bar's mark already claims `selene-mark`.
       -->
       <p class="menu__title">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <mask id="menu-crescent">
+          <mask id="menu-mark">
             <rect width="24" height="24" fill="black" />
             <circle cx="12" cy="12" r="9" fill="white" />
-            <circle cx="17.5" cy="8.5" r="8.5" fill="black" />
+            <circle cx="15.72" cy="10.27" r="6.8" fill="black" />
           </mask>
           <rect
             width="24"
             height="24"
             fill="currentColor"
-            mask="url(#menu-crescent)"
+            mask="url(#menu-mark)"
           />
         </svg>
         <span>Selene</span>

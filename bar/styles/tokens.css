@@ -31,6 +31,17 @@
   /* --- Semantic roles --------------------------------------------------- */
   --accent: var(--sl-glow);
   --accent-soft: var(--sl-halo);
+  /* The mark, and the only role that does not take the accent. Everything else
+   * lit in this bar is a readout saying "this one" — the focused workspace, a
+   * hovered control — and the brand is not that. Sitting above the accent in
+   * lightness and below it in chroma separates it: brighter, and closer to
+   * white than to violet, which is what moonlight is.
+   *
+   * Two steps, because --sl-moon is the top of the ramp and a mark that
+   * started there would have nowhere to go on hover. It rests one step down
+   * and lights up to the top when pointed at. */
+  --brand: var(--sl-halo);
+  --brand-lit: var(--sl-moon);
   /* 88% is a floor, not a taste call. The bar sits on wallpapers it has never
    * seen, and a white one is the worst case: at 88% the dimmest text role
    * (--fg-muted) still clears WCAG AA against it, at 85% it does not. */
@@ -181,9 +192,11 @@
   --ws-scale-displayed: 0.875;
   --ws-scale-focused: 1;
 
-  /* The mark. 16px matches the workspace indicators, the window icon and the
-   * RAM ring, so the row shares one optical size. */
-  --brand-size: 16px;
+  /* The mark, and the one thing in the row that is deliberately larger than
+   * the 16px everything else shares. It is the brand rather than a readout, and
+   * at 16 the carve had too little room to read as anything but a nick. 20
+   * lands on 25 whole device pixels at 1.25 like the rest. */
+  --brand-size: 20px;
 
   /* Menu, which is also where the settings live. `--menu-window-h` is how tall
    * the widget window grows while it is open (menu.js, through lib/window.js);

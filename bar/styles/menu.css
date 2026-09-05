@@ -43,7 +43,9 @@
   align-items: center;
   gap: 6px;
   margin: 2px 8px 8px;
-  color: var(--accent);
+  /* The mark and the name are one thing, so they wear the brand colour rather
+   * than the accent the rest of the bar lights up with. */
+  color: var(--brand);
   font-size: 13px;
   font-weight: 600;
   /* Narrower than the section labels. The wider tracking there keeps small

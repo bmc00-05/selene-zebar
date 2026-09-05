@@ -10,7 +10,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent);
+  color: var(--brand);
   cursor: pointer;
   /* Names this element as the anchor the menu positions against. */
   anchor-name: --brand;
@@ -26,7 +26,7 @@
 }
 
 .brand:hover {
-  color: var(--accent-soft);
+  color: var(--brand-lit);
 }
 
 .brand:active {
@@ -36,5 +36,5 @@
 /* :popover-open on the trigger is not a thing; menu.js mirrors the panel's
  * state onto the button as aria-expanded. */
 .brand[aria-expanded='true'] {
-  color: var(--accent-soft);
+  color: var(--brand-lit);
 }
