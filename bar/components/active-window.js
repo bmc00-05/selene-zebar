@@ -1,14 +1,13 @@
 /**
- * The focused window, for the centre of the bar: its own icon and its title.
- * Mirrors the YASB active_window widget this bar replaces — icon + title,
+ * The focused window, for the centre of the bar: its own icon and its title,
  * ellipsis when long, nothing at all when no window has focus.
  *
  * The title is free: it arrives on every glazewm tick. The icon is not — the
  * page is sandboxed away from Win32, so it is fetched by running
- * scripts/window-icon.ps1 through Zebar's shellExec. That costs ~0.9s, almost
- * all of it PowerShell starting, so results are cached and the cost lands once
- * per application per session. The title shows immediately; the icon fades in
- * when it lands.
+ * scripts/window-icon.ps1 through Zebar's shellExec. That costs most of a
+ * second, almost all of it PowerShell starting, so results are cached and the
+ * cost lands once per application per session. The title shows immediately;
+ * the icon fades in when it lands.
  */
 
 import { readMs } from '../lib/css.js';
@@ -70,13 +69,10 @@ export function mountActiveWindow(root, zebar) {
   };
 
   /**
-   * Empties everything the last window left behind.
-   *
-   * Hiding the container is not enough on its own. The title and the icon both
-   * survive in the DOM, so the next window to take focus cross-faded out of a
-   * title that had no business being there and, for a moment, wore the previous
-   * application's icon. The stale title also still sized the readout, which
-   * pushed the centred widget off to one side.
+   * Empties everything the last window left behind. Hiding the container is
+   * not enough: the title and the icon survive in the DOM, so the next window
+   * to take focus would cross-fade out of a stale title, briefly wear the
+   * previous application's icon, and be sized by text that is no longer shown.
    */
   function clearReadout() {
     clearTimeout(clearPrevious);
@@ -98,10 +94,8 @@ export function mountActiveWindow(root, zebar) {
    * the first reads as one window handing over to the next.
    *
    * The outgoing span is emptied once the fade is over. Both spans share one
-   * grid cell, so the wider of the two decides how wide the readout is — and
-   * while the old text lingered it was often the wider one, sizing the widget
-   * to a title that was no longer shown. Since the centre region is centred,
-   * that made the whole thing sit off to one side.
+   * grid cell, so the wider of the two decides how wide the readout is, and a
+   * stale wider title would leave the centred widget sitting off to one side.
    */
   function setTitle(title) {
     if (title === shownTitle) {

@@ -51,7 +51,7 @@
 
 /* Muted is the one state that is not about how loud it is, so it steps back
  * rather than changing hue — the same brightness signal the rest of the bar
- * uses, and it leaves --warn and --alert meaning danger alone. */
+ * uses, leaving --warn and --alert to mean danger alone. */
 .volume[data-state='muted'] {
   color: var(--fg-muted);
 }

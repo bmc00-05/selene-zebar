@@ -4,25 +4,27 @@
 
 Minimal and quiet: a night-sky ground, moonlit silver, Inter typography.
 
-> **Status: left and centre are live.** The mark opens a menu, the workspace
-> indicators track GlazeWM, and the centre shows the focused window. The right
-> region is still empty.
+> **Status: the bar is in daily use.** The mark opens a menu, the workspace
+> indicators track GlazeWM, the media widget shows what is playing, the centre
+> shows the focused window, and the right region carries volume, RAM, the
+> clock with a calendar, the battery and a power menu.
 
 ## Why
 
 Zebar renders its widgets in a WebView2 window, so a bar is plain HTML, CSS and
 JavaScript. That buys the things a Qt-stylesheet bar cannot have: transitions,
-flexbox and grid, container queries, and DevTools for debugging.
+flexbox and grid, popovers and anchor positioning, and DevTools for debugging.
 
 ## Requirements
 
-|                                               |                                                                     |
-| --------------------------------------------- | ------------------------------------------------------------------- |
-| [Zebar](https://github.com/glzr-io/zebar)     | 3.3.1+ — `winget install -e --id glzr-io.zebar`                     |
-| [GlazeWM](https://github.com/glzr-io/glazewm) | 3.10+ — `winget install -e --id glzr-io.glazewm`                    |
-| Node                                          | 20+ (tooling only — the widget itself has no build step)            |
-| [Inter](https://github.com/rsms/inter)        | body text                                                           |
-| JetBrainsMono Nerd Font                       | icon glyphs — `winget install -e --id DEVCOM.JetBrainsMonoNerdFont` |
+|                                               |                                                          |
+| --------------------------------------------- | -------------------------------------------------------- |
+| [Zebar](https://github.com/glzr-io/zebar)     | 3.3.1+ — `winget install -e --id glzr-io.zebar`          |
+| [GlazeWM](https://github.com/glzr-io/glazewm) | 3.10+ — `winget install -e --id glzr-io.glazewm`         |
+| Node                                          | 20+ (tooling only — the widget itself has no build step) |
+| [Inter](https://github.com/rsms/inter)        | body text                                                |
+
+No icon font: every mark in the bar is a drawn SVG.
 
 ## Install
 
@@ -71,15 +73,19 @@ comment for the colour picker.
 **Every colour lives in `tokens.css`**, and nothing below that file writes a
 raw colour. Swapping the palette is one file.
 
-Two constraints shape the geometry. Lengths are multiples of 4 because a 1.25×
-display only lands those on whole device pixels — 18px and 7px came out at 22.5
-and 8.75, which left a dot visibly off-centre inside its ring. And sizes are
-animated with `transform: scale()` rather than width and height, because
-animating the box re-rounds its edges to the device grid every frame and the
-circle wobbles.
+Two constraints shape the geometry. Lengths are multiples of 4 (or of 0.8)
+because a 1.25× display only lands those on whole device pixels; anything else
+softens an edge or sits a dot off-centre inside its ring. And sizes are animated
+with `transform: scale()` rather than width and height, because animating the
+box re-rounds its edges to the device grid every frame and the circle wobbles.
 
 The bar's translucency is a floor, not a taste: at 88% the dimmest text still
 clears WCAG AA against a white wallpaper, and 85% does not.
+
+Animation is cheap to write and not free to run. On an integrated GPU every
+compositor frame costs CPU whatever is in it, so the two halos that breathe
+permanently run on `steps()` easing — the compositor skips frames where the
+value has not changed — and a `--breathe-steps` token sets how many.
 
 ## Layout
 
@@ -88,18 +94,36 @@ zpack.json                pack manifest — widgets, presets, privileges
 bar/
   index.html              the widget Zebar loads
   bar.js                  provider wiring; hands each tick to the components
+  lib/
+    css.js                reads tokens back out of CSS
+    window.js             grows the widget window while a panel is open
   components/
     workspaces.js         workspace indicators, reconciled by name
+    media.js              equaliser, marquee, and the playback panel
     active-window.js      focused window's icon and title
     menu.js               the popover behind the mark
+    volume.js             output volume, read-only
+    memory.js             RAM ring
+    clock.js              clock; the date format lives here
+    calendar.js           the month calendar behind the clock
+    battery.js            battery gauge
+    power.js              lock, sleep, restart, shut down
   scripts/
     window-icon.ps1       extracts a window's icon, run through shellExec
   styles/
     tokens.css            the Selene ramp, typography, metrics, motion
     bar.css               reset and the three-region shell
+    panel.css             surface and motion shared by the floating panels
     brand.css             the mark and its menu
     workspaces.css        workspace indicators
+    media.css             equaliser, marquee, playback panel
     active-window.css     focused-window readout
+    volume.css            volume readout
+    memory.css            RAM ring
+    clock.css             clock
+    calendar.css          month calendar
+    battery.css           battery gauge and its states
+    power.css             power button and overlay
 scripts/link.ps1          symlink into ~/.glzr/zebar
 ```
 

@@ -3,10 +3,7 @@
  *
  * Read-only. The provider can set the volume as well, but nothing here calls
  * that — a status bar that changes what it reports on a stray click is worse
- * than one that only reports.
- *
- * The scale is 0-100, not 0-1. Checked against Windows rather than assumed:
- * 42/75/10 on the system slider came back as 42/75/10 here.
+ * than one that only reports. The provider's scale is 0-100, not 0-1.
  */
 
 /** Above this the second arc lights, so the icon reads loud at a glance. */

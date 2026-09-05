@@ -6,23 +6,11 @@
   box-sizing: border-box;
 }
 
-/*
- * Make `hidden` actually hide.
- *
- * The browser's own rule is `[hidden] { display: none }`, and any author rule
- * that sets display beats it — every widget here says `display: flex`, so every
- * `root.hidden = true` in the components was doing nothing at all. Measured
- * with the attribute forced on: workspaces 192x16, active-window 320x16,
- * battery 66x20 and the rest all still drawn. The one that worked was the
- * clock, and only because it happens not to declare a display.
- *
- * The symptom was the media widget: when playback ended it stayed on the bar as
- * an equaliser lying flat next to nothing, doing nothing.
- *
- * !important is the point rather than a shortcut — `hidden` has to outrank a
- * component's own layout, and requiring each component to remember
- * `.thing[hidden]` is how this comes back with the next widget.
- */
+/* Make `hidden` actually hide. The browser's own rule is `[hidden] { display:
+ * none }`, and any author rule that sets display beats it — every widget here
+ * declares one, so `root.hidden = true` alone would do nothing. !important is
+ * the point: `hidden` has to outrank a component's own layout without each
+ * component having to restate it. */
 [hidden] {
   display: none !important;
 }
@@ -45,40 +33,31 @@ body {
   user-select: none;
 }
 
-/* Insets the bar from the screen edges GlazeWM cannot reach. No bottom value —
- * the gap under the bar is GlazeWM's outer_gap.top, and reserving one here too
- * is what stacked two gaps into dead space.
+/* Insets the bar from the screen edges GlazeWM cannot reach. No bottom value:
+ * the gap under the bar is GlazeWM's outer_gap.top.
  *
  * On body alone, never on `html, body`: body nests inside html, so a shared
- * rule applies the padding twice and every inset comes out doubled. */
+ * rule applies the padding twice. */
 body {
   padding: var(--bar-inset-y) var(--bar-inset-x) 0;
 }
 
 .bar {
   display: grid;
-  /* Center stays optically centred regardless of how wide left/right grow. */
+  /* Centre stays optically centred regardless of how wide left/right grow. */
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  /* Fixed, not 100%. The window grows while the menu is open, and a percentage
+  /* Fixed, not 100%. The window grows while a panel is open, and a percentage
    * would stretch the bar along with it. */
   height: var(--bar-height);
   padding: 0 var(--bar-pad-x);
   background: var(--bar-bg);
   border: 1px solid var(--bar-border);
   border-radius: var(--radius-bar);
-  /* No backdrop-filter, on purpose. There used to be a `blur(16px)
-   * saturate(120%)` here for busy wallpapers, and on this one it did nothing
-   * visible: the strip the bar sits over is a single flat colour (pixel
-   * variance 0 across the top 50px of the wallpaper), and a screen capture
-   * with the filter on and off differed only where the battery halo happened
-   * to be mid-breath. What it did cost was CPU — with any animation running,
-   * the filter re-ran every frame and added 5.8 points of one core (13.5% ->
-   * 7.7%) for that invisible result.
-   *
-   * If a wallpaper with detail under the bar ever comes back, so can the
-   * filter; but measure it, because on this GPU any per-frame filter over a
-   * 1920px strip is the most expensive line in the stylesheet. */
+  /* No backdrop-filter, on purpose. On this GPU a per-frame filter over the
+   * whole strip is the most expensive line a stylesheet can have, and over a
+   * flat wallpaper it shows nothing. If a wallpaper with detail under the bar
+   * ever comes back, measure before adding it. */
 }
 
 .bar__region {

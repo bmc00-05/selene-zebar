@@ -1,22 +1,19 @@
 /**
- * The clock, to the left of the battery.
+ * The clock, and the button that opens the calendar behind it.
  *
  * Two formats from one provider tick: the bar shows the short one, the tooltip
  * carries the year and the full weekday for when the short one is not enough.
- * A calendar panel on click is the obvious next step and this leaves room for
- * it — the element is already a button.
  */
 
 /**
  * What the bar shows: `Fri, 04 Sep 17:04`. HH is what makes it 24-hour.
  *
  * `dd`, not `d`: the day keeps two digits so the clock does not widen on the
- * 10th of every month. This sits in the right-hand group, which is anchored to
- * the right edge, so a wider clock pushes the volume and RAM readouts left —
- * measured at 7.78px for `4 Sep` -> `14 Sep`. Weekday and month names still
- * vary by a few px because the letters are proportional; that happens once a
- * day at midnight and is not worth a fixed-width font. The comma is taste:
- * with two three-letter tokens in a row, it marks where the weekday ends.
+ * 10th of every month — this sits in the right-hand group, which is anchored
+ * to the right edge, so a wider clock pushes the volume and RAM readouts left.
+ * Weekday and month names still vary by a few px because the letters are
+ * proportional; that happens once a day and is not worth a fixed-width font.
+ * The comma marks where the weekday ends between two three-letter tokens.
  */
 export const CLOCK_FORMAT = 'EEE, dd MMM HH:mm';
 

@@ -9,8 +9,8 @@
  * rest, which is the trade for a row that reads as texture rather than text.
  *
  * The dot never changes its box. All four states are the same 8px element at a
- * different `transform: scale()`, which is what keeps the growth steady — see
- * the note on --ws-dot in tokens.css for why width and height could not.
+ * different `transform: scale()` — see --ws-dot in tokens.css for why width
+ * and height could not be animated.
  */
 
 .workspaces {
@@ -49,9 +49,8 @@
   /* Empty by default: an outline with nothing in it. */
   background: transparent;
   transform: scale(var(--ws-scale-empty));
-  /* box-shadow rides along so the halo arrives with the growth. Left out, the
-   * glow snapped on at frame one while the dot was still small, and the two
-   * arriving separately is most of what read as a bounce. */
+  /* Size and colour move together on the focus timing, so a change of state
+   * reads as one motion. */
   transition:
     transform var(--ws-focus-dur) var(--ws-focus-ease),
     background-color var(--ws-focus-dur) var(--ws-focus-ease),
@@ -62,18 +61,15 @@
  * The halo, in two layers.
  *
  * The shadow is cast once and never recomputed; nothing after this animates
- * anything but opacity. Animating box-shadow directly worked but cost 162ms of
- * renderer work every 4 seconds — about 4% of a core, permanently — because the
- * keyframe reached the shadow through custom properties and color-mix() and
- * every frame re-resolved them. RecalcStyleDuration went 0.4ms -> 39.7ms.
- * Fading a settled shadow costs 4.9ms over the same window, recalc 1.1ms.
+ * anything but opacity. Animating box-shadow itself, reached through custom
+ * properties and color-mix(), re-resolves them every frame and costs style
+ * recalc for as long as the halo breathes.
  *
- * Two layers rather than one because focus and the breath both want opacity,
- * and an animation on a property beats the transition on it. With one layer the
- * halo left in a single frame: unfocusing removed the animation, which is not a
- * change a transition can catch, so it snapped from 0.64 to 0. Split, the outer
- * layer fades with focus and the inner one breathes inside it, and the two
- * opacities simply multiply.
+ * Two layers because focus and the breath both want opacity, and an animation
+ * on a property beats the transition on it. With one layer, unfocusing removed
+ * the animation — not a change a transition can catch — and the halo snapped
+ * off. Split, the outer layer fades with focus and the inner one breathes
+ * inside it, and the two opacities multiply.
  */
 .workspace__halo {
   position: absolute;
@@ -127,17 +123,14 @@
 }
 
 /*
- * The focused one, and the only thing in the row that keeps moving.
+ * The focused one, and the only thing in the row that keeps moving. The halo
+ * comes up with the focus and then breathes — the same idea as the charging
+ * battery, at a comparable depth (--ws-breathe-low) and pace (--ws-breathe-dur).
  *
- * The halo breathes. It is the same idea as the charging battery but pitched
- * much lower — 55% of full rather than 20%, over 4s rather than 2.6 — because
- * charging is occasional and this is permanent. Deep enough to notice if you
- * look, shallow enough to ignore while working.
- *
- * The animation waits out the focus transition before it starts, and its 0%
- * is exactly the value that transition lands on, so the two hand over without
- * a step. Starting it immediately would snap the halo to the keyframe's first
- * value while the transition was still bringing it up.
+ * The animation waits out the focus transition, and its 0% is the value that
+ * transition lands on, so the two hand over without a step. Started at once,
+ * the halo would snap to the keyframe's first value while the fade was still
+ * bringing it up.
  */
 .workspace.is-focused {
   border-color: var(--accent);
@@ -149,27 +142,11 @@
   transform: scale(var(--ws-scale-focused));
 }
 
-/*
- * The halo comes up with the focus and then breathes.
- *
- * The animation waits out the focus transition, and its 0% is the value that
- * transition lands on, so the two hand over without a step — start it at once
- * and the halo snaps to the keyframe's first value while the fade is still
- * bringing it up.
- *
- * The first attempt was pitched far lower than the battery's charging pulse on
- * the reasoning that charging is occasional while this is on screen all the
- * time. Rendered side by side, the trough and the peak turned out to be the
- * same picture — the swing has to be near the battery's after all, and the
- * halo itself had to be raised to give it room.
- */
 .workspace.is-focused .workspace__halo {
   opacity: 1;
 }
 
-/* Stepped, not eased — see --breathe-steps in tokens.css: every frame the
- * value does not change is a frame the compositor does not draw, and that is
- * the difference between ~8% and ~4% of a core for a halo that never stops. */
+/* Stepped, not eased — see --breathe-steps in tokens.css. */
 .workspace.is-focused .workspace__halo::after {
   animation: ws-breathe var(--ws-breathe-dur)
     steps(var(--breathe-steps), jump-none) var(--ws-focus-dur) infinite;

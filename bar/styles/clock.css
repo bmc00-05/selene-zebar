@@ -1,9 +1,5 @@
 /*
- * Clock.
- *
- * A button rather than a span, because clicking it will open a calendar and
- * the element that does that should be one from the start — swapping the tag
- * later would mean re-deciding focus, hover and keyboard behaviour at once.
+ * Clock. A button, because clicking it opens the calendar.
  */
 
 .clock {

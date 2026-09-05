@@ -2,10 +2,8 @@
  * The power button at the right end of the bar, and the overlay it opens.
  *
  * The overlay covers the whole screen, which a Zebar widget can only do by
- * growing its own window — the same trick the mark's menu uses, plus a move to
- * the screen origin. Growing it is safe: the strip GlazeWM keeps clear comes
- * from the preset in zpack.json, not the live window, so nothing on the desktop
- * shifts while this is open.
+ * growing its own window to the screen and moving it to the origin — the
+ * full-screen claim in lib/window.js.
  *
  * Shutdown and restart cannot be taken back, so they need holding down rather
  * than a click. Lock and sleep go straight through.
@@ -46,17 +44,9 @@ export function mountPower(root, zebar) {
 
   let holdTimer = null;
 
-  // Full screen is the only claim that also moves the window.
-  //
-  // It used to ask for focus as well, because the widget is configured
-  // `focused: false` and Escape needs a focused window. That call could never
-  // have worked: Zebar's ACL denies `plugin:window|set_focus` to widgets —
-  // "Command plugin:window|set_focus not allowed by ACL" — and WidgetPrivileges
-  // has only `shellCommands`, so there is nothing to grant in zpack.json.
-  //
-  // Nothing was broken by removing it. The overlay opens only from a click on
-  // the button, and that click focuses the window on its own; the failing call
-  // just threw an unhandled rejection on every open.
+  // Full screen is the only claim that also moves the window. Focus is not
+  // asked for: the click that opens the overlay already focuses the window,
+  // and Zebar's ACL denies `plugin:window|set_focus` to widgets anyway.
   const grown = growWindowWhileOpen(overlay, widget, { fullScreen: true });
 
   overlay.addEventListener('beforetoggle', event => {
@@ -113,8 +103,7 @@ export function mountPower(root, zebar) {
     // Put the window back first, and unlike an ordinary close, without waiting
     // for the scrim to fade. Lock and sleep return to a desktop that is still
     // there, and a full-screen widget left covering it would be the first thing
-    // seen on waking — worth more than the fade, which nobody is watching once
-    // the screen is on its way out.
+    // seen on waking.
     overlay.hidePopover();
     grown.restoreNow();
 

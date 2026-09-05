@@ -23,9 +23,8 @@
  * flicker. Fading one out under the other reads as the slot filling in.
  *
  * Stacking them also means neither is ever removed, so nothing here depends on
- * the `hidden` attribute. That matters: `hidden` does nothing to an inline
- * <svg>, which lives in the SVG namespace and so falls outside the UA
- * stylesheet's [hidden] rule.
+ * the `hidden` attribute — which does nothing to an inline <svg>, since the
+ * SVG namespace falls outside the UA stylesheet's [hidden] rule.
  */
 .active-window__slot {
   display: grid;

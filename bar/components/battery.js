@@ -5,14 +5,10 @@
  * its left keep a fixed position instead of sliding whenever the battery state
  * changes.
  *
- * The warning is a colour, amber then red, the same two the RAM ring uses. The
- * bar signals with brightness everywhere else and this widget used to as well,
- * but once one thing on the row warns in colour, the one beside it warning in
- * brightness reads as merely bright rather than as a warning.
- *
- * The thresholds came down with the change. Colour is a much louder signal than
- * a step of brightness, and at the old 30% the gauge would have sat amber for a
- * good part of every day.
+ * The warning is a colour, amber then red, the same two the RAM ring uses; why
+ * they leave the bar's one hue is in tokens.css next to the values. The
+ * thresholds are low because colour is a loud signal, and a gauge that sat
+ * amber for a good part of every day would stop meaning anything.
  */
 
 /** Below this, discharging counts as low: amber. */
@@ -23,8 +19,6 @@ const LOW_PERCENT = 15;
  * not: memory at 90% means the machine is being used, but a battery here is
  * minutes from going out, and it is the one thing in this bar worth
  * interrupting for.
- *
- * Kept in JS because JS is what picks the class.
  */
 const CRITICAL_PERCENT = 5;
 

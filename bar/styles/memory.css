@@ -1,10 +1,9 @@
 /*
  * RAM ring.
  *
- * The arc is drawn with stroke-dasharray against a circumference normalised to
- * 100 by `pathLength` in the markup, so `--mem-level` is a plain percentage.
- * Measured: with pathLength, `50 100` paints exactly the top half of the ring;
- * without it the same value repeats as a dashed circle.
+ * The arc is drawn with stroke-dasharray against a circumference normalised
+ * to 100 by `pathLength` in the markup, so `--mem-level` is a plain
+ * percentage; without pathLength the same value repeats as a dashed circle.
  *
  * The colour lives on the wrapper and both the arc and the label take it from
  * there through currentColor, so a state change cannot move one and not the
@@ -49,8 +48,8 @@
 }
 
 .memory__label {
-  /* The digits change under a ring that does not move; tabular figures stop the
-   * label from breathing, the same reason the clock has them. */
+  /* The digits change under a ring that does not move; tabular figures stop
+   * the label from breathing, the same reason the clock has them. */
   font-variant-numeric: tabular-nums;
 }
 
