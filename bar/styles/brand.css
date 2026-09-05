@@ -1,15 +1,9 @@
 /*
  * The Selene mark and the menu it opens.
  *
- * The menu uses the platform popover: `popover` on the panel and
- * `popovertarget` on the button (see index.html). That hands the browser three
- * things this bar would otherwise hand-roll — the top layer, so no z-index
- * fight with the workspace row; light dismiss on outside click and Escape; and
- * focus handling. Placement comes from CSS anchor positioning, so there is no
- * JavaScript measuring where the button is.
- *
- * What JavaScript still does is grow the widget window, because a popover is
- * only free of the page, not of the window it lives in.
+ * The menu is a `.panel` (panel.css), which carries the surface and the
+ * open/close motion. This file is the mark, the menu's placement and its
+ * contents.
  */
 
 .brand {
@@ -43,8 +37,8 @@
   transform: scale(0.88);
 }
 
-/* :popover-open on the trigger is not a thing, so the open state is mirrored
- * from the panel via the shared ancestor — see .menu:popover-open below. */
+/* :popover-open on the trigger is not a thing; menu.js mirrors the panel's
+ * state onto the button as aria-expanded. */
 .brand[aria-expanded='true'] {
   color: var(--accent-soft);
 }
@@ -55,68 +49,17 @@
   position-anchor: --brand;
   /* Below the mark, running rightwards from its left edge. */
   position-area: bottom span-right;
-  /* If it would not fit below, put it above rather than let it slide. */
-  position-try-fallbacks: flip-block;
   width: var(--menu-width);
-  margin: 6px 0 0;
   padding: 6px;
-  border: 1px solid var(--menu-border);
-  border-radius: var(--menu-radius);
-  background: var(--menu-bg);
-  box-shadow: var(--menu-shadow);
-  color: var(--fg);
-  /* The popover default is a black border and white background. */
-  overflow: visible;
-}
-
-/* Grid rather than block so the rule and items share one gap. The gap sits on
- * the base rule, not here: `display` is held through the close by
- * allow-discrete but nothing else in this rule is, so a gap declared here would
- * collapse to 0 on the first frame of the fade and shift every item. */
-.menu {
+  /* Grid rather than block so the rule and items share one gap. The gap sits
+   * here and not in :popover-open: `display` is held through the close by
+   * allow-discrete, but nothing else declared there is, so a gap there would
+   * collapse to 0 on the first frame of the fade and shift every item. */
   gap: 1px;
 }
 
 .menu:popover-open {
   display: grid;
-}
-
-/*
- * Open and close, both directions.
- *
- * The closed state has to be written out. @starting-style only says where the
- * panel comes from, so with `opacity: 1` as the resting rule the panel held at
- * full opacity for the whole discrete `display` window and then vanished. That
- * was visible: menu.js shrank the window at the same moment, position-area
- * found no room below the mark, and 34px of fully opaque panel was drawn on top
- * of the bar until display flipped. Stating the closed state gives it an exit;
- * menu.js waits for that exit before shrinking.
- *
- * `display` and `overlay` run for --dur-base rather than --dur-fast so the
- * slower of the two properties, transform, is not cut off mid-flight.
- */
-.menu {
-  opacity: 0;
-  transform: translateY(-4px) scale(0.98);
-  transition:
-    opacity var(--dur-fast) var(--ease-standard),
-    transform var(--dur-base) var(--ease-out-back),
-    overlay var(--dur-base) allow-discrete,
-    display var(--dur-base) allow-discrete;
-}
-
-.menu:popover-open {
-  opacity: 1;
-  transform: none;
-}
-
-/* Where it comes from on the way in — the same spring the workspace indicators
- * use when they arrive. */
-@starting-style {
-  .menu:popover-open {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.98);
-  }
 }
 
 .menu__title {
@@ -146,7 +89,7 @@
 
 .menu__item:hover,
 .menu__item:focus-visible {
-  background: var(--menu-item-hover);
+  background: var(--panel-item-hover);
   outline: none;
 }
 
@@ -154,5 +97,5 @@
   height: 1px;
   margin: 4px 8px;
   border: 0;
-  background: var(--menu-border);
+  background: var(--panel-border);
 }

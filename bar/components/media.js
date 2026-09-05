@@ -28,14 +28,11 @@ const TICK_MS = 500;
 /**
  * How long the session has to stay gone before the widget believes it.
  *
- * A track change is a real gap, not a handover: measured, `currentSession`
- * goes null and `allSessions` drops to zero for about half a second between
- * one song ending and the next arriving. Acting on the first null blinked the
- * widget out every few minutes and closed the panel underneath whoever had it
- * open — pressing Next from inside the panel made the panel disappear.
- *
- * Two seconds is comfortably clear of that half-second gap while still being
- * quick enough that stopping playback feels like it took effect.
+ * A track change is a real gap, not a handover: `currentSession` goes null for
+ * about half a second between one song ending and the next arriving. Acting on
+ * the first null would blink the widget out on every track and close the panel
+ * under whoever had just pressed Next. Two seconds clears the gap while
+ * stopping playback still feels immediate.
  */
 const SESSION_GRACE_MS = 2000;
 
@@ -59,7 +56,6 @@ export function mountMedia(root, zebar) {
     artist: panel.querySelector('.media-panel__artist'),
     elapsed: panel.querySelector('.media-panel__elapsed'),
     total: panel.querySelector('.media-panel__total'),
-    progress: panel.querySelector('.media-panel__progress'),
     toggle: panel.querySelector('[data-action="toggle"]'),
   };
 
@@ -181,16 +177,13 @@ export function mountMedia(root, zebar) {
       }
     }
 
-    // A fresh fix on where playback actually is — but only when there is one.
-    //
-    // This runs on every group tick, once a second, while the provider moves
-    // `position` about once every eight. Re-stamping the clock each time reset
-    // the extrapolation to a reading that was up to eight seconds stale, so the
-    // elapsed time never advanced more than a second past the last emission and
-    // the panel looked like it only updated every ten seconds. Re-sync when the
-    // number actually changes, or when playback starts or stops — a resume
-    // reports the same position it paused at, and the clock has to start from
-    // now rather than from whenever that position first arrived.
+    // A fresh fix on where playback is — but only when there is one. This runs
+    // on every group tick, once a second, while the provider moves `position`
+    // about once every eight; re-stamping the clock on every tick would reset
+    // the extrapolation to a reading up to eight seconds stale. So: re-sync
+    // when the number actually changes, or when playback starts or stops — a
+    // resume reports the position it paused at, and the clock has to start
+    // from now rather than from whenever that number first arrived.
     if (session.position !== reported || playbackChanged) {
       reported = session.position;
       syncedPosition = session.position;

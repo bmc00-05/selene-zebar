@@ -1,6 +1,6 @@
 /*
- * The Selene ramp and the handful of derived values the bar reasons about.
- * Everything downstream reads from here; no raw colour below this file.
+ * Every value the bar reasons about: the Selene ramp, the roles built on it,
+ * metrics, and motion. Nothing below this file writes a raw colour.
  */
 
 :root {
@@ -9,9 +9,9 @@
    * and chroma move, which is what makes background and foreground read as
    * one family rather than two palettes that happen to sit together.
    *
-   * Written in oklch because its lightness is perceptual: 68% -> 76% -> 84%
-   * are evenly spaced steps to the eye, where the same jumps in hex are not.
-   * Retuning a step means editing one number. Hex is noted for the picker. */
+   * oklch because its lightness is perceptual: 68% -> 76% -> 84% are even
+   * steps to the eye, where the same jumps in hex are not. Hex is noted for
+   * the picker. */
   --sl-void: oklch(15% 0.013 278); /* #0a0b11 */
   --sl-night: oklch(17% 0.017 278); /* #0e0f17 */
   --sl-dusk: oklch(20% 0.02 278); /* #14151f */
@@ -23,23 +23,20 @@
   --sl-silver: oklch(84% 0.032 278); /* #c5c9e0 */
   --sl-moon: oklch(94% 0.016 278); /* #e8eaf6 */
 
-  /* Chroma peaks here, at 0.069. High for this ramp, low in absolute terms —
-   * which is the point: it reads as silver carrying violet, not as violet. */
+  /* Chroma peaks here, at 0.069 — high for this ramp, low in absolute terms,
+   * so it reads as silver carrying violet rather than as violet. */
   --sl-glow: oklch(80% 0.069 278); /* #b3baea */
   --sl-halo: oklch(87% 0.047 278); /* #ccd2f4 */
 
   /* --- Semantic roles --------------------------------------------------- */
   --accent: var(--sl-glow);
   --accent-soft: var(--sl-halo);
-  /* 88% is a floor, not a taste call. The bar is meant to sit on wallpapers we
-   * have never seen, and a white one is the worst case: the plate composites
-   * up towards it and every text colour loses contrast against it. At 88% the
-   * dimmest text role (--fg-muted, an empty workspace number) still clears
-   * WCAG AA there at 4.82:1; at 85% it drops to 4.35 and fails. */
+  /* 88% is a floor, not a taste call. The bar sits on wallpapers it has never
+   * seen, and a white one is the worst case: at 88% the dimmest text role
+   * (--fg-muted) still clears WCAG AA against it, at 85% it does not. */
   --bar-bg: color-mix(in srgb, var(--sl-night) 88%, transparent);
-  /* A rim rather than a line: light borrowed from the foreground at low
-   * opacity, so it reads as the edge catching light instead of a drawn
-   * outline. A solid ramp colour looks like a box at this size. */
+  /* A rim rather than a line: foreground light at low opacity reads as the
+   * edge catching light instead of a drawn outline. */
   --bar-border: color-mix(in srgb, var(--sl-silver) 10%, transparent);
   --fg: var(--sl-silver);
   --fg-soft: var(--sl-soft);
@@ -48,27 +45,24 @@
   --on-accent: var(--sl-void);
 
   /* --- Danger ------------------------------------------------------------
-   * The only two colours in this file that leave hue 278, and the exception is
-   * deliberate. Everything else says "look here" with brightness, which works
-   * while there is one thing to say; it stops working when the meaning is
-   * "this is going wrong" and the widget next door is merely bright.
-   *
-   * Used by the RAM ring at 80/90% and by the battery at 15/5%. Two widgets,
+   * The only two colours off hue 278, and the exception is deliberate.
+   * Brightness says "look here", which works while there is one thing to
+   * say; it cannot say "this is going wrong" once the widget next door is
+   * merely bright. Used by the RAM ring at 80/90% and the battery at 15/5%,
    * one vocabulary: amber is a caution, red is a problem.
    *
-   * Lightness is held at the accent's 80% so the swap does not read as the
-   * widget suddenly getting brighter — only chroma and hue move. Chroma goes
-   * above the ramp's ceiling of 0.069, and that is the part that says "not the
-   * usual state". Both are warm, so the pair reads as one family against the
-   * cool base rather than as two unrelated colours.
+   * Lightness stays at the accent's 80% so the swap reads as a change of
+   * colour, not of brightness. Chroma goes above the ramp's ceiling of 0.069,
+   * and that is the part that registers as "not the usual state". Both are
+   * warm, so they read as one family against the cool base.
    *
    * If the palette is ever retuned, these two are meant to stay off-hue. */
   --warn: oklch(82% 0.11 85); /* #e5bf6d */
   --alert: oklch(70% 0.17 25); /* #f66d67 */
-  /* Two layers rather than one wide blur. A single large blur bright enough to
-   * notice also swallows the ring it is meant to light; the tight inner shadow
-   * keeps the stroke crisp while the wide one carries the bloom. A moon's halo
-   * falls off the same way — bright at the rim, thin further out. */
+
+  /* Focused-workspace halo. Two layers rather than one wide blur: the tight
+   * inner shadow keeps the stroke crisp while the wide one carries the bloom,
+   * the way a moon's halo falls off — bright at the rim, thin further out. */
   --ws-halo-ring:
     0 0 4.8px color-mix(in srgb, var(--accent) 88%, transparent),
     0 0 16px color-mix(in srgb, var(--accent) 45%, transparent);
@@ -76,102 +70,84 @@
     0 0 4.8px color-mix(in srgb, var(--accent) 95%, transparent),
     0 0 14.4px color-mix(in srgb, var(--accent) 64%, transparent);
   /* The bottom of the breath, as a fraction of the halo's full strength. A
-   * plain number and not a second pair of shadows: see the note on the layer
-   * in workspaces.css for why the halo is faded rather than redrawn.
-   *
-   * This started at 0.55 and was not visible — rendered side by side, the
-   * trough and the peak were the same picture. The halo above was raised
-   * about 1.6x at the same time, so the peak is brighter than the old resting
-   * level and the swing has somewhere to happen. */
+   * plain number rather than a second pair of shadows, because the halo is
+   * faded, never redrawn — see the halo layer in workspaces.css. */
   --ws-breathe-low: 0.35;
-  /* Floating panels — the Selene menu and the calendar. These sit over the
-   * desktop rather than on the bar plate, so they are opaque: there is nothing
-   * behind them worth showing, and translucency over an unknown wallpaper only
-   * costs legibility. Named --menu-* because the menu had them first; both
-   * panels share the surface deliberately, so they read as one material. */
-  --menu-bg: var(--sl-dusk);
-  --menu-border: color-mix(in srgb, var(--sl-silver) 14%, transparent);
-  --menu-item-hover: var(--sl-ash);
-  --menu-shadow: 0 8px 24px color-mix(in srgb, var(--sl-void) 70%, transparent);
+
+  /* Floating panels — the menu, the calendar and the media panel. They sit
+   * over the desktop rather than on the bar plate, so they are opaque: there
+   * is nothing behind them worth showing, and translucency over an unknown
+   * wallpaper only costs legibility. One surface for all three, so they read
+   * as one material. */
+  --panel-bg: var(--sl-dusk);
+  --panel-border: color-mix(in srgb, var(--sl-silver) 14%, transparent);
+  --panel-item-hover: var(--sl-ash);
+  --panel-shadow: 0 8px 24px color-mix(in srgb, var(--sl-void) 70%, transparent);
+  --panel-radius: 10px;
 
   /* --- Typography ---------------------------------------------------------
-   * No icon font. Every mark in this bar is a drawn SVG — the moon, the
-   * battery, the power symbol, the window glyph. That started when the Nerd
-   * Font codepoint for a crescent turned out to render an arrow in the
-   * installed version, and it has held since: a drawn shape cannot drift
-   * between font releases and needs nothing installed to show up. */
+   * No icon font. Every mark in this bar is a drawn SVG, so nothing has to be
+   * installed for it to show and no glyph can drift between font releases. */
   --font-body: 'Inter', 'Segoe UI Variable', 'Segoe UI', sans-serif;
   --fs-base: 12px;
 
   /* --- Metrics -----------------------------------------------------------
-   * Every gap around the bar is 4px, but two different systems produce them,
-   * because GlazeWM only positions ordinary windows — the bar is an appbar
-   * that reserves screen space, so GlazeWM never moves it:
+   * Every gap around the bar is 4px, but two systems produce them, because
+   * GlazeWM only positions ordinary windows — the bar is an appbar that
+   * reserves screen space, so GlazeWM never moves it:
    *
    *     screen edge -> bar        us, via --bar-inset-*
    *     bar -> windows            GlazeWM, via gaps.outer_gap.top
    *     screen edge -> windows    GlazeWM, via gaps.outer_gap.left/right
    *
    * Change one and the other three stop matching. GlazeWM's side is
-   * `gaps.outer_gap` in dotfiles/glazewm/config.yaml, currently 4px all round.
+   * `gaps.outer_gap` in dotfiles/glazewm/config.yaml, 4px all round.
    *
-   * There is no bottom inset: the gap under the bar is GlazeWM's to give.
-   * Reserving one here too is what stacked 18px of dead space before. So the
-   * preset height in zpack.json covers exactly two bands:
+   * There is no bottom inset: the gap under the bar is GlazeWM's to give, and
+   * reserving one here too stacks two gaps. So the preset height in zpack.json
+   * covers exactly two bands:
    *
    *     --bar-inset-y  +  the bar itself
    *          4px       +       36px       = 40px
    *
-   * Both are multiples of 4 on purpose. This monitor runs at 1.25 (= 5/4), so
-   * only multiples of 4 land on whole device pixels; 35px would come out at
-   * 43.75 and soften the rim.
-   *
-   * `--bar-pad-x` is inside the bar, where GlazeWM cannot reach; at 0 the
-   * leftmost glyph sits flush against the plate edge. */
+   * Lengths throughout this file are multiples of 4, or of 0.8 where a value
+   * has to be finer. This monitor runs at 1.25 (= 5/4), so only those land on
+   * whole device pixels; anything else softens an edge or sits off-centre. */
   --bar-inset-x: 4px;
   --bar-inset-y: 4px;
-  /* The bar states its own height rather than filling the window, because the
-   * window is no longer a fixed size: it grows while the menu is open. Filling
-   * it would stretch the bar to 200-odd pixels every time the menu opened.
-   * This plus --bar-inset-y must equal the preset height in zpack.json. */
+  /* Stated rather than filling the window, because the window grows while a
+   * panel is open. This plus --bar-inset-y must equal the preset height in
+   * zpack.json. */
   --bar-height: 36px;
   /* Larger than --radius-bar, or the first glyph sits inside the corner curve
-   * and reads as crowded against the edge. Also a multiple of 4, so it lands
-   * on whole device pixels like everything else. */
+   * and reads as crowded against the edge. */
   --bar-pad-x: 12px;
   --gap-group: 12px;
   --gap-item: 6px;
   --radius-bar: 10px;
 
-  /* Workspace indicators. `--ws-hit` is the click target and also the ring; the
-   * dot keeps one box and changes scale, so the four states read as one dot
-   * growing rather than four different dots.
+  /* Workspace indicators. `--ws-hit` is the click target and also the ring;
+   * the dot keeps one box and changes scale, so the four states read as one
+   * dot growing rather than four different dots.
    *
-   * Scale, not width and height. Animating the box re-runs layout every frame
-   * and the dot's top and bottom edges round to the device grid independently,
-   * so the circle drifts a pixel one way and back — it looked like the dot was
-   * bouncing. A transform is composited about the element's own centre, so the
-   * growth is exactly symmetric and nothing re-rounds mid-flight.
-   *
-   * 16 and 8 are multiples of 4 because this monitor scales by 1.25 (= 5/4);
-   * only multiples of 4 land on whole device pixels. 18 and 7 did not, which
-   * left the dot visibly off-centre inside its ring. `--ws-ring-width` is
-   * 0.8px for the same reason — exactly one device pixel. */
+   * Scale, not width and height: animating the box re-runs layout every frame
+   * and its edges round to the device grid independently, so the circle
+   * drifts a pixel and back. A transform is composited about the element's
+   * own centre, so the growth is exactly symmetric. `--ws-ring-width` is
+   * exactly one device pixel at 1.25. */
   --ws-hit: 16px;
   --ws-dot: 8px;
   --ws-ring-width: 0.8px;
 
   /* Focus changes get their own timing rather than the bar's default.
-   * --ease-standard front-loads hard: measured on a real switch, 68% of a
-   * 220ms change had landed 65ms in, which reads as a cut rather than a move.
-   * Longer, and on a curve that spends its time in the middle. */
+   * --ease-standard front-loads hard enough that a 220ms switch reads as a
+   * cut rather than a move; this is longer, on a curve that spends its time
+   * in the middle. */
   --ws-focus-dur: 320ms;
   --ws-focus-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* How long one breath of the focused halo takes. Close to the battery's
-   * charging pulse (2.6s) now that the depth is close to it too — 4s with a
-   * deep swing read as laboured rather than calm. Still the slowest thing in
-   * the bar. */
+  /* How long one breath of the focused halo takes. The slowest thing in the
+   * bar: it is on screen permanently and meant to be ignorable. */
   --ws-breathe-dur: 3s;
 
   /* Rendered dot = --ws-dot x scale: 5px, 6px, 7px, 8px. */
@@ -180,17 +156,17 @@
   --ws-scale-displayed: 0.875;
   --ws-scale-focused: 1;
 
-  /* The mark. 16px keeps it on the pixel grid like everything else, and matches
-   * the workspace indicators so the row shares one optical size. */
+  /* The mark. 16px matches the workspace indicators, the window icon and the
+   * RAM ring, so the row shares one optical size. */
   --brand-size: 16px;
 
-  /* Menu. `--menu-window-h` is read by bar.js: it is how tall the widget window
-   * grows while the menu is open, and must clear the bar plus the panel plus
-   * its shadow. Too small and the menu is clipped at the window edge; too large
-   * costs nothing, since the reserved strip does not follow the window. */
+  /* Menu. `--menu-window-h` is how tall the widget window grows while the
+   * menu is open (menu.js, through lib/window.js); it must clear the bar plus
+   * the panel plus its shadow. Too small and the menu is clipped at the window
+   * edge; too large costs nothing, since the reserved strip does not follow
+   * the window. */
   --menu-width: 190px;
   --menu-window-h: 220px;
-  --menu-radius: 10px;
 
   /* Calendar. The panel states no width — seven columns of --cal-cell decide
    * it — but its height has to be known here, because --cal-window-h is how
@@ -200,10 +176,7 @@
    *     bar band 40 + margin 6 + 262 + room for the shadow          -> 340
    *
    * Six rows always, never five: a panel that changed height between months
-   * would stop matching this number. calendar.js fills the spare cells.
-   *
-   * 32 and 24 are multiples of 4 like everything else here, so they land on
-   * whole device pixels at this monitor's 1.25 scale. */
+   * would stop matching this number. calendar.js fills the spare cells. */
   --cal-cell: 32px;
   --cal-head: 24px;
   --cal-pad: 10px;
@@ -212,32 +185,18 @@
    * than half the cell so neighbouring days do not touch it. */
   --cal-today-r: 13px;
 
-  /* Media.
+  /* Media. `--media-max-w` is a guard, not a taste call: the bar's regions are
+   * a `1fr auto 1fr` grid and the left region is start-aligned, so content
+   * that outgrows its track does not push the centre — it draws on top of it.
+   * 240 leaves the focused-window title clear with room to spare.
    *
-   * `--media-max-w` is a guard, not a taste call. The bar's regions are a
-   * `1fr auto 1fr` grid and the left region is start-aligned, so content that
-   * outgrows its track does not push the centre — it draws on top of it.
-   * Measured from the media slot: 350px still cleared the focused-window title
-   * by 9px, 371px overlapped it by 12. At 240 the whole group (equaliser 14 +
-   * gap 6 + text) comes to 260 and leaves 99px of daylight.
-   *
-   * For scale: `DEMON TIME · Jeffrey White` is 168px and sits still; a long
-   * Korean title with an artist runs about 255px and scrolls.
-   *
-   * --media-window-h is how tall the widget window grows for the panel, read
-   * by media.js through lib/window.js. */
+   * --media-window-h is how tall the widget window grows for the panel
+   * (media.js, through lib/window.js). */
   --media-max-w: 240px;
-  /* Seven bars, 26.4 wide against 16 tall. Wider than tall on purpose: a
-   * square block of bars reads as an icon, a wide one reads as a meter.
-   *
-   * The odd-looking widths are the same trick as --ws-ring-width. This monitor
-   * scales by 1.25, so a value lands on whole device pixels when it is a
-   * multiple of 0.8: the bars are 3 device pixels and the gaps 2, where a
-   * round 2px would have been 2.5 and softened both vertical edges. The whole
-   * group comes to exactly 33 device pixels.
-   *
-   * Height is a multiple of 4 like everything else. The bar count lives in the
-   * markup, the per-bar travel in media.css. */
+  /* Seven bars, wider than tall on purpose: a square block of bars reads as an
+   * icon, a wide one reads as a meter. Bar and gap are multiples of 0.8px —
+   * 3 and 2 device pixels at 1.25 — so their vertical edges stay crisp. The
+   * bar count lives in the markup, the per-bar travel in media.css. */
   --media-eq-h: 16px;
   --media-eq-bar: 2.4px;
   --media-eq-gap: 1.6px;
@@ -248,50 +207,43 @@
   --media-window-h: 220px;
   --media-rail: 4px;
   --media-button: 28px;
+  --media-button-icon: 16px;
 
-  /* Focused-window readout. 16px keeps the icon on the pixel grid and at the
-   * same optical size as the mark and the workspace ring. `--aw-max-w` is where
-   * long titles start to ellipsise; YASB cut at 20 characters, but width is the
-   * better unit when Korean and Latin titles mix. */
+  /* Focused-window readout. `--aw-max-w` is where long titles start to
+   * ellipsise; width rather than a character count, because Korean and Latin
+   * titles mix. */
   --aw-icon: 16px;
   --aw-max-w: 320px;
   --aw-icon-saturate: 0.55;
 
-  /* Battery gauge. Multiples of 4, so 40x25 whole device pixels at 1.25. The
-   * battery drawing is 24x12 of that; the surplus is room for the halo to
-   * spread, since an SVG clips to its own box. */
+  /* Battery gauge. The drawing is 24x12 inside a 32x20 box; the surplus is
+   * room for the halo to spread, since an SVG clips to its own box. */
   --battery-w: 32px;
   --battery-h: 20px;
-  /* The mains halo, in SVG user units. It is a blurred copy of the case
-   * outline, not a drop-shadow on the whole gauge: a shadow falls behind the
-   * filled bar too, so the glow pooled inside the case and blurred the edge
-   * between case and gauge. */
+  /* The mains halo, in SVG user units. A blurred copy of the case outline
+   * rather than a shadow on the whole gauge, so the light sits on the case
+   * edge and does not pool behind the fill. */
   --battery-glow-width: 2;
   --battery-glow-blur: 2px;
 
-  /* Volume. 16px like the mark, the window icon and the RAM ring, so the row
-   * shares one optical size and lands on whole device pixels at 1.25. */
+  /* Volume icon, 16px like the other marks in the row. */
   --vol-icon: 16px;
 
-  /* RAM ring. 16px puts it on the pixel grid and at the same optical size as
-   * the mark, the window icon and the workspace ring. r=6 with a 2-wide stroke
-   * makes the outer diameter 14, leaving 1 of margin inside the 16 box.
-   *
-   * The circumference is normalised to 100 by `pathLength` in the markup, so
-   * nothing here or in memory.js has to carry 2*pi*r. */
+  /* RAM ring. r=6 with a 2-wide stroke makes the outer diameter 14, leaving 1
+   * of margin inside the 16 box. The circumference is normalised to 100 by
+   * `pathLength` in the markup, so nothing here or in memory.js carries
+   * 2*pi*r. */
   --mem-ring: 16px;
   --mem-stroke: 2;
   --mem-track: color-mix(in srgb, var(--fg-muted) 28%, transparent);
 
   /* Power button and overlay. The scrim is opaque rather than blurred: a
    * transparent window's backdrop-filter cannot reach the applications behind
-   * it on Windows, so blur left them sharp. This is what actually darkens. */
+   * it on Windows, so blur leaves them sharp. This is what actually darkens. */
   --power-button: 16px;
   --power-scrim: color-mix(in srgb, var(--sl-void) 88%, transparent);
-  /* Square, and stated rather than left to the content: letting the label size
-   * decide the height produced 108.6px, which is neither square nor on the
-   * pixel grid, and would shift again if the font changed. 120 lands on
-   * 150 whole device pixels at 1.25. */
+  /* Square, and stated rather than left to the label: a content-sized tile is
+   * neither square nor on the pixel grid, and shifts with the font. */
   --power-tile: 120px;
   --power-icon: 28px;
   --power-gap: 12px;
@@ -302,39 +254,23 @@
   --power-hold: 600ms;
 
   /* --- Motion ------------------------------------------------------------
-   * The reason this project exists: a bar that can actually animate.
-   *
    * `--ease-standard` carries every continuous change — a focus moving, a
    * colour settling. `--ease-out-back` overshoots, so it is kept for discrete
-   * arrivals only: a workspace appearing, the menu opening. Used on a focus
-   * change it reads as the dot bouncing. */
+   * arrivals only: a workspace appearing, a panel opening. On a focus change
+   * it reads as the dot bouncing. */
   --dur-fast: 120ms;
   --dur-base: 220ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-out-back: cubic-bezier(0.34, 1.4, 0.64, 1);
 
-  /* What animation costs here, measured, because it is not what one expects.
+  /* Step count for the halos that breathe. On this machine an animation
+   * costs CPU per compositor frame, whatever is in the frame, and the
+   * compositor skips frames where the animated value has not changed — so a
+   * breath in steps costs about half of the same breath eased. 20 steps over
+   * 3s is a 3% opacity change every 150ms, which the eye does not pick apart.
    *
-   * On this machine a single 16px element fading at 60fps costs about 8% of
-   * one core — in Zebar and in a plain Edge tab alike (8.8-10.8% there). It
-   * is not the transparent window (opaque: 16.2%, transparent: 17.8%), not
-   * the element's size (a 2x2px dot costs the same as the halo), not GPU
-   * acceleration (D3D11, compositing enabled). It is the per-frame cost of
-   * Chromium's compositor on this Intel GPU: roughly 1.5ms of CPU for every
-   * frame it produces, whatever is in it. The same thing made VS Code's
-   * blinking cursor famous for eating 13%.
-   *
-   * So the only lever is the number of frames, and the compositor does not
-   * draw a frame when the animated value has not changed. A breath eased over
-   * 3s changes every frame; the same breath in steps changes only at the
-   * steps. Measured on the focused halo: continuous 7.7-14%, steps(20) 4.0-
-   * 4.9%, steps(6) 1.5-2.4%, stopped 0.7-1.8%.
-   *
-   * 20 steps over a 3s breath is a 3% opacity change every 150ms, which the
-   * eye does not pick apart; 6 steps shows the stairs. Applied to the two
-   * halos that breathe. Not to the equaliser — seven bars on seven phases
-   * change on nearly every frame anyway — and not to the marquee, which has to
-   * glide. */
+   * Not used on the equaliser, where seven bars on seven phases change on
+   * nearly every frame anyway, nor on the marquee, which has to glide. */
   --breathe-steps: 20;
 }
 

@@ -1,12 +1,9 @@
 /*
  * Power button and its full-screen overlay.
  *
- * The backdrop is opaque, not blurred. backdrop-filter was tried first and
- * measured: on Windows a transparent window's backdrop only reaches content
- * inside the same window, so a blurred panel left the applications behind it
- * perfectly sharp (adjacent-pixel variance 0.12 blurred vs 0 unblurred — noise,
- * not blur). A scrim is what actually darkens the screen, and it guarantees
- * button contrast over any wallpaper.
+ * The overlay is a popover, but not a `.panel`: it fills the window rather
+ * than hanging off an anchor, and it fades in place without moving. The
+ * backdrop is an opaque scrim rather than a blur — see --power-scrim.
  */
 
 .power {
@@ -46,7 +43,7 @@
 
 .power__overlay {
   /* The popover owns the whole window once open; the window itself is what
-   * grows to cover the screen. */
+   * grows to cover the screen (power.js, through lib/window.js). */
   width: 100%;
   height: 100%;
   max-width: none;
@@ -57,31 +54,16 @@
   background: var(--power-scrim);
   color: var(--fg);
   overflow: hidden;
-  /* Centring belongs here, not in the :popover-open rule below. `display` is
-   * held through the close by allow-discrete, but nothing else in that rule is:
-   * putting place-items there dropped it to `normal` on the first frame of the
-   * fade, and the buttons sat in the top-left corner for the whole 220ms —
-   * measured jumping from x=510,y=372 to 0,0. */
+  /* Centring belongs here, not in the :popover-open rule: `display` is held
+   * through the close by allow-discrete, but nothing else declared there is,
+   * so place-items there would drop to `normal` on the first frame of the
+   * fade and throw the buttons into the top-left corner. */
   place-items: center;
-}
-
-/* Only the display flip, which is what the popover actually toggles. */
-.power__overlay:popover-open {
-  display: grid;
-}
-
-/*
- * Fades as one piece, both directions.
- *
- * The closed state has to be written out. @starting-style only says where the
- * scrim comes from, so with `opacity: 1` as the resting rule it stayed fully
- * opaque for the whole discrete `display` window. That was the worst of the
- * three panels: power.js put the window back to the bar strip at the same
- * moment, and a scrim at `height: 100%` then covered the entire bar — 40px of
- * flat scrim over the plate, measured at opacity 1 for 167ms. Stating the
- * closed state gives it an exit; power.js waits for that exit before restoring.
- */
-.power__overlay {
+  /*
+   * The closed state is written out, as for the panels: without it the scrim
+   * would hold at full opacity for the whole discrete `display` window with
+   * no exit, and power.js restores the window while it is still drawn.
+   */
   opacity: 0;
   transition:
     opacity var(--dur-base) var(--ease-standard),
@@ -89,7 +71,9 @@
     display var(--dur-base) allow-discrete;
 }
 
+/* Only the display flip, which is what the popover actually toggles. */
 .power__overlay:popover-open {
+  display: grid;
   opacity: 1;
 }
 
@@ -106,15 +90,9 @@
 
 .power__action {
   position: relative;
-  /* Icon over label, the pair centred as one block in a fixed square.
-   *
-   * The height is declared rather than left to the content: with `auto` the
-   * tile followed the label and came out 108.6px, neither square nor on the
-   * pixel grid, and it would shift again if the font changed.
-   *
-   * The rows are `auto auto` inside a centred content box, not `1fr auto` —
-   * a fractional row swallows the spare height and pushes the pair off centre
-   * (icon sat 33.5px from the top against 20.8px below the label). */
+  /* Icon over label, the pair centred as one block in a fixed square. The
+   * rows are `auto auto` inside a centred content box, not `1fr auto`: a
+   * fractional row swallows the spare height and pushes the pair off centre. */
   display: grid;
   grid-template-rows: auto auto;
   align-content: center;
@@ -123,9 +101,9 @@
   width: var(--power-tile);
   height: var(--power-tile);
   padding: var(--power-tile-pad);
-  border: 1px solid var(--menu-border);
+  border: 1px solid var(--panel-border);
   border-radius: var(--radius-bar);
-  background: var(--menu-bg);
+  background: var(--panel-bg);
   color: var(--fg);
   font: inherit;
   cursor: pointer;
@@ -158,8 +136,8 @@
 /* --- Hold to confirm ----------------------------------------------------- */
 
 /* Shutdown and restart fill as they are held. The bar scales rather than
- * changing width, the same reason the battery gauge does: animating geometry
- * re-rounds the edges to the device grid every frame. */
+ * changing width, for the same reason the battery gauge does: animating
+ * geometry re-rounds the edges to the device grid every frame. */
 .power__progress {
   position: absolute;
   inset: 0;

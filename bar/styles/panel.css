@@ -1,0 +1,58 @@
+/*
+ * Floating panels: the menu, the calendar and the media panel.
+ *
+ * Each is a platform popover — `popover` on the panel, `popovertarget` on its
+ * button (see index.html) — which hands the browser the top layer, light
+ * dismiss on outside click and Escape, and focus handling. CSS anchor
+ * positioning places it, so nothing measures the button in JavaScript. What
+ * JavaScript still does is grow the widget window (lib/window.js): a popover
+ * is free of the page, not of the window it lives in.
+ *
+ * This file is the shared surface and the open/close motion. Each panel's own
+ * stylesheet adds its anchor, size, `display` and contents.
+ */
+
+.panel {
+  margin: 6px 0 0;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+  color: var(--fg);
+  /* The popover default is a black border, a white background and clipping. */
+  overflow: visible;
+  /* If it would not fit below its anchor, put it above rather than let it
+   * slide. */
+  position-try-fallbacks: flip-block;
+  /*
+   * The closed state is written out. @starting-style only says where the
+   * panel comes from; without an explicit closed state the panel would hold
+   * at full opacity for the whole discrete `display` window and then vanish,
+   * with no exit — and the component shrinks the window while it is still
+   * drawn.
+   *
+   * `display` and `overlay` run for --dur-base rather than --dur-fast so the
+   * slower of the two properties, transform, is not cut off mid-flight.
+   */
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transition:
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-out-back),
+    overlay var(--dur-base) allow-discrete,
+    display var(--dur-base) allow-discrete;
+}
+
+.panel:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+/* Where it comes from on the way in — the same spring the workspace
+ * indicators use when they arrive. */
+@starting-style {
+  .panel:popover-open {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}

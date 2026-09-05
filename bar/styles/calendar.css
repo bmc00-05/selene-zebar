@@ -1,71 +1,24 @@
 /*
  * The month calendar under the clock.
  *
- * Placement is CSS anchor positioning, mirrored from the Selene menu: that
- * panel hangs off the leftmost element and runs rightwards, this one hangs off
- * the rightmost and runs leftwards. `span-left` aligns the panel's right edge
- * with the clock's right edge exactly — measured at 0px — so nothing here
- * measures the clock in JavaScript.
+ * A `.panel` (panel.css) anchored to the clock. The menu hangs off the
+ * leftmost element and runs rightwards; this one hangs off the rightmost and
+ * runs leftwards, so `span-left` puts its right edge on the clock's.
  *
  * A real <table>, because a calendar is tabular data and `th[scope=col]` gives
- * a screen reader the weekday headers for free. The drawn-SVG rule elsewhere in
- * this bar is about icons; this is a grid of numbers.
+ * a screen reader the weekday headers for free. The drawn-SVG rule elsewhere
+ * in this bar is about icons; this is a grid of numbers.
  */
 
 .calendar {
   position-anchor: --clock;
   /* Below the clock, running leftwards from its right edge. */
   position-area: bottom span-left;
-  /* If it would not fit below, put it above rather than let it slide. */
-  position-try-fallbacks: flip-block;
-  margin: 6px 0 0;
   padding: var(--cal-pad);
-  border: 1px solid var(--menu-border);
-  border-radius: var(--menu-radius);
-  background: var(--menu-bg);
-  box-shadow: var(--menu-shadow);
-  color: var(--fg);
-  /* The popover default is a black border and white background. */
-  overflow: visible;
 }
 
 .calendar:popover-open {
   display: block;
-}
-
-/*
- * Open and close, both directions.
- *
- * The closed state has to be written out. @starting-style only says where the
- * panel comes from, so with `opacity: 1` as the resting rule the panel held at
- * full opacity for the whole discrete `display` window and then vanished —
- * measured at op=1.00 for 119ms. Stating the closed state gives it an exit.
- *
- * `display` and `overlay` run for --dur-base rather than --dur-fast so the
- * slower of the two properties, transform, is not cut off mid-flight.
- */
-.calendar {
-  opacity: 0;
-  transform: translateY(-4px) scale(0.98);
-  transition:
-    opacity var(--dur-fast) var(--ease-standard),
-    transform var(--dur-base) var(--ease-out-back),
-    overlay var(--dur-base) allow-discrete,
-    display var(--dur-base) allow-discrete;
-}
-
-.calendar:popover-open {
-  opacity: 1;
-  transform: none;
-}
-
-/* Where it comes from on the way in — the same spring the menu and the
- * workspace indicators use when they arrive. */
-@starting-style {
-  .calendar:popover-open {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.98);
-  }
 }
 
 .calendar__month {
@@ -82,7 +35,7 @@
    * a 1 and a 30 must not make neighbouring columns different widths. */
   table-layout: fixed;
   border-collapse: collapse;
-  /* tabular figures for the same reason they are on the clock. */
+  /* Tabular figures for the same reason they are on the clock. */
   font-variant-numeric: tabular-nums;
 }
 

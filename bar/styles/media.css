@@ -1,11 +1,10 @@
 /*
  * Media: the equaliser and the track in the bar, and the panel behind them.
  *
- * The bar half is capped at --media-max-w and that cap is not cosmetic. The
- * bar's three regions are a `1fr auto 1fr` grid and the left region is
- * start-aligned, so content that outgrows its track does not push the centre —
- * it silently draws on top of it. Measured: 371px of content here and the
- * region overlapped the focused-window title by 12px.
+ * The bar half is capped at --media-max-w, and the cap is not cosmetic: the
+ * bar's regions are a `1fr auto 1fr` grid with the left region start-aligned,
+ * so content that outgrows its track does not push the centre — it draws on
+ * top of it.
  */
 
 .media {
@@ -33,26 +32,18 @@
 /* --- Equaliser ----------------------------------------------------------- */
 
 /*
- * Seven bars, none of them driven by the music.
+ * Seven bars, none of them driven by the music. Nothing in reach reports a
+ * spectrum — the media provider carries no audio — so this is decoration that
+ * says "playing", and it is honest about being decoration.
  *
- * Nothing in reach reports a spectrum — the media provider carries no audio,
- * and every route to the real signal was measured and rejected: the microphone
- * hears the room rather than the stream, tab capture demands a picker every
- * launch, and the Windows peak meter gives one amplitude per channel, not
- * frequencies. This is decoration that says "playing", and it is honest about
- * being decoration.
- *
- * What makes it read as a waveform instead of seven blinking things is that no
- * two bars agree. Each has its own cycle length, its own phase, and its own
- * travel; the durations share no common multiple, so the group never resolves
- * into a pattern you can catch.
- *
- * The travel is shaped like a spectrum rather than being uniform: the middle
- * bars swing hardest and the outer ones barely move, which is roughly what a
- * real analyser looks like once the sub-bass and the air have fallen away.
+ * What makes it read as a waveform instead of seven blinking things is that
+ * no two bars agree. Each has its own cycle length, phase and travel, and the
+ * durations share no common multiple, so the group never resolves into a
+ * pattern you can catch. The travel is shaped like a spectrum: the middle bars
+ * swing hardest and the outer ones barely move.
  *
  * scaleY, never height: animating the box re-rounds its edges to the device
- * grid every frame, the same thing that made the workspace dot wobble.
+ * grid every frame.
  */
 .media__eq {
   display: flex;
@@ -138,24 +129,16 @@
   }
 }
 
-/* Paused, or nothing coming out: the bars settle to the floor.
+/* Paused, or nothing playing: the bars settle to the floor. Lying flat is
+ * unmistakable where a shape frozen mid-stride is not, and it is what a real
+ * meter does with no signal. No separate glyph — the equaliser already is the
+ * play indicator.
  *
- * They used to freeze mid-stride with animation-play-state, which left them at
- * whatever heights they happened to be holding — a shape indistinguishable
- * from a quiet moment in the music. Lying flat is unmistakable, and it is the
- * shape a real meter takes with no signal.
- *
- * The settle is an animation rather than a transition because a transition
- * does not fire here: taking the running animation away and letting the base
- * transform through changes no computed value that a transition can catch, and
- * the bars snapped straight to the floor — measured, the first frame after the
- * state change was already there.
- *
- * So the descent is explicit, and it starts from `--settle-from`, which
- * media.js writes with the height each bar was actually rendering at the
- * moment playback stopped. Without it the keyframe would start from the base
- * `--lo` and jump before it fell. The state needs no separate glyph — the
- * equaliser already is the play indicator. */
+ * An animation rather than a transition, because taking the running animation
+ * away changes no computed value a transition can catch: the bars would snap.
+ * The descent starts from `--settle-from`, which media.js writes with the
+ * height each bar was rendering when playback stopped; without it the
+ * keyframe would start from the base `--lo` and jump before it fell. */
 .media[data-playing='false'] {
   color: var(--fg-muted);
 }
@@ -215,42 +198,21 @@
 
 /* --- Panel --------------------------------------------------------------- */
 
+/* A `.panel` (panel.css) anchored to the bar button. */
 .media-panel {
   position-anchor: --media;
   /* Below the button, running rightwards from its left edge — the same
    * direction the Selene menu opens, and away from the screen edge. */
   position-area: bottom span-right;
-  position-try-fallbacks: flip-block;
   width: var(--media-panel-w);
-  margin: 6px 0 0;
   padding: 12px;
-  border: 1px solid var(--menu-border);
-  border-radius: var(--menu-radius);
-  background: var(--menu-bg);
-  box-shadow: var(--menu-shadow);
-  color: var(--fg);
-  overflow: visible;
-  opacity: 0;
-  transform: translateY(-4px) scale(0.98);
-  transition:
-    opacity var(--dur-fast) var(--ease-standard),
-    transform var(--dur-base) var(--ease-out-back),
-    overlay var(--dur-base) allow-discrete,
-    display var(--dur-base) allow-discrete;
+  /* On the base rule, not in :popover-open, for the reason the menu's gap is:
+   * only `display` is held through the close. */
+  gap: 10px;
 }
 
 .media-panel:popover-open {
   display: grid;
-  gap: 10px;
-  opacity: 1;
-  transform: none;
-}
-
-@starting-style {
-  .media-panel:popover-open {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.98);
-  }
 }
 
 .media-panel__title {
@@ -335,14 +297,14 @@
 }
 
 .media-panel__button svg {
-  width: 16px;
-  height: 16px;
+  width: var(--media-button-icon);
+  height: var(--media-button-icon);
 }
 
 .media-panel__button:hover,
 .media-panel__button:focus-visible {
   color: var(--accent);
-  background: var(--menu-item-hover);
+  background: var(--panel-item-hover);
   outline: none;
 }
 
