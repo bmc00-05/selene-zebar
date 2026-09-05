@@ -19,7 +19,9 @@
         "bar/**/*.html",
         "bar/**/*.css",
         "bar/**/*.js",
-        "bar/**/*.ps1"
+        "bar/**/*.ps1",
+        "bar/**/*.woff2",
+        "bar/**/*.txt"
       ],
       "caching": {
         "defaultDuration": 604800,

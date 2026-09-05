@@ -2,7 +2,7 @@
 
 > A [Zebar](https://github.com/glzr-io/zebar) status bar for Windows, built for [GlazeWM](https://github.com/glzr-io/glazewm).
 
-Minimal and quiet: a night-sky ground, moonlit silver, Inter typography.
+Minimal and quiet: a night-sky ground, moonlit silver, Pretendard typography.
 
 > **Status: the bar is in daily use.** The mark opens the settings panel, the
 > workspace indicators track GlazeWM, the media widget shows what is playing,
@@ -22,9 +22,18 @@ flexbox and grid, popovers and anchor positioning, and DevTools for debugging.
 | [Zebar](https://github.com/glzr-io/zebar)     | 3.3.1+ — `winget install -e --id glzr-io.zebar`          |
 | [GlazeWM](https://github.com/glzr-io/glazewm) | 3.10+ — `winget install -e --id glzr-io.glazewm`         |
 | Node                                          | 20+ (tooling only — the widget itself has no build step) |
-| [Inter](https://github.com/rsms/inter)        | body text                                                |
 
-No icon font: every mark in the bar is a drawn SVG.
+Nothing else to install. The bar ships its own typeface —
+[Pretendard](https://github.com/orioncactus/pretendard), variable build, under
+the SIL Open Font License — because one family has to carry both Latin and
+Hangul: a Korean track title should be drawn by the face the bar was designed
+with, not by whatever the machine falls back to.
+
+It covers Latin, Hangul, Cyrillic and Greek. Text outside those — a Japanese or
+Chinese title, Arabic, Thai — falls back to a system font, which still reads
+fine but will not match the rest of the bar.
+
+No icon font either: every mark in the bar is a drawn SVG.
 
 ## Install
 
@@ -129,9 +138,13 @@ bar/
     calendar.js           the month calendar behind the clock
     battery.js            battery gauge
     power.js              lock, sleep, restart, shut down
+  fonts/
+    PretendardVariable.woff2   the bar's typeface, shipped with the pack
+    OFL.txt                    its licence, which has to travel with it
   scripts/
     window-icon.ps1       extracts a window's icon, run through shellExec
   styles/
+    fonts.css             @font-face for the bundled typeface
     tokens.css            the Selene ramp, typography, metrics, motion
     bar.css               reset and the three-region shell
     panel.css             surface and motion shared by the floating panels

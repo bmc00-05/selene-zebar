@@ -86,9 +86,26 @@
   --panel-radius: 10px;
 
   /* --- Typography ---------------------------------------------------------
+   * One family for both scripts. Latin-only faces leave Hangul to whatever the
+   * machine happens to fall back to — here that was Noto Sans KR, which nobody
+   * chose and which is not on any other machine's guarantee list. A media title
+   * is as likely to be Korean as English, so the two have to be one decision.
+   *
+   * Pretendard covers both and its figures are proportional by default, which
+   * is what `font-variant-numeric: tabular-nums` is for wherever digits change
+   * under something that must not move — the clock, the RAM ring, the volume
+   * readout, the battery, the calendar.
+   *
+   * The pack carries the face itself — see fonts.css. The names after it are
+   * a ladder rather than decoration: a copy installed on the machine, then the
+   * OS default. If the bundled file ever fails to load, the bar steps down one
+   * rung instead of falling to something unreadable.
+   *
    * No icon font. Every mark in this bar is a drawn SVG, so nothing has to be
    * installed for it to show and no glyph can drift between font releases. */
-  --font-body: 'Inter', 'Segoe UI Variable', 'Segoe UI', sans-serif;
+  --font-body:
+    'Pretendard Variable', 'Pretendard', 'Segoe UI Variable', 'Segoe UI',
+    sans-serif;
   --fs-base: 12px;
 
   /* --- Metrics -----------------------------------------------------------

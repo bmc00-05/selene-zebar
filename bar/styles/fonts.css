@@ -1,0 +1,32 @@
+/*
+ * The bar ships its own typeface.
+ *
+ * Asking someone to install a font before the bar looks right is a poor first
+ * screen, and a missing one is worse than obvious: the stack quietly falls to
+ * the OS default and Hangul goes back to whatever the machine happens to have.
+ * Bundled, everyone sees the same bar.
+ *
+ * The variable build rather than the static weights. One file covers 500, 600
+ * and 700 — the three this bar uses — and anything added later, and it carries
+ * the full glyph set. The subset build is a third of the size but, being a
+ * subset, drops glyphs: an uncommon syllable in a track title would fall out
+ * to another font, which is a hard bug to trace for a saving of about a
+ * megabyte.
+ *
+ * `font-weight: 45 920` is the axis range Pretendard itself declares, and
+ * `woff2-variations` is what tells the renderer to use that axis instead of
+ * synthesising weights.
+ *
+ * Licensed under the SIL Open Font License 1.1 — the licence requires the text
+ * to travel with the font, so it sits next to it in fonts/OFL.txt.
+ */
+
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-weight: 45 920;
+  font-style: normal;
+  /* Local file, so the wait is nothing. `swap` would paint the first frame in
+   * a different face and then change it, which on a bar reads as a flicker. */
+  font-display: block;
+  src: url('../fonts/PretendardVariable.woff2') format('woff2-variations');
+}
