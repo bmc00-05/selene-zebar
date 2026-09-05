@@ -195,4 +195,9 @@ fastest way to settle on spacing and colour values before writing them into
 
 ## License
 
-MIT
+[MIT](LICENSE) — the bar itself.
+
+One thing in this repository is not covered by that. `bar/fonts/` carries
+[Pretendard](https://github.com/orioncactus/pretendard) by Kil Hyung-jin, under
+the [SIL Open Font License 1.1](bar/fonts/OFL.txt), which travels with the font
+and stays in force wherever the pack goes.
