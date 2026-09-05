@@ -91,8 +91,21 @@ body {
   min-width: 0;
 }
 
+/*
+ * The side regions stretch to their tracks and align their contents inside,
+ * rather than being sized by what is in them.
+ *
+ * `justify-self: start` looks like the same thing and is not: it sizes the
+ * region to its content, which is then free to overrun the 1fr track and draw
+ * on top of the centre. Measured, the left region came out 504px wide at every
+ * screen size from 1280 to 3840 — it never consulted the track at all — and at
+ * 1280 the media widget covered 41px of the focused-window title.
+ *
+ * Stretched, the track is a real limit and the contents give way inside it.
+ */
 .bar__region--left {
-  justify-self: start;
+  justify-self: stretch;
+  justify-content: flex-start;
 }
 
 .bar__region--center {
@@ -100,7 +113,8 @@ body {
 }
 
 .bar__region--right {
-  justify-self: end;
+  justify-self: stretch;
+  justify-content: flex-end;
 }
 
 /* Shown only while the GlazeWM provider has produced nothing yet. */

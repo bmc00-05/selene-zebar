@@ -1,10 +1,9 @@
 /*
  * Media: the equaliser and the track in the bar, and the panel behind them.
  *
- * The bar half is capped at --media-max-w, and the cap is not cosmetic: the
- * bar's regions are a `1fr auto 1fr` grid with the left region start-aligned,
- * so content that outgrows its track does not push the centre — it draws on
- * top of it.
+ * The bar half is capped at --media-max-w. The cap keeps a long title from
+ * crowding the row; what stops it reaching the centre is the region itself,
+ * which is held to its grid track — see bar.css.
  */
 
 .media {
@@ -174,6 +173,11 @@
   display: flex;
   overflow: hidden;
   max-width: var(--media-max-w);
+  /* Without this the flex item's automatic minimum is its content width, so
+   * the cap stops it growing but nothing makes it give way on a narrow screen.
+   * This is what lets the title shrink below --media-max-w when the region has
+   * less room than that. */
+  min-width: 0;
   white-space: nowrap;
 }
 

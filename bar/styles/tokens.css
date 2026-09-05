@@ -128,8 +128,15 @@
    *          4px       +       36px       = 40px
    *
    * Lengths throughout this file are multiples of 4, or of 0.8 where a value
-   * has to be finer. This monitor runs at 1.25 (= 5/4), so only those land on
-   * whole device pixels; anything else softens an edge or sits off-centre. */
+   * has to be finer than that.
+   *
+   * The two rules are not equally portable. A multiple of 4 lands on whole
+   * device pixels at every scale Windows offers — 36px is 36, 45, 54, 72 at
+   * 1.0, 1.25, 1.5 and 2.0. A multiple of 0.8 only does so at this monitor's
+   * 1.25 (= 5/4): elsewhere 0.8px is 0.8, 1.2, 1.6 device pixels and the edge
+   * softens. Those values are tuned for the machine this was built on and are
+   * a shade blurrier on others — visible if you look for it, not broken. The
+   * alternative is giving up crisp hairlines here, which is the worse trade. */
   --bar-inset-x: 4px;
   --bar-inset-y: 4px;
   /* Stated rather than filling the window, because the window grows while a
@@ -150,8 +157,9 @@
    * Scale, not width and height: animating the box re-runs layout every frame
    * and its edges round to the device grid independently, so the circle
    * drifts a pixel and back. A transform is composited about the element's
-   * own centre, so the growth is exactly symmetric. `--ws-ring-width` is
-   * exactly one device pixel at 1.25. */
+   * own centre, so the growth is exactly symmetric. `--ws-ring-width` is one
+   * device pixel at this monitor's 1.25 and a fraction elsewhere — see the
+   * note on the two rules above. */
   --ws-hit: 16px;
   --ws-dot: 8px;
   --ws-ring-width: 0.8px;
@@ -222,8 +230,9 @@
    * (media.js, through lib/window.js). */
   --media-max-w: 240px;
   /* Seven bars, wider than tall on purpose: a square block of bars reads as an
-   * icon, a wide one reads as a meter. Bar and gap are multiples of 0.8px —
-   * 3 and 2 device pixels at 1.25 — so their vertical edges stay crisp. The
+   * icon, a wide one reads as a meter. Bar and gap are multiples of 0.8px, so
+   * at this monitor's 1.25 they come to 3 and 2 whole device pixels and the
+   * vertical edges stay crisp; at other scales they land between pixels. The
    * bar count lives in the markup, the per-bar travel in media.css. */
   --media-eq-h: 16px;
   --media-eq-bar: 2.4px;
