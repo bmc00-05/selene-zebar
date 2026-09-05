@@ -80,14 +80,27 @@ export function mountBattery(root) {
  * Collapses the provider's five states plus the charge level into the one
  * label the stylesheet switches on.
  *
- * `state` comes straight from the provider and is one of discharging,
- * charging, full, empty or unknown — the low and critical steps are ours,
- * layered on top of discharging only. A charging battery at 8% is not a
- * warning; it is already being dealt with.
+ * `state` comes from the provider and is one of discharging, charging, full,
+ * empty or unknown; low and critical are ours.
+ *
+ * What decides whether the number gets to raise a warning is whether the
+ * charger is in. On mains — charging or full — a low number is not a warning,
+ * it is already being dealt with. Off mains the number decides, and that has
+ * to include `empty`: the provider starts saying `empty` while the battery is
+ * still running the machine, and letting that word through unchanged took the
+ * warning away at exactly the charge that needs one.
+ *
+ * `unknown` is the one state that stays as it is. It says the provider could
+ * not read the battery, so its percentage cannot be trusted to raise an alarm
+ * either — a red pulse on a number that means nothing is worse than no pulse.
  */
 function stateOf(battery, percent) {
-  if (battery.state !== 'discharging') {
+  if (battery.state === 'charging' || battery.state === 'full') {
     return battery.state;
+  }
+
+  if (battery.state === 'unknown') {
+    return 'unknown';
   }
 
   if (percent <= CRITICAL_PERCENT) {
@@ -98,5 +111,5 @@ function stateOf(battery, percent) {
     return 'low';
   }
 
-  return 'discharging';
+  return battery.state;
 }
