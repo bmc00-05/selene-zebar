@@ -27,6 +27,7 @@ const ICON_SCRIPT = 'scripts/window-icon.ps1';
 export function mountActiveWindow(root, zebar) {
   const els = {
     icon: root.querySelector('.active-window__icon'),
+    title: root.querySelector('.active-window__title'),
     titles: [...root.querySelectorAll('.active-window__title > span')],
   };
 
@@ -80,6 +81,7 @@ export function mountActiveWindow(root, zebar) {
     for (const span of els.titles) {
       span.textContent = '';
     }
+    els.title.style.width = '';
 
     root.classList.remove('has-icon');
     els.icon.style.backgroundImage = '';
@@ -93,9 +95,9 @@ export function mountActiveWindow(root, zebar) {
    * into the visible span would just flash it; fading a second span in over
    * the first reads as one window handing over to the next.
    *
-   * The outgoing span is emptied once the fade is over. Both spans share one
-   * grid cell, so the wider of the two decides how wide the readout is, and a
-   * stale wider title would leave the centred widget sitting off to one side.
+   * The outgoing span is emptied once the fade is over — it is out of flow by
+   * then (active-window.css) so it no longer sizes anything, but leaving text
+   * in it would put a stale title back on screen at the next swap.
    */
   function setTitle(title) {
     if (title === shownTitle) {
@@ -106,19 +108,61 @@ export function mountActiveWindow(root, zebar) {
     const next = 1 - activeSlot;
     const previous = activeSlot;
 
+    // While the box still belongs to the title that is leaving.
+    const from = els.title.getBoundingClientRect().width;
+
     els.titles[next].textContent = title;
     els.titles[next].classList.add('is-current');
     els.titles[previous].classList.remove('is-current');
     activeSlot = next;
 
+    growTitle(from);
+
     clearTimeout(clearPrevious);
     clearPrevious = setTimeout(() => {
+      // Back to being sized by its content, so the readout can give way again
+      // when the bar is short of room.
+      els.title.style.width = '';
       // Only if it is still the outgoing one — another swap may have overtaken
       // this timer, in which case that swap owns the span now.
       if (activeSlot !== previous) {
         els.titles[previous].textContent = '';
       }
     }, fadeMs);
+  }
+
+  /**
+   * Carries the readout's width across to whatever the incoming title needs,
+   * over the same time as the fade.
+   *
+   * The title itself does not move — it is centred in a box whose centre is
+   * fixed (see active-window.css) — so what this animates is the icon beside
+   * it. Left alone the box would resize in one step and the icon would jump,
+   * which is the more distracting half of a change the eye has already taken
+   * in. CSS cannot do it without help: the computed width is `auto` on both
+   * sides of the swap, and a transition has no change to act on.
+   *
+   * @param {number} from  the width before the swap
+   */
+  function growTitle(from) {
+    const box = els.title;
+
+    // Auto first, so the incoming title is measured at its natural width with
+    // the region's own limits still in force.
+    box.style.width = '';
+    const to = box.getBoundingClientRect().width;
+
+    // Nothing to come from on the first title of a session, and nothing to do
+    // when the width did not move — two long titles both stop at --aw-max-w.
+    if (from === 0 || Math.abs(to - from) < 0.5) {
+      return;
+    }
+
+    box.style.width = `${from}px`;
+    // Commits the starting width. Without it both assignments are collapsed
+    // into one style recalculation and the transition never runs.
+    void box.offsetWidth;
+    box.style.width = `${to}px`;
   }
 
   async function showIcon(key, handle) {

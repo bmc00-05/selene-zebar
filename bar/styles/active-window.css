@@ -6,6 +6,9 @@
  * is hidden and flips which one is `.is-current`, so the outgoing one fades
  * under the incoming one. Ellipsis lives on the spans, not the container,
  * because overflow has to be clipped on the element that holds the text.
+ *
+ * The geometry that keeps the title still while all that happens is at the
+ * bottom of this file.
  */
 
 .active-window {
@@ -65,10 +68,27 @@
   opacity: 0;
 }
 
+/*
+ * The readout is `[icon 16][gap 8][title T]`, centred as a group, so the title
+ * box's centre sits at the bar's centre + 12 whatever T is. Centre the text
+ * inside that box and the title stops moving entirely — only the icon travels
+ * when a window with a different name takes focus.
+ *
+ * That only holds if T is the incoming title's width. Left in flow, the two
+ * stacked spans size the cell to whichever is wider, so a short title drew
+ * left of where it belonged and jumped to the middle when the timer emptied
+ * the old span — the whole complaint. So the outgoing one is taken out of
+ * flow and the box follows the title that is arriving.
+ *
+ * `position: relative` is what that absolute span is positioned against.
+ * active-window.js drives the width; the transition is here.
+ */
 .active-window__title {
+  position: relative;
   display: grid;
   min-width: 0;
   color: var(--fg);
+  transition: width var(--dur-base) var(--ease-standard);
 }
 
 .active-window__title > span {
@@ -77,8 +97,19 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  /* Ignored while a title is too long to fit — it is clipped from the left
+   * edge and ellipsised, as before. */
+  text-align: center;
   opacity: 0;
   transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+/* Out of flow, so a title on its way out no longer decides how wide the
+ * readout is. It keeps tracking the box as that width animates, which fades it
+ * out and draws it in at the same time. */
+.active-window__title > span:not(.is-current) {
+  position: absolute;
+  inset: 0;
 }
 
 .active-window__title > span.is-current {
