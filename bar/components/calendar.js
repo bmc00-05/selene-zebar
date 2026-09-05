@@ -2,9 +2,9 @@
  * The month calendar behind the clock.
  *
  * Same shape as the Selene menu: the popover attributes in index.html hand the
- * browser the top layer, Escape and light dismiss, and CSS anchor positioning
- * puts the panel under the clock. A popover escapes the page but not the
- * window, so the window has to grow — lib/window.js owns that.
+ * browser the top layer, Escape and light dismiss, CSS anchor positioning puts
+ * the panel under the clock, and lib/window.js grows the window while it is
+ * open.
  *
  * This month only. There is no navigation and therefore no state to get out of
  * sync: every open shows today. What fills the grid comes from the date
@@ -70,14 +70,6 @@ export function mountCalendar(root, zebar) {
 
     if (isOpening && today && today !== builtDay) {
       build(today);
-    }
-  });
-
-  // Light dismiss only covers clicks this window receives. Clicking another
-  // application never reaches the page, so the panel would sit there open.
-  widget.tauriWindow.onFocusChanged(({ payload: focused }) => {
-    if (!focused) {
-      root.hidePopover();
     }
   });
 

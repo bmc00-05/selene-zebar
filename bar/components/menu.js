@@ -3,13 +3,9 @@
  *
  * Opening and closing is the browser's job — the popover attributes in
  * index.html handle the top layer, outside clicks and Escape, and CSS anchor
- * positioning places the panel. The panel would be clipped at the edge of a
- * 40px-tall window, so the window grows while the menu is open; lib/window.js
- * owns that for every panel that needs it.
- *
- * Growing it is safe. The strip GlazeWM keeps clear comes from the preset in
- * zpack.json, not from the live window, so nothing on the desktop shifts —
- * measured before and after: workspace y=55 h=1020 either way.
+ * positioning places the panel. lib/window.js grows the window while the menu
+ * is open, since the panel would otherwise be clipped at the edge of a
+ * 40px-tall window, and closes it when the window loses focus.
  */
 
 import { readPx } from '../lib/css.js';
@@ -37,14 +33,6 @@ export function mountMenu(root, zebar) {
 
   root.addEventListener('beforetoggle', event => {
     trigger.setAttribute('aria-expanded', String(event.newState === 'open'));
-  });
-
-  // Light dismiss only covers clicks this window receives. Clicking another
-  // application never reaches the page, so the menu would sit there open.
-  widget.tauriWindow.onFocusChanged(({ payload: focused }) => {
-    if (!focused) {
-      root.hidePopover();
-    }
   });
 
   root.addEventListener('click', event => {
