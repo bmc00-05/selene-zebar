@@ -123,7 +123,7 @@ bar/
     media.js              equaliser, marquee, and the playback panel
     active-window.js      focused window's icon and title
     menu.js               the settings panel behind the mark
-    volume.js             output volume, read-only
+    volume.js             output volume; click to mute
     memory.js             RAM ring
     clock.js              clock; the date format lives here
     calendar.js           the month calendar behind the clock

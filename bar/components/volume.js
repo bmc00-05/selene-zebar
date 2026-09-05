@@ -1,9 +1,11 @@
 /**
- * Output volume: a speaker and the percentage.
+ * Output volume: a speaker, the percentage, and a click that mutes.
  *
- * Read-only. The provider can set the volume as well, but nothing here calls
- * that — a status bar that changes what it reports on a stray click is worse
- * than one that only reports. The provider's scale is 0-100, not 0-1.
+ * Mute is the only thing written back. The provider can set the level too and
+ * this deliberately does not touch it: a stray click on a mute toggle costs one
+ * more click, where a stray change to the level loses the number that was
+ * there and there is nothing to put back. For the same reason there is no
+ * scroll-to-change. The provider's scale is 0-100.
  */
 
 /** Above this the second arc lights, so the icon reads loud at a glance. */
@@ -12,17 +14,37 @@ const LOUD_PERCENT = 50;
 /**
  * Wires the readout into `root` and returns the function that updates it.
  *
- * @param {HTMLElement} root  the .volume element
+ * @param {HTMLElement} root  the .volume button
  * @returns {(output: object) => void}
  */
 export function mountVolume(root) {
   const label = root.querySelector('.volume__label');
 
+  /** The last provider output, and the device it described, held for clicks. */
+  let latest = null;
+  let device = null;
+
   let shownPercent = null;
   let shownState = null;
 
+  root.addEventListener('click', () => {
+    if (!device) {
+      return;
+    }
+
+    // The device is named rather than left to the provider's default: this
+    // widget reports one specific device and must not mute a different one.
+    //
+    // Nothing is drawn here. Windows pushes the change back fast enough that
+    // the widget answers a click on its own — measured at about 150ms — and
+    // update() below does the drawing. Painting first would risk showing a
+    // state that never happened.
+    latest.setMute(!device.isMuted, { deviceId: device.deviceId });
+  });
+
   return function update({ audio }) {
-    const device = audio?.defaultPlaybackDevice ?? null;
+    latest = audio;
+    device = audio?.defaultPlaybackDevice ?? null;
 
     if (!device) {
       root.hidden = true;
@@ -45,6 +67,11 @@ export function mountVolume(root) {
       // One state at a time, as with the battery and the RAM ring; the
       // stylesheet decides which parts of the icon that lights.
       root.dataset.state = state;
+      // Safe to sit inside this guard: `muted` is the state exactly when the
+      // device is muted, so the two can never need updating separately. The
+      // label stays `Mute` and this is what says whether it is on — a label
+      // that flipped to `Unmute` would contradict it.
+      root.setAttribute('aria-pressed', String(device.isMuted));
     }
   };
 }

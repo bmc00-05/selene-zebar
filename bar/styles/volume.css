@@ -1,5 +1,5 @@
 /*
- * Volume readout.
+ * Volume readout, and the button that mutes.
  *
  * Every part of the icon is in the markup and the state decides which parts
  * are lit. Fading opacity is what lets a volume change read as the arcs coming
@@ -11,7 +11,12 @@
   display: flex;
   align-items: center;
   gap: var(--gap-item);
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--fg-soft);
+  font: inherit;
+  cursor: pointer;
   transition: color var(--dur-base) var(--ease-standard);
 }
 
@@ -36,6 +41,13 @@
   transition: opacity var(--dur-base) var(--ease-standard);
 }
 
+/* Heavier than the arcs. Two thin strokes crossing read lighter than two
+ * curved ones of the same width, and this is the mark that has to carry the
+ * state on its own. */
+.volume__cross {
+  stroke-width: 1.6;
+}
+
 /* Quiet lights the near arc, loud adds the far one. Nothing lights at zero:
  * a speaker on its own is the picture of no sound, which is different from
  * muted and has to look different. */
@@ -49,11 +61,26 @@
   opacity: 1;
 }
 
-/* Muted is the one state that is not about how loud it is, so it steps back
- * rather than changing hue — the same brightness signal the rest of the bar
- * uses, leaving --warn and --alert to mean danger alone. */
-.volume[data-state='muted'] {
-  color: var(--fg-muted);
+/*
+ * Muted does not step back. It used to take --fg-muted, on the reasoning that
+ * it is a different kind of state rather than a quieter one — but a dim mark at
+ * the edge of vision is one you simply miss, and being muted is exactly what
+ * you need to notice. The cross carries the whole signal at full brightness.
+ * --warn and --alert stay reserved for danger.
+ *
+ * The number is struck through instead of dimmed, which says what dimming only
+ * implies: the percentage is still true, it just is not in effect. Nothing else
+ * in the bar strikes text, so it reads as a statement rather than as styling.
+ */
+.volume[data-state='muted'] .volume__label {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.6px;
+}
+
+.volume:hover,
+.volume:focus-visible {
+  color: var(--accent);
+  outline: none;
 }
 
 .volume__label {

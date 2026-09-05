@@ -122,8 +122,19 @@
           it wants; see volume.css. Muted and zero are different pictures on
           purpose — a muted device at 40% is silent, and the number alone
           cannot say that.
+
+          A button, because clicking it mutes. The label stays `Mute` whatever
+          the state and `aria-pressed` carries whether it is on, which is the
+          ordinary shape of a toggle button; volume.js keeps it in step.
         -->
-        <div class="volume" id="volume" hidden>
+        <button
+          class="volume"
+          id="volume"
+          type="button"
+          aria-label="Mute"
+          aria-pressed="false"
+          hidden
+        >
           <svg class="volume__icon" viewBox="0 0 16 16" aria-hidden="true">
             <path class="volume__cone" d="M2 6h2.6L8 3.1v9.8L4.6 10H2z" />
             <path
@@ -134,13 +145,18 @@
               class="volume__wave volume__wave--far"
               d="M12.3 4.6a5 5 0 0 1 0 6.8"
             />
+            <!--
+              Wider than the arcs it replaces. The cross used to span 3.8 units
+              where the lit arcs reach past 14, so the one state that has to be
+              noticed was drawn smaller than the ones that do not.
+            -->
             <path
               class="volume__cross"
-              d="M10.6 6.4 14.4 9.6M14.4 6.4 10.6 9.6"
+              d="M10.2 5.8 14.8 10.2M14.8 5.8 10.2 10.2"
             />
           </svg>
           <span class="volume__label"></span>
-        </div>
+        </button>
 
         <!--
           Near the front of the right-hand group on purpose. This region is
