@@ -1,9 +1,5 @@
 /*
- * The Selene mark and the menu it opens.
- *
- * The menu is a `.panel` (panel.css), which carries the surface and the
- * open/close motion. This file is the mark, the menu's placement and its
- * contents.
+ * The Selene mark. What it opens is in menu.css.
  */
 
 .brand {
@@ -41,61 +37,4 @@
  * state onto the button as aria-expanded. */
 .brand[aria-expanded='true'] {
   color: var(--accent-soft);
-}
-
-/* --- The menu ------------------------------------------------------------ */
-
-.menu {
-  position-anchor: --brand;
-  /* Below the mark, running rightwards from its left edge. */
-  position-area: bottom span-right;
-  width: var(--menu-width);
-  padding: 6px;
-  /* Grid rather than block so the rule and items share one gap. The gap sits
-   * here and not in :popover-open: `display` is held through the close by
-   * allow-discrete, but nothing else declared there is, so a gap there would
-   * collapse to 0 on the first frame of the fade and shift every item. */
-  gap: 1px;
-}
-
-.menu:popover-open {
-  display: grid;
-}
-
-.menu__title {
-  margin: 2px 8px 6px;
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.menu__title-dim {
-  color: var(--fg-muted);
-  font-weight: 500;
-}
-
-.menu__item {
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 6px;
-  background: none;
-  color: var(--fg);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-standard);
-}
-
-.menu__item:hover,
-.menu__item:focus-visible {
-  background: var(--panel-item-hover);
-  outline: none;
-}
-
-.menu__rule {
-  height: 1px;
-  margin: 4px 8px;
-  border: 0;
-  background: var(--panel-border);
 }

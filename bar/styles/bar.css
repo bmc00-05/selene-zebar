@@ -15,6 +15,30 @@
   display: none !important;
 }
 
+/*
+ * Widgets switched off in the settings panel.
+ *
+ * lib/settings.js writes the ones that are on to `data-widgets` on the root,
+ * so these are stated the other way round — as "not listed" rather than
+ * "listed as off". That is what makes the bar come up correctly: before the
+ * script has run there is no attribute at all, every selector here matches,
+ * and nothing is drawn. A widget that is meant to be off is therefore never
+ * painted for a frame before being taken away.
+ *
+ * !important for the same reason as [hidden] above: each widget declares its
+ * own display, and this has to outrank it.
+ */
+:root:not([data-widgets~='workspaces']) #workspaces,
+:root:not([data-widgets~='media']) #media,
+:root:not([data-widgets~='active-window']) #active-window,
+:root:not([data-widgets~='volume']) #volume,
+:root:not([data-widgets~='memory']) #memory,
+:root:not([data-widgets~='clock']) #clock,
+:root:not([data-widgets~='battery']) #battery,
+:root:not([data-widgets~='power']) #power {
+  display: none !important;
+}
+
 html,
 body {
   height: 100%;

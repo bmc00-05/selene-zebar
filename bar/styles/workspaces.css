@@ -152,6 +152,14 @@
     steps(var(--breathe-steps), jump-none) var(--ws-focus-dur) infinite;
 }
 
+/* Saver mode holds it still, lit at full strength: the focused workspace is
+ * still marked, it just stops moving. Kept apart from the reduced-motion block
+ * at the foot of this file — that one answers a comfort setting and has to
+ * work whether or not the script ran, this one is a CPU choice. */
+:root[data-saver] .workspace.is-focused .workspace__halo::after {
+  animation: none;
+}
+
 @keyframes ws-breathe {
   0%,
   100% {

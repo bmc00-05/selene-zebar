@@ -4,10 +4,10 @@
 
 Minimal and quiet: a night-sky ground, moonlit silver, Inter typography.
 
-> **Status: the bar is in daily use.** The mark opens a menu, the workspace
-> indicators track GlazeWM, the media widget shows what is playing, the centre
-> shows the focused window, and the right region carries volume, RAM, the
-> clock with a calendar, the battery and a power menu.
+> **Status: the bar is in daily use.** The mark opens the settings panel, the
+> workspace indicators track GlazeWM, the media widget shows what is playing,
+> the centre shows the focused window, and the right region carries volume,
+> RAM, the clock with a calendar, the battery and a power menu.
 
 ## Why
 
@@ -46,6 +46,26 @@ Then point Zebar at the pack in `~/.glzr/zebar/settings.json`:
   ]
 }
 ```
+
+## Settings
+
+The crescent at the left end opens the panel: a chip per widget, **saver mode**,
+and two ways back to a working bar — reload, and reset to defaults.
+
+Saver mode stops the animations that never end — the breathing halos, the
+equaliser, the marquee — and leaves everything else alone. Transitions still
+run, because they answer something and then stop. Measured on this machine, the
+focused halo alone is the difference between 6.3% and 2.1% of one core.
+
+Two things it deliberately does not stop: the equaliser holds its peaks instead
+of lying flat, so it still says whether something is playing, and the battery's
+critical pulse below 5% keeps going, because it is a warning rather than an
+impression.
+
+Settings live in `localStorage` and survive a reload and a Zebar restart alike —
+the widget is served from a fixed origin. A switch names a key, `lib/settings.js`
+publishes it onto the root element, and the stylesheets do the rest, so adding a
+setting is a row in the markup and a rule in CSS.
 
 ## Design
 
@@ -97,11 +117,12 @@ bar/
   lib/
     css.js                reads tokens back out of CSS
     window.js             grows the widget window while a panel is open
+    settings.js           what the bar remembers, published onto <html>
   components/
     workspaces.js         workspace indicators, reconciled by name
     media.js              equaliser, marquee, and the playback panel
     active-window.js      focused window's icon and title
-    menu.js               the popover behind the mark
+    menu.js               the settings panel behind the mark
     volume.js             output volume, read-only
     memory.js             RAM ring
     clock.js              clock; the date format lives here
@@ -114,7 +135,8 @@ bar/
     tokens.css            the Selene ramp, typography, metrics, motion
     bar.css               reset and the three-region shell
     panel.css             surface and motion shared by the floating panels
-    brand.css             the mark and its menu
+    brand.css             the mark
+    menu.css              the settings panel and its switches
     workspaces.css        workspace indicators
     media.css             equaliser, marquee, playback panel
     active-window.css     focused-window readout

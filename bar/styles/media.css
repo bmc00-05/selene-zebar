@@ -156,6 +156,18 @@
   }
 }
 
+/* Saver mode stops the bars where the music would have taken them: each holds
+ * its own peak, so the row keeps the arch a spectrum has and still says
+ * "playing". Stopping them at rest instead would have been the same picture as
+ * paused, and the equaliser is the only play indicator there is.
+ *
+ * Scoped to the playing state on purpose — the paused rule above has to keep
+ * its settle animation, which is finite and costs nothing. */
+:root[data-saver] .media[data-playing='true'] .media__eq i {
+  animation: none;
+  transform: scaleY(var(--hi));
+}
+
 /* --- Marquee ------------------------------------------------------------- */
 
 .media__marquee {
@@ -194,6 +206,28 @@
 
 .media__track {
   flex: none;
+}
+
+/* Saver mode: a long title stops travelling and is cut with an ellipsis
+ * instead. The second copy goes away — it exists only to make the loop
+ * seamless — and so does the mask, which fades both ends and would eat the
+ * first characters of a title that no longer moves. */
+:root[data-saver] .media__track--copy {
+  display: none;
+}
+
+:root[data-saver] .media.is-scrolling .media__marquee {
+  mask-image: none;
+}
+
+:root[data-saver] .media.is-scrolling .media__track {
+  animation: none;
+  /* Shrinkable, so the text can be clipped at the marquee's max width; `none`
+   * above keeps it at its full content width and nothing would ellipsise. */
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* --- Panel --------------------------------------------------------------- */

@@ -160,13 +160,24 @@
    * RAM ring, so the row shares one optical size. */
   --brand-size: 16px;
 
-  /* Menu. `--menu-window-h` is how tall the widget window grows while the
-   * menu is open (menu.js, through lib/window.js); it must clear the bar plus
-   * the panel plus its shadow. Too small and the menu is clipped at the window
-   * edge; too large costs nothing, since the reserved strip does not follow
-   * the window. */
-  --menu-width: 190px;
-  --menu-window-h: 220px;
+  /* Menu, which is also where the settings live. `--menu-window-h` is how tall
+   * the widget window grows while it is open (menu.js, through lib/window.js);
+   * it must clear the bar plus the panel plus its shadow. Too small and the
+   * panel is clipped at the window edge; too large costs nothing, since the
+   * reserved strip does not follow the window. */
+  --menu-width: 208px;
+  /* The panel measures about 258 and its shadow reaches 32 below that, so it
+   * needs 326; the rest is room for another line of chips, since a window
+   * taller than the panel costs nothing. */
+  --menu-window-h: 360px;
+
+  /* Settings switches. The travel works out as --switch-w minus --switch-h,
+   * because the thumb is inset by the same amount all round — so the two
+   * numbers below are the only ones to change. Both are multiples of 4, like
+   * every other length here. */
+  --switch-w: 24px;
+  --switch-h: 12px;
+  --switch-thumb: 8px;
 
   /* Calendar. The panel states no width — seven columns of --cal-cell decide
    * it — but its height has to be known here, because --cal-window-h is how

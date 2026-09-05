@@ -1,0 +1,238 @@
+/*
+ * The panel behind the Selene mark: the bar's settings, and the three actions
+ * that were here before them.
+ *
+ * A `.panel` (panel.css) carries the surface and the open/close motion; this
+ * file is the placement, the rows and the switches.
+ *
+ * Nothing here knows what a setting does. Each switch names a key in
+ * `data-setting` and lib/settings.js publishes the answer onto the root
+ * element, where the other stylesheets pick it up.
+ */
+
+.menu {
+  position-anchor: --brand;
+  /* Below the mark, running rightwards from its left edge. */
+  position-area: bottom span-right;
+  width: var(--menu-width);
+  padding: 6px;
+  /* Grid rather than block so rules, headings and rows share one gap. The gap
+   * sits here and not in :popover-open: `display` is held through the close by
+   * allow-discrete, but nothing else declared there is, so a gap there would
+   * collapse to 0 on the first frame of the fade and shift every row. */
+  gap: 1px;
+}
+
+.menu:popover-open {
+  display: grid;
+}
+
+/*
+ * The name, with the mark that opens this panel beside it.
+ *
+ * Sentence case at 13px, which is deliberately a different kind of type from
+ * the section labels below: those are small, uppercase and widely spaced, and
+ * a title written the same way stops reading as the title — the eye cannot
+ * tell which of two stacked wordmarks is which.
+ *
+ * `Selene`, not `selene-zebar`. That is the pack's id on disk, and Zebar is
+ * the runtime this rides on rather than the name of the thing.
+ */
+.menu__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 8px 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  /* Narrower than the section labels. The wider tracking there keeps small
+   * uppercase from clotting; at this size it would only look loose. */
+  letter-spacing: 0.02em;
+}
+
+/* Sized in em, so the mark follows the type rather than stating its own size. */
+.menu__title svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
+/* Names a group. Quieter than the title and quieter than what it introduces,
+ * so the eye reads it as a divider rather than as an option. */
+.menu__section {
+  margin: 8px 8px 2px;
+  color: var(--fg-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* How many of the widgets are on, written by menu.js. A chip is less obviously
+ * a toggle than a switch is, and a count is what says at a glance that this
+ * heading introduces something to pick from. */
+.menu__count {
+  color: color-mix(in srgb, var(--fg-muted) 65%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Every clickable row, whether it runs something or toggles something. One
+ * shape for both so the panel reads as one list. */
+.menu__item,
+.menu__switch {
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.menu__item:hover,
+.menu__item:focus-visible,
+.menu__switch:hover,
+.menu__switch:focus-visible {
+  background: var(--panel-item-hover);
+  outline: none;
+}
+
+.menu__rule {
+  height: 1px;
+  margin: 4px 8px;
+  border: 0;
+  background: var(--panel-border);
+}
+
+/* --- Widget chips -------------------------------------------------------- */
+
+/*
+ * The widgets are a set to pick from, so they are drawn as one: chips that
+ * wrap, rather than a row each. Eight rows came to 216px of panel for a 40px
+ * bar and every widget added later was another row; chips take a line for
+ * roughly every three, and a new one usually costs nothing at all.
+ *
+ * Still role="switch" with aria-checked. A switch does not have to look like a
+ * track and a thumb, and keeping the contract means the click handling, the
+ * settings store and the screen reader all see exactly what they saw before.
+ *
+ * On is a filled face inside a lit rim, off is an outline — the same thing the
+ * workspace dots say with fill against outline.
+ */
+.menu__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 2px;
+}
+
+.menu__chip {
+  padding: 3px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg-muted);
+  /* Inherits the panel's weight and never changes it: a bolder label is a
+   * wider one, and a chip that grew on being switched on would re-wrap the
+   * rows below it. Fill and text colour carry the state instead. */
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.45;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+
+/* The face takes a little of the accent rather than the plain hover surface.
+ * Rendered side by side at actual size, the quieter version was legible only
+ * once you looked for it — across eight chips the eye has to sort them at a
+ * glance, and a fill that carries the hue does that where a grey one did not.
+ *
+ * An off chip keeps its outline. It is the one most likely to be clicked next,
+ * so it has to go on looking like something that can be. */
+.menu__chip[aria-checked='true'] {
+  background: color-mix(in srgb, var(--accent) 16%, var(--panel-item-hover));
+  border-color: color-mix(in srgb, var(--accent) 80%, transparent);
+  color: var(--fg);
+}
+
+/* After the state rules, so hovering a chip that is already on still answers.
+ * An attribute selector outranks a bare pseudo-class, so these have to name
+ * the state as well. */
+.menu__chip:hover,
+.menu__chip:focus-visible {
+  border-color: color-mix(in srgb, var(--fg) 30%, transparent);
+  color: var(--fg);
+  outline: none;
+}
+
+.menu__chip[aria-checked='true']:hover,
+.menu__chip[aria-checked='true']:focus-visible {
+  border-color: var(--accent);
+}
+
+/* --- Switches ------------------------------------------------------------ */
+
+/*
+ * A button with role="switch", not a checkbox. The state lives in
+ * `aria-checked`, which is the same idiom the rest of the bar uses for state
+ * (`data-state` on the battery, the volume, the RAM ring) — one attribute the
+ * stylesheet switches on — and a button brings keyboard handling with it, so
+ * Space and Enter work without a line of JavaScript.
+ */
+.menu__switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* The label steps back when the setting is off, so a glance down the column
+ * reads which rows are live even before the switches are taken in. */
+.menu__switch[aria-checked='false'] {
+  color: var(--fg-muted);
+}
+
+.menu__track {
+  position: relative;
+  flex: none;
+  width: var(--switch-w);
+  height: var(--switch-h);
+  border-radius: calc(var(--switch-h) / 2);
+  background: var(--panel-item-hover);
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+/*
+ * Inset by half the difference, which is what makes the travel below exactly
+ * `--switch-w - --switch-h`: the thumb starts that far from the left edge and
+ * stops the same distance from the right.
+ */
+.menu__thumb {
+  position: absolute;
+  top: calc((var(--switch-h) - var(--switch-thumb)) / 2);
+  left: calc((var(--switch-h) - var(--switch-thumb)) / 2);
+  width: var(--switch-thumb);
+  height: var(--switch-thumb);
+  border-radius: 50%;
+  background: var(--fg-muted);
+  transition:
+    transform var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+
+.menu__switch[aria-checked='true'] .menu__track {
+  background: var(--accent);
+}
+
+/* Dark on the lit track, the same colour anything else that sits on top of
+ * --accent uses. A pale thumb on a pale track would have nothing to read. */
+.menu__switch[aria-checked='true'] .menu__thumb {
+  background: var(--on-accent);
+  transform: translateX(calc(var(--switch-w) - var(--switch-h)));
+}

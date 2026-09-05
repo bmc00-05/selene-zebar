@@ -12,6 +12,7 @@
  * network after the first run.
  */
 import * as zebar from 'https://esm.sh/zebar@3.3';
+import { applySettings } from './lib/settings.js';
 import { mountWorkspaces } from './components/workspaces.js';
 import { mountActiveWindow } from './components/active-window.js';
 import { mountMenu } from './components/menu.js';
@@ -22,6 +23,12 @@ import { mountCalendar } from './components/calendar.js';
 import { mountMemory } from './components/memory.js';
 import { mountMedia } from './components/media.js';
 import { mountVolume } from './components/volume.js';
+
+// Before anything is mounted: the stylesheets hide every widget until the root
+// element says which ones are on, so this is what makes the bar appear at all.
+// Doing it first is also what keeps a widget that is switched off from being
+// painted for a frame before it is taken away.
+applySettings();
 
 const providers = zebar.createProviderGroup({
   glazewm: { type: 'glazewm' },

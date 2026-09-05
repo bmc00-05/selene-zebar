@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="./styles/bar.css" />
     <link rel="stylesheet" href="./styles/panel.css" />
     <link rel="stylesheet" href="./styles/brand.css" />
+    <link rel="stylesheet" href="./styles/menu.css" />
     <link rel="stylesheet" href="./styles/workspaces.css" />
     <link rel="stylesheet" href="./styles/media.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
@@ -358,18 +359,157 @@
       tall as the bar, so lib/window.js grows it while one of these is open.
     -->
     <div class="panel menu" id="bar-menu" popover>
+      <!--
+        The mark again, at the head of the panel it opens, so the panel reads
+        as belonging to the button that was pressed.
+
+        Its mask needs an id of its own: an SVG mask is looked up across the
+        whole document, and the brand's crescent already claims
+        `selene-crescent`.
+      -->
       <p class="menu__title">
-        selene<span class="menu__title-dim">-zebar</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <mask id="menu-crescent">
+            <rect width="24" height="24" fill="black" />
+            <circle cx="12" cy="12" r="9" fill="white" />
+            <circle cx="17.5" cy="8.5" r="8.5" fill="black" />
+          </mask>
+          <rect
+            width="24"
+            height="24"
+            fill="currentColor"
+            mask="url(#menu-crescent)"
+          />
+        </svg>
+        <span>Selene</span>
       </p>
+
+      <!--
+        One chip per widget, in the order they sit on the bar, so the list can
+        be read against what it controls. The key in `data-setting` is a key of
+        DEFAULTS in lib/settings.js and the name in `data-widgets` that bar.css
+        matches on — one name for the whole chain.
+
+        Still role="switch": these are the same on/off controls the saver row
+        is, drawn as a set to pick from rather than as eight rows. The count
+        beside the heading is written by menu.js.
+
+        The mark itself is not in the list: it is the way back to this panel.
+      -->
+      <p class="menu__section">
+        Widgets <span class="menu__count" data-count="widget:"></span>
+      </p>
+      <div class="menu__chips">
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:workspaces"
+        >
+          Workspaces
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:media"
+        >
+          Media
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:active-window"
+        >
+          Window
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:volume"
+        >
+          Volume
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:memory"
+        >
+          RAM
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:clock"
+        >
+          Clock
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:battery"
+        >
+          Battery
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:power"
+        >
+          Power
+        </button>
+      </div>
+
+      <p class="menu__section">Motion</p>
+      <!--
+        Saver mode stops the animations that never end — the breathing halos,
+        the equaliser, the marquee. Everything else in the bar animates only in
+        answer to something and then stops, which costs nothing at rest, so
+        those are left alone. The rules are in each widget's own stylesheet,
+        under :root[data-saver].
+      -->
+      <button
+        class="menu__switch"
+        type="button"
+        role="switch"
+        aria-checked="false"
+        data-setting="saver"
+      >
+        <span>Saver mode</span>
+        <span class="menu__track" aria-hidden="true">
+          <span class="menu__thumb"></span>
+        </span>
+      </button>
+
+      <!--
+        Two ways to get back to a working bar, and nothing else. Reloading
+        GlazeWM's config used to be here and is not any more: GlazeWM binds it
+        to alt+shift+r itself, and this panel is about this bar rather than a
+        console for the window manager. Closing the widget has gone the same
+        way — the tray already exits Zebar, nothing restarts the bar
+        automatically, and a button that takes it away does not belong next to
+        eight that only change how it looks.
+      -->
+      <hr class="menu__rule" />
       <button class="menu__item" type="button" data-action="reload-bar">
         Reload bar
       </button>
-      <button class="menu__item" type="button" data-action="reload-glazewm">
-        Reload GlazeWM config
-      </button>
-      <hr class="menu__rule" />
-      <button class="menu__item" type="button" data-action="close-bar">
-        Close bar
+      <button class="menu__item" type="button" data-action="reset">
+        Reset settings
       </button>
     </div>
 

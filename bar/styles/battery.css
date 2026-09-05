@@ -100,6 +100,12 @@
     infinite;
 }
 
+/* Saver mode holds the halo still. It stays lit, so "on mains" still reads;
+ * only "current is flowing" stops being said. */
+:root[data-saver] .battery[data-state='charging'] .battery__glow {
+  animation: none;
+}
+
 /* Low and critical, in the two colours the RAM ring also uses. Only the signal
  * is set here; the three elements above pick it up. battery.js layers these
  * on the discharging state only, so they never collide with the charging fill
@@ -118,7 +124,11 @@
  * signal stays up until the charger goes in, where something flashing at the
  * edge of vision becomes noise you learn to ignore. A hard blink would also
  * run into the photosensitivity limits WCAG sets on flashing. Going deeper —
- * down to 0.25 — buys the urgency instead. */
+ * down to 0.25 — buys the urgency instead.
+ *
+ * Saver mode does not touch this one. It is the only animation in the bar that
+ * carries a warning rather than an impression, and a battery below 5% is rare
+ * enough that what it costs is not what saver mode is for. */
 .battery[data-state='critical'] .battery__gauge,
 .battery[data-state='critical'] .battery__label {
   animation: battery-pulse 1.2s ease-in-out infinite;
