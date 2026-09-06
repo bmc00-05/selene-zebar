@@ -40,6 +40,14 @@ let win = null;
  */
 let resting = null;
 
+/**
+ * The same values, once they have arrived, reachable without awaiting.
+ *
+ * `pagehide` cannot await: a promise continuation is not guaranteed to run
+ * before the page is gone, so the restore below reads this instead.
+ */
+let restingNow = null;
+
 let pending = null;
 
 /**
@@ -77,7 +85,10 @@ export function growWindowWhileOpen(el, widget, spec) {
     // Physical both ways: what the window reports is what it is given back,
     // with no logical/physical rounding in between.
     resting = Promise.all([win.outerPosition(), win.innerSize()]).then(
-      ([pos, size]) => ({ pos, size }),
+      ([pos, size]) => {
+        restingNow = { pos, size };
+        return restingNow;
+      },
     );
 
     // Copied first: hiding a popover drops its claim from the map mid-loop.
@@ -88,6 +99,66 @@ export function growWindowWhileOpen(el, widget, spec) {
         }
       }
     });
+
+    /*
+     * The window outlives the page, and the claims do not.
+     *
+     * The menu's own "Reload bar" can only be pressed while the menu is open,
+     * and `location.reload()` destroys the page before the popover's close
+     * event can fire — so the claim is never dropped, and the window stays at
+     * --menu-window-h. Measured: 40 logical before, 360 with the menu up, and
+     * still 360 after the reload with the panel closed. The bar draws 40 of
+     * that and the invisible 320 keeps taking every click, which over a
+     * top-docked window means the title bars and close buttons underneath it
+     * stop responding.
+     *
+     * Two halves, because neither is enough alone. This one stops the state
+     * from arising at all, and it is the only one that can — the reload path
+     * still knows where the window belongs. It is best effort: the page may go
+     * before the calls land.
+     *
+     * Nothing here is awaited. Both are bare IPC messages, which is what gives
+     * them their chance of getting out; the answers are of no use to a page
+     * that is about to stop existing.
+     */
+    window.addEventListener('pagehide', () => {
+      if (!restingNow) {
+        return;
+      }
+
+      claims.clear();
+      win.setPosition({
+        type: 'Physical',
+        x: restingNow.pos.x,
+        y: restingNow.pos.y,
+      });
+      win.setSize({
+        type: 'Physical',
+        width: restingNow.size.width,
+        height: restingHeight(),
+      });
+    });
+
+    /*
+     * And the other half: a page that has come up while the window is still
+     * grown, because the restore above did not get out in time — or because
+     * the reload came from outside the page entirely (the tray's "Empty cache
+     * && reload configs", a devtools reload) with a panel open.
+     *
+     * There are no claims yet, so this takes the resting branch and puts the
+     * strip back. In the ordinary case it writes the geometry the window
+     * already has, which costs one no-op pair of IPC calls at startup.
+     *
+     * What this cannot repair is where the window was: `resting` has just been
+     * measured from a window that was left in the wrong place, and only the
+     * height is recoverable from the tokens. That is harmless for the panels,
+     * which never move the window — the power overlay is the one exception,
+     * and on a single monitor with a full-width top-docked bar its position is
+     * the resting one anyway. Closing that last gap needs the preset's own
+     * geometry, which the page cannot read: currentWidget() does not carry it
+     * and zpack.json is not served (includeFiles has no *.json).
+     */
+    apply();
   }
 
   el.addEventListener('beforetoggle', event => {
