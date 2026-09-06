@@ -41,6 +41,22 @@ const WATCH_MS = 150;
 const IDLE_MS = 300;
 
 /**
+ * How long an unchanging, non-silent frame means the capture has died.
+ *
+ * cava can end up writing without reading: the process stays alive, the frames
+ * keep coming, and every one of them repeats whatever the filters last held.
+ * Caught in the wild with the third bar sitting at 0.93 in a silent room while
+ * a cava started alongside it read zeros the whole time. Only the process is
+ * broken, so only a restart fixes it.
+ *
+ * Silence is exempt — a still row of zeros is what a quiet machine looks like,
+ * and is the one repeated frame that means nothing is wrong. Five seconds is
+ * well past anything real audio holds: cava's own smoothing keeps the low
+ * digits moving even under a held tone.
+ */
+const STUCK_MS = 5000;
+
+/**
  * Unexpected exits tolerated before cava is written off for this session.
  *
  * Without a ceiling, a cava that dies on startup would be spawned again on the
@@ -79,6 +95,10 @@ export function mountCava(root, zebar) {
   let watchdog = null;
   let lastFrame = 0;
 
+  /** The last frame's values, and when they last differed from the one before. */
+  let shownFrame = null;
+  let frameChanged = 0;
+
   // A reload does not take the process with it. Zebar kills what a widget
   // spawned only when the whole application drops its shell state — a page
   // going away is not that — so without this, every reload of the bar leaves
@@ -100,6 +120,12 @@ export function mountCava(root, zebar) {
       // switched off in the panel, which is display:none rather than hidden.
       settings['widget:media'] &&
       !root.hidden &&
+      // The equaliser is the play indicator — media.css has it running while
+      // playing and lying flat when nothing is. Left to cava it would follow
+      // whatever else the machine happens to make a noise about, and stand up
+      // over a track that is paused, which is the opposite of what it is for.
+      // Stopping here also means a track left paused for an hour costs nothing.
+      root.dataset.playing === 'true' &&
       !unavailable;
 
     // Reconciled on the provider tick — about once a second — rather than by
@@ -126,7 +152,12 @@ export function mountCava(root, zebar) {
       process.onExit(() => onExit(process));
       child = process;
 
+      // Both clocks start now. Without resetting the staleness one, a fresh
+      // process would inherit the previous one's last change and be judged
+      // stuck before it had sent anything.
       lastFrame = performance.now();
+      frameChanged = lastFrame;
+      shownFrame = null;
       watchdog = setInterval(checkIdle, WATCH_MS);
       html.dataset.cava = 'live';
     } catch (error) {
@@ -221,10 +252,15 @@ export function mountCava(root, zebar) {
       return;
     }
 
+    let silent = true;
+
     for (let i = 0; i < BAR_COUNT; i++) {
       const value = Number(parts[i]);
       if (!Number.isFinite(value)) {
         return;
+      }
+      if (value !== 0) {
+        silent = false;
       }
 
       // Onto the same range the keyframes use, so the two sources sit at the
@@ -235,20 +271,50 @@ export function mountCava(root, zebar) {
     }
 
     lastFrame = performance.now();
+
+    // Silence counts as movement here. Repeating zeros is a working cava in a
+    // quiet room; repeating anything else is the failure STUCK_MS describes.
+    const text = parts.slice(0, BAR_COUNT).join(';');
+    if (silent || text !== shownFrame) {
+      shownFrame = text;
+      frameChanged = lastFrame;
+      // Whatever went wrong before, it is reading audio now — so earlier
+      // failures were not the start of a pattern worth giving up over.
+      restarts = 0;
+    }
   }
 
   /**
-   * Walks the bars down when frames stop arriving — cava asleep on silence
-   * (`sleep_timer`), or the process gone. Without this they would hold
-   * whatever the last frame said, which reads as playing.
+   * The two ways cava stops telling the truth, and what to do about each.
+   *
+   * Frames stop arriving: the process is gone, or wedged before it writes.
+   * Walk the bars down, or they hold whatever the last frame said and go on
+   * reading as playing. (Not `sleep_timer` — measured, cava keeps emitting
+   * through silence, it just emits zeros.)
+   *
+   * Frames arrive but never change: the process is writing without reading.
+   * Nothing recovers from that but a restart — see STUCK_MS.
    */
   function checkIdle() {
-    if (performance.now() - lastFrame < IDLE_MS) {
+    const now = performance.now();
+
+    if (now - lastFrame >= IDLE_MS) {
+      for (const bar of bars) {
+        bar.style.setProperty('--level', String(floor));
+      }
       return;
     }
 
-    for (const bar of bars) {
-      bar.style.setProperty('--level', String(floor));
+    // Frames are still arriving and still saying the same thing, and it is not
+    // silence — see STUCK_MS. Dropping the process here rather than waiting for
+    // an exit that will never come; the next tick starts a fresh one, and
+    // releasing puts the keyframes back in the meantime.
+    if (child && now - frameChanged >= STUCK_MS) {
+      console.warn('[cava] frames stopped changing; restarting.');
+      const { processId } = child;
+      child = null;
+      release();
+      kill(processId);
     }
   }
 }
