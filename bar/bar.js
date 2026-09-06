@@ -14,6 +14,7 @@
 import * as zebar from 'https://esm.sh/zebar@3.3';
 import { applySettings } from './lib/settings.js';
 import { mountWorkspaces } from './components/workspaces.js';
+import { mountLayout } from './components/layout.js';
 import { mountActiveWindow } from './components/active-window.js';
 import { mountMenu } from './components/menu.js';
 import { mountBattery } from './components/battery.js';
@@ -68,6 +69,7 @@ const updates = [
   mountClock(document.querySelector('#clock'), zebar),
   mountCalendar(document.querySelector('#calendar'), zebar),
   mountBattery(document.querySelector('#battery'), zebar),
+  mountLayout(document.querySelector('#layout')),
   mountPower(document.querySelector('#power'), zebar),
 ];
 

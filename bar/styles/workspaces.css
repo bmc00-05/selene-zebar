@@ -146,6 +146,22 @@
   opacity: 1;
 }
 
+/*
+ * Window management paused (alt+shift+p): the halo goes out.
+ *
+ * It is the one part of this row that claims more than a position — it says
+ * this workspace is the live one and is being managed. While the WM is paused
+ * that is not true, so the claim is withdrawn. The ring stays: which workspace
+ * is in front is still a fact.
+ *
+ * Written on the root by components/layout.js, and deliberately not conditional
+ * on that widget being switched on — this is about the dots being honest, not
+ * about the mark being visible.
+ */
+:root[data-wm-paused] .workspace.is-focused .workspace__halo {
+  opacity: 0;
+}
+
 /* Stepped, not eased — see --breathe-steps in tokens.css. */
 .workspace.is-focused .workspace__halo::after {
   animation: ws-breathe var(--ws-breathe-dur)

@@ -42,6 +42,7 @@ const DEFAULTS = {
   'widget:memory': true,
   'widget:clock': true,
   'widget:battery': true,
+  'widget:layout': true,
   'widget:power': true,
 };
 

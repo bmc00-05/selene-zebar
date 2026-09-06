@@ -198,6 +198,11 @@
    * lands on 25 whole device pixels at 1.25 like the rest. */
   --brand-size: 20px;
 
+  /* The layout mark, at the 16px every other mark in the row shares — the
+   * volume speaker, the RAM ring, the window glyph, the power symbol it sits
+   * next to. A size of its own would only make the row look misaligned. */
+  --layout-icon: 16px;
+
   /* Menu, which is also where the settings live. `--menu-window-h` is how tall
    * the widget window grows while it is open (menu.js, through lib/window.js);
    * it must clear the bar plus the panel plus its shadow. Too small and the

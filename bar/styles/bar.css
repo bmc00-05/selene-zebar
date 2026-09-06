@@ -29,6 +29,7 @@
  * own display, and this has to outrank it.
  */
 :root:not([data-widgets~='workspaces']) #workspaces,
+:root:not([data-widgets~='layout']) #layout,
 :root:not([data-widgets~='media']) #media,
 :root:not([data-widgets~='active-window']) #active-window,
 :root:not([data-widgets~='volume']) #volume,

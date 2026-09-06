@@ -1,0 +1,108 @@
+/*
+ * The layout mark.
+ *
+ * Every part of it is in the markup and the state decides which are drawn —
+ * the same arrangement the speaker uses in volume.css. The advantage is that
+ * the drawing stays here rather than being assembled in JavaScript, and adding
+ * a state is a rule instead of a branch.
+ *
+ * Four pictures, listed in components/layout.js in the order they are decided.
+ * Floating and fullscreen are not among them — see the note at the head of
+ * that file for why GlazeWM cannot be asked.
+ */
+
+.layout {
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-soft);
+  cursor: pointer;
+  transition: color var(--dur-base) var(--ease-standard);
+}
+
+.layout__mark {
+  display: block;
+  width: var(--layout-icon);
+  height: var(--layout-icon);
+}
+
+/* One weight for the whole mark, matching the outline marks either side of it
+ * — the workspace rings and the window glyph. */
+.layout__mark {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Nothing is drawn until a state asks for it. Without this the mark would come
+ * up as every picture at once for the frame before the first provider tick. */
+.layout__frame,
+.layout__split,
+.layout__handles {
+  display: none;
+}
+
+/* --- Which parts each state draws ---------------------------------------- */
+
+.layout[data-state='tiling-h'] .layout__frame,
+.layout[data-state='tiling-v'] .layout__frame,
+.layout[data-state='mode'] .layout__frame,
+.layout[data-state='paused'] .layout__frame {
+  display: block;
+}
+
+/* `horizontal` puts the windows side by side, so the divider stands upright.
+ * The pairing looks inverted written down and is right on screen. */
+.layout[data-state='tiling-h'] .layout__split--v,
+.layout[data-state='tiling-v'] .layout__split--h {
+  display: block;
+}
+
+/* Handles on the four edges: the selection idiom, which is what a resize mode
+ * is. If a mode that is not about resizing is ever configured, it needs a
+ * picture of its own rather than this one. */
+.layout[data-state='mode'] .layout__handles {
+  display: block;
+}
+
+/* --- What each state costs in brightness --------------------------------- */
+
+/*
+ * No new colour. --warn and --alert are reserved for danger (the RAM ring and
+ * the battery) and neither of these is that — both are states the user turned
+ * on. Brightness carries it instead, and in both directions: a mode is lit
+ * because it changes what the keys do, and paused is dimmed because the window
+ * manager has stopped doing anything at all.
+ */
+.layout[data-state='mode'] {
+  color: var(--accent);
+}
+
+.layout[data-state='paused'] {
+  color: var(--fg-muted);
+  opacity: 0.55;
+}
+
+/* Dashed rather than solid: an outline that is not joined up reads as a rule
+ * that is not in force. */
+.layout[data-state='paused'] .layout__frame {
+  stroke-dasharray: 2.4 2.4;
+}
+
+/* After the state rules, so a hover still answers on every one of them. The
+ * button changes the tiling direction, and a control that never responds to
+ * the pointer does not look like one. */
+.layout:hover,
+.layout:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.layout:active {
+  transform: scale(0.88);
+}

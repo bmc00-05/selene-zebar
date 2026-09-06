@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="./styles/brand.css" />
     <link rel="stylesheet" href="./styles/menu.css" />
     <link rel="stylesheet" href="./styles/workspaces.css" />
+    <link rel="stylesheet" href="./styles/layout.css" />
     <link rel="stylesheet" href="./styles/media.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
     <link rel="stylesheet" href="./styles/volume.css" />
@@ -263,6 +264,51 @@
           <span class="battery__label"></span>
         </div>
 
+        <!--
+          The layout mark: one 16px picture for the GlazeWM state the bar
+          cannot otherwise show — the tiling direction, a binding mode, and
+          whether window management is paused. Every part is here and
+          `data-state` picks which are drawn; layout.css has the table, and
+          components/layout.js the order they are decided in, along with why
+          floating and fullscreen are not among them.
+
+          Second from the end, and that is the whole reason it is here. This
+          region is anchored to the right edge, so every item's position is
+          decided by the widths to its right — and the only thing to the right
+          of this is the power button, which is a fixed 16px. It is the one
+          slot in the bar besides the mark by the moon whose x never moves.
+
+          The alternative was the front of this group, which reads more
+          prominently but absorbs every digit the readouts to its right gain or
+          lose: measured, volume 0% -> 100% is 12.8px, the battery another
+          12.7px, RAM 6px. A mark that drifts half an icon width while you are
+          not looking at it is the wrong trade for a readout you glance at.
+        -->
+        <button class="layout" id="layout" type="button" hidden>
+          <svg class="layout__mark" viewBox="0 0 16 16" aria-hidden="true">
+            <rect
+              class="layout__frame"
+              x="2.2"
+              y="2.2"
+              width="11.6"
+              height="11.6"
+              rx="2.4"
+            />
+            <!-- The divider, upright for windows side by side. -->
+            <path class="layout__split layout__split--v" d="M8 2.2v11.6" />
+            <path class="layout__split layout__split--h" d="M2.2 8h11.6" />
+
+            <!-- A binding mode: handles on the four edges, the selection
+                 idiom. Filled, so `stroke` is turned off for the group. -->
+            <g class="layout__handles" fill="currentColor" stroke="none">
+              <circle cx="8" cy="2.2" r="1.35" />
+              <circle cx="8" cy="13.8" r="1.35" />
+              <circle cx="2.2" cy="8" r="1.35" />
+              <circle cx="13.8" cy="8" r="1.35" />
+            </g>
+          </svg>
+        </button>
+
         <div class="power" id="power">
           <button
             class="power__button"
@@ -506,6 +552,15 @@
           data-setting="widget:battery"
         >
           Battery
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-setting="widget:layout"
+        >
+          Layout
         </button>
         <button
           class="menu__chip"
