@@ -80,7 +80,14 @@ export function mountLayout(root) {
     // workspace halos answer it too (workspaces.css). It is written whether or
     // not this widget is switched on — that rule is about the workspaces being
     // honest, not about this icon being visible.
-    html.toggleAttribute('data-wm-paused', glazewm.isPaused);
+    //
+    // Boolean() is load-bearing. `isPaused` is undefined until the first
+    // pause_changed event arrives, because GlazeWM answers `query paused` with
+    // a bare `"data": false` while the client destructures `{ paused }` out of
+    // it. Passing undefined as toggleAttribute's second argument is the same as
+    // not passing one at all, so this flipped the attribute on every provider
+    // tick and left the focused workspace's halo blinking about once a second.
+    html.toggleAttribute('data-wm-paused', Boolean(glazewm.isPaused));
 
     const state = stateOf(glazewm);
     if (state !== shownState) {
