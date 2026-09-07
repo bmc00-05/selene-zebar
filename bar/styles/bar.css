@@ -32,6 +32,7 @@
 :root:not([data-widgets~='layout']) #layout,
 :root:not([data-widgets~='media']) #media,
 :root:not([data-widgets~='active-window']) #active-window,
+:root:not([data-widgets~='minimized']) #minimized,
 :root:not([data-widgets~='volume']) #volume,
 :root:not([data-widgets~='memory']) #memory,
 :root:not([data-widgets~='clock']) #clock,
@@ -109,7 +110,11 @@ body {
   justify-content: flex-start;
 }
 
+/* `position: relative` for the minimised-window badge, which hangs off the
+ * right of this region without joining its flow — minimized.css says why it
+ * cannot be laid out with the readout. */
 .bar__region--center {
+  position: relative;
   justify-self: center;
 }
 

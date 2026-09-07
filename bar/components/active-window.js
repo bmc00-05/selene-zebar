@@ -2,20 +2,15 @@
  * The focused window, for the centre of the bar: its own icon and its title,
  * ellipsis when long, nothing at all when no window has focus.
  *
- * The title is free: it arrives on every glazewm tick. The icon is not — the
- * page is sandboxed away from Win32, so it is fetched by running
- * scripts/window-icon.ps1 through Zebar's shellExec. That costs most of a
- * second, almost all of it PowerShell starting, so results are cached and the
- * cost lands once per application per session. The title shows immediately;
- * the icon fades in when it lands.
+ * The title is free: it arrives on every glazewm tick. The icon is not — it
+ * costs most of a second the first time an application is seen, so it comes
+ * from lib/window-icon.js, which extracts it once and shares the answer with
+ * the minimised-windows panel. The title shows immediately; the icon fades in
+ * when it lands.
  */
 
 import { readMs } from '../lib/css.js';
-
-/** Processes that host PWAs. Their windows share a process but not an icon. */
-const PWA_HOSTS = new Set(['chrome', 'msedge']);
-
-const ICON_SCRIPT = 'scripts/window-icon.ps1';
+import { cachedIcon, iconKey, windowIcon } from '../lib/window-icon.js';
 
 /**
  * Wires the readout into `root` and returns the function that updates it.
@@ -30,16 +25,6 @@ export function mountActiveWindow(root, zebar) {
     title: root.querySelector('.active-window__title'),
     titles: [...root.querySelectorAll('.active-window__title > span')],
   };
-
-  /** cache key -> data URL, or null when the window turned out to have none. */
-  const iconCache = new Map();
-
-  // The script lives next to index.html; htmlPath is the only absolute path
-  // the widget API hands out.
-  const scriptPath =
-    zebar.currentWidget().htmlPath.replace(/[\\/][^\\/]*$/, '') +
-    '/' +
-    ICON_SCRIPT;
 
   let shownTitle = null;
   let shownKey = null;
@@ -61,12 +46,12 @@ export function mountActiveWindow(root, zebar) {
     root.hidden = false;
     setTitle(container.title);
 
-    const key = cacheKey(container);
+    const key = iconKey(container);
     if (key === shownKey) {
       return;
     }
     shownKey = key;
-    showIcon(key, container.handle);
+    showIcon(key, container);
   };
 
   /**
@@ -165,8 +150,8 @@ export function mountActiveWindow(root, zebar) {
     box.style.width = `${to}px`;
   }
 
-  async function showIcon(key, handle) {
-    let icon = iconCache.get(key);
+  async function showIcon(key, container) {
+    let icon = cachedIcon(container);
 
     if (icon === undefined) {
       // Not seen before. Fall back to the glyph rather than leaving a gap or
@@ -174,8 +159,7 @@ export function mountActiveWindow(root, zebar) {
       // the state the slot holds for the second or so the extraction takes.
       root.classList.remove('has-icon');
 
-      icon = await fetchIcon(handle);
-      iconCache.set(key, icon);
+      icon = await windowIcon(zebar, container);
 
       // Focus may have moved on during the round trip. Only the window that
       // is still current gets to paint.
@@ -190,41 +174,4 @@ export function mountActiveWindow(root, zebar) {
     // No icon means the glyph is the answer, not a placeholder: leave it.
     root.classList.toggle('has-icon', Boolean(icon));
   }
-
-  async function fetchIcon(handle) {
-    try {
-      const result = await zebar.shellExec('powershell', [
-        '-NoProfile',
-        '-NonInteractive',
-        '-ExecutionPolicy',
-        'Bypass',
-        '-File',
-        scriptPath,
-        String(handle),
-      ]);
-      // shellExec resolves to { code, success, signal, stdout, stderr }. The
-      // script prints nothing and exits 0 for a window without an icon, so an
-      // empty stdout is a normal answer, not a failure.
-      if (!result.success) {
-        console.warn('[active-window] icon script failed:', result.stderr);
-        return null;
-      }
-      const base64 = result.stdout.trim();
-      return base64 ? `data:image/png;base64,${base64}` : null;
-    } catch (error) {
-      console.warn('[active-window] icon extraction failed:', error);
-      return null;
-    }
-  }
-}
-
-/**
- * One icon per application is the rule — except for PWA hosts, where every
- * window is chrome.exe and each carries a different icon, so those are keyed
- * by window instead.
- */
-function cacheKey(container) {
-  return PWA_HOSTS.has(container.processName)
-    ? `${container.processName}:${container.handle}`
-    : container.processName;
 }

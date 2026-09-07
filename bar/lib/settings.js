@@ -38,6 +38,7 @@ const DEFAULTS = {
   'widget:workspaces': true,
   'widget:media': true,
   'widget:active-window': true,
+  'widget:minimized': true,
   'widget:volume': true,
   'widget:memory': true,
   'widget:clock': true,

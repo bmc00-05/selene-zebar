@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="./styles/layout.css" />
     <link rel="stylesheet" href="./styles/media.css" />
     <link rel="stylesheet" href="./styles/active-window.css" />
+    <link rel="stylesheet" href="./styles/minimized.css" />
     <link rel="stylesheet" href="./styles/volume.css" />
     <link rel="stylesheet" href="./styles/memory.css" />
     <link rel="stylesheet" href="./styles/clock.css" />
@@ -142,6 +143,50 @@
           </span>
           <span class="active-window__title"><span></span><span></span></span>
         </div>
+
+        <!--
+          How many windows are minimised in the focused workspace — the one
+          window state nothing else in the bar shows, and invisible entirely
+          with the taskbar on auto-hide.
+
+          A sibling of the readout rather than part of it, and taken out of
+          flow. Both are load-bearing: in flow it would move the title every
+          time it appeared, and inside `.active-window` it would disappear
+          whenever the Window widget was switched off. minimized.css has the
+          full reasoning.
+        -->
+        <button
+          class="minimized"
+          id="minimized"
+          type="button"
+          popovertarget="minimized-panel"
+          aria-expanded="false"
+          hidden
+        >
+          <!--
+            A square holding the count, and nothing else in it.
+
+            A folded corner was drawn here first, on the reasoning that a
+            dog-ear says "put away" where a plain box only says "contained".
+            Rendered at four sizes it did not earn its place: the fold ate the
+            corner the figures needed, so `+2` sat against the left edge at
+            every size that kept the number readable. The square is emptier and
+            says the same thing once there is a count inside it.
+          -->
+          <span class="minimized__mark">
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <rect
+                class="minimized__box"
+                x="1.1"
+                y="1.1"
+                width="17.8"
+                height="17.8"
+                rx="4.4"
+              />
+            </svg>
+            <span class="minimized__count"></span>
+          </span>
+        </button>
       </div>
 
       <div class="bar__region bar__region--right">
@@ -522,6 +567,15 @@
           type="button"
           role="switch"
           aria-checked="true"
+          data-setting="widget:minimized"
+        >
+          Hidden
+        </button>
+        <button
+          class="menu__chip"
+          type="button"
+          role="switch"
+          aria-checked="true"
           data-setting="widget:volume"
         >
           Volume
@@ -719,6 +773,50 @@
         </button>
       </div>
     </div>
+
+    <!--
+      What is hidden in the focused workspace. Empty here: minimized.js fills
+      it from the row template below whenever the panel opens, and a row
+      restores its window.
+    -->
+    <div class="panel minimized-panel" id="minimized-panel" popover>
+      <p class="minimized-panel__heading">Minimised</p>
+      <div class="minimized-panel__list"></div>
+    </div>
+
+    <!--
+      One row, cloned per window. A template rather than markup built in
+      JavaScript, for the same reason the layout mark keeps every one of its
+      parts here: the shapes in this bar live in the document, and nothing
+      draws an SVG from script.
+
+      The glyph is the same window outline the centre readout falls back to,
+      and it holds the slot until the extracted icon arrives over it.
+    -->
+    <template id="minimized-row">
+      <button class="minimized-panel__item" type="button">
+        <span class="minimized-panel__slot">
+          <svg
+            class="minimized-panel__fallback"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+          >
+            <rect
+              x="1.5"
+              y="2.5"
+              width="13"
+              height="11"
+              rx="2"
+              fill="none"
+              stroke="currentColor"
+            />
+            <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" stroke="currentColor" />
+          </svg>
+          <span class="minimized-panel__icon" aria-hidden="true"></span>
+        </span>
+        <span class="minimized-panel__title"></span>
+      </button>
+    </template>
 
     <script type="module" src="./bar.js"></script>
   </body>

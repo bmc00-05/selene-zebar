@@ -291,6 +291,46 @@
   --aw-max-w: 320px;
   --aw-icon-saturate: 0.55;
 
+  /* Minimised-window badge, beside the focused-window title, and its panel.
+   *
+   * A square note with its top-left corner turned back, holding the count.
+   * Larger than the 16px every other mark shares, and that is the whole tension
+   * in this widget: the count has to be as readable as the other readouts,
+   * which are all --fs-base, and a `+2` at that size does not fit inside a 16px
+   * square once the dog-ear has taken a corner. 20 is the compromise, matching
+   * --brand-size rather than the marks, with the figures a step under
+   * --fs-base. --min-count-nudge moves them clear of the fold.
+   *
+   * --min-window-h is how tall the widget window grows while the panel is open
+   * (minimized.js, through lib/window.js), and it has to clear the fullest
+   * panel there can be, since lib/window.js takes one fixed claim at mount:
+   *
+   *     bar band 40 + margin 6 + heading 20 + 8 rows x 28 + padding 12
+   *       + room for the shadow                                  -> 350
+   *
+   * A list longer than --min-rows-max scrolls inside the panel rather than
+   * making it taller, which is what keeps that sum true. */
+  --min-badge: 20px;
+  /* SVG user units, in a 20 viewBox drawn at --min-badge: 1 unit is 1px. The
+   * square is inset 1.1 with this stroke centred on it, so the clear space
+   * inside runs from 1.7 to 18.3 — 16.6 units for the figures to sit in. */
+  --min-box-stroke: 1.2;
+  /* Measured against that 16.6, for every reading the badge can show. At 12px
+   * — what the other readouts use — the figures leave 0.5px on each side and
+   * read as touching the stroke; at 10 they leave 1.8. The badge never shows
+   * more than two characters (minimized.js caps at `9+`), so this one size
+   * covers every case. */
+  --min-count-size: 10px;
+  --min-panel-w: 240px;
+  --min-row-h: 28px;
+  --min-icon: 16px;
+  --min-rows-max: 8;
+  --min-window-h: 350px;
+  /* How far the list fades where it runs past its end. There is no scrollbar —
+   * this is what says there is more. Deep enough to be seen against a row of
+   * text, shallow enough that the row it falls on is still readable. */
+  --min-fade: 20px;
+
   /* Battery gauge. The drawing is 24x12 inside a 32x20 box; the surplus is
    * room for the halo to spread, since an SVG clips to its own box. */
   --battery-w: 32px;

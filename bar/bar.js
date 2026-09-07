@@ -16,6 +16,7 @@ import { applySettings } from './lib/settings.js';
 import { mountWorkspaces } from './components/workspaces.js';
 import { mountLayout } from './components/layout.js';
 import { mountActiveWindow } from './components/active-window.js';
+import { mountMinimized } from './components/minimized.js';
 import { mountMenu } from './components/menu.js';
 import { mountBattery } from './components/battery.js';
 import { mountPower } from './components/power.js';
@@ -63,6 +64,7 @@ const updates = [
   // has just settled for this tick.
   mountCava(document.querySelector('#media'), zebar),
   mountActiveWindow(document.querySelector('#active-window'), zebar),
+  mountMinimized(document.querySelector('#minimized'), zebar),
   mountMenu(document.querySelector('#bar-menu'), zebar),
   mountVolume(document.querySelector('#volume'), zebar),
   mountMemory(document.querySelector('#memory'), zebar),

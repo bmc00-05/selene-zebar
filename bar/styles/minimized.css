@@ -1,0 +1,240 @@
+/*
+ * The minimised-window badge, and the panel that lists what is hidden.
+ *
+ * The badge is a count inside a square, sitting to the right of the
+ * focused-window title. The panel is a `.panel` (panel.css) like the other
+ * three; this file is the badge, the placement and the rows.
+ */
+
+/*
+ * Out of flow, and deliberately so.
+ *
+ * The centre readout is `[icon 16][gap 8][title T]` centred as a group, which
+ * is what puts the title box's centre at a fixed offset from the bar's and lets
+ * the title stay still while windows change (active-window.css). A badge in
+ * that flow would move that centre by half its own width every time it appeared
+ * or went away, which is exactly the jump the readout was built to avoid.
+ *
+ * It is also a sibling of `.active-window` rather than a child, so that the two
+ * switch on and off separately: Window is its own chip in the settings panel,
+ * and turning it off takes `#active-window` away with `display: none`. A count
+ * of what is hidden should not go with it. The readout also hides itself
+ * whenever focus is on an empty workspace, and the badge has no reason to.
+ */
+.minimized {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  translate: 0 -50%;
+  margin-left: var(--gap-item);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  /* What the panel anchors to. */
+  anchor-name: --minimized;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+
+.minimized:hover,
+.minimized:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+
+/*
+ * The square and the count share one cell.
+ *
+ * The shape is a drawn SVG, like every other mark in this bar, and the number
+ * is real text laid over it rather than lettered into the drawing — so it takes
+ * the bar's own face and its tabular figures, and a count changing cannot shift
+ * the square under it.
+ */
+.minimized__mark {
+  display: grid;
+  place-items: center;
+  width: var(--min-badge);
+  height: var(--min-badge);
+}
+
+.minimized__mark > * {
+  grid-area: 1 / 1;
+}
+
+.minimized__mark svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--min-box-stroke);
+}
+
+/* Centred, with nothing to dodge. The square is drawn so that the figures clear
+ * its inside edge on both sides — see --min-count-size in tokens.css for the
+ * measurement that settled the size. */
+.minimized__count {
+  font-size: var(--min-count-size);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* --- The panel ----------------------------------------------------------- */
+
+.minimized-panel {
+  position-anchor: --minimized;
+  /* Centred under the badge: span-all is what reaches past both of its edges,
+   * where the menu's `span-right` runs one way from the mark. */
+  position-area: bottom span-all;
+  width: var(--min-panel-w);
+  padding: 6px;
+  /* As in menu.css: the gap is here rather than in :popover-open, or it would
+   * collapse to 0 on the first frame of the close and shift every row. */
+  gap: 1px;
+}
+
+.minimized-panel:popover-open {
+  display: grid;
+}
+
+/* Same type as the menu's section labels — this panel is a list under a
+ * heading, and the two should read as the same kind of thing. */
+.minimized-panel__heading {
+  margin: 2px 8px 4px;
+  color: var(--fg-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/*
+ * Scrolls past --min-rows-max rather than growing without limit. The window
+ * behind it is grown once, at mount, to a height that fits that many rows —
+ * lib/window.js takes a fixed claim — so a taller list has to give way inside
+ * the panel instead of pushing past the window and being clipped.
+ */
+.minimized-panel__list {
+  display: grid;
+  /* minmax(0, 1fr), not the implicit `auto`: a grid track sized to its content
+   * lets a long window title push the row wider than the panel, and the list
+   * then scrolls sideways to reach it instead of the title ellipsising. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  max-height: calc(var(--min-row-h) * var(--min-rows-max));
+  /* Both axes stated. `overflow-y: auto` alone leaves x at `visible`, which the
+   * spec then computes to `auto` — and a horizontal scrollbar appeared under
+   * the rows the moment a title was long. */
+  overflow: hidden auto;
+  /* Reaching the end of this list must not start scrolling anything behind it. */
+  overscroll-behavior: contain;
+  /*
+   * No scrollbar at all.
+   *
+   * The platform draws a light, wide one on a panel that is neither, and even
+   * thinned and recoloured it stays a control bolted to the edge of a surface
+   * that has no other. What replaces it is the mask below: the list fades out
+   * at whichever end it runs past, which says there is more in the panel's own
+   * language and takes no width.
+   */
+  scrollbar-width: none;
+
+  /*
+   * Both ends, driven by where the list is scrolled to — minimized.js sets the
+   * classes. At rest both are 0, and a gradient whose stops are all at the ends
+   * is a plain opaque mask, so a list that fits is not dimmed at all.
+   */
+  --min-fade-top: 0px;
+  --min-fade-bottom: 0px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--min-fade-top),
+    #000 calc(100% - var(--min-fade-bottom)),
+    transparent 100%
+  );
+}
+
+.minimized-panel__list.has-more-above {
+  --min-fade-top: var(--min-fade);
+}
+
+.minimized-panel__list.has-more-below {
+  --min-fade-bottom: var(--min-fade);
+}
+
+/* One row per window, shaped like the menu's rows so the two panels read as
+ * one material. */
+.minimized-panel__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* A grid item's min-width is `auto`, which is its content — so without this
+   * the row refuses to shrink and the title never reaches its ellipsis. */
+  min-width: 0;
+  height: var(--min-row-h);
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.minimized-panel__item:hover,
+.minimized-panel__item:focus-visible {
+  background: var(--panel-item-hover);
+  outline: none;
+}
+
+/* The glyph and the real icon share one cell and cross-fade, exactly as in the
+ * centre readout — an icon costs most of a second the first time an application
+ * is seen, and a gap where it will land reads as broken. */
+.minimized-panel__slot {
+  display: grid;
+  flex: none;
+  width: var(--min-icon);
+  height: var(--min-icon);
+}
+
+.minimized-panel__slot > * {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+.minimized-panel__icon {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  /* The same pull on the chroma the centre readout gives it: an extracted icon
+   * is the only saturated colour on a one-hue bar. */
+  filter: saturate(var(--aw-icon-saturate));
+  opacity: 0;
+}
+
+.minimized-panel__fallback {
+  color: var(--fg-muted);
+  opacity: 1;
+}
+
+.minimized-panel__item.has-icon .minimized-panel__icon {
+  opacity: 1;
+}
+
+.minimized-panel__item.has-icon .minimized-panel__fallback {
+  opacity: 0;
+}
+
+.minimized-panel__title {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

@@ -26,6 +26,7 @@ to look the way it does here.
 | Workspaces     | One dot per GlazeWM workspace. Size says empty / has windows / displayed, and the focused one wears a ring and a halo. Click to switch. |
 | Media          | What is playing, with an equaliser that runs while it plays. Click for the transport panel.                                             |
 | Focused window | The window's own icon and its title, centred.                                                                                           |
+| Hidden         | How many windows are minimised in the focused workspace. Click for the list, and click a window to bring it back.                       |
 | Volume         | Output level and a speaker that shows how loud. Click to mute.                                                                          |
 | RAM            | A ring that fills with memory in use.                                                                                                   |
 | Clock          | Date and time. Click for the month.                                                                                                     |
@@ -162,7 +163,13 @@ Cyrillic, Greek, kana and the common symbols. Han characters — kanji and hanzi
 — along with Arabic and Thai fall back to a system font, which stays readable
 but will not match the rest of the bar.
 
-**Two upstream quirks are worth knowing.**
+**The hidden-window count can lag.** GlazeWM publishes no event when a window
+changes state, so the count is refreshed by the focus change that minimising
+normally causes. Minimise the window you are looking at and it is right
+immediately; an application that minimises itself in the background is not
+counted until focus next moves, which is the next time you switch windows.
+
+**A few upstream quirks are worth knowing.**
 
 - Zebar's battery provider does not recover if the machine sleeps: the device
   handle goes stale, the provider errors from then on, and the widget hides
@@ -223,12 +230,14 @@ bar/
   lib/
     css.js                reads tokens back out of CSS
     window.js             grows the widget window while a panel is open
+    window-icon.js        extracts an application's icon, once, and shares it
     settings.js           what the bar remembers, published onto <html>
   components/
     workspaces.js         workspace indicators, reconciled by name
     media.js              equaliser, marquee, and the playback panel
     cava.js               drives the equaliser from real audio
     active-window.js      focused window's icon and title
+    minimized.js          how many windows are hidden, and which
     layout.js             tiling direction, binding mode, paused
     menu.js               the settings panel behind the mark
     volume.js             output volume; click to mute
