@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/glzr-io/zebar/raw/v3.3.1/resources/zpack-schema.json",
   "name": "selene-zebar",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A moonlit status bar for GlazeWM. Night-sky dark, silver accents, hand-written CSS.",
   "tags": ["topbar", "glazewm", "dark", "minimal"],
   "previewImages": [
