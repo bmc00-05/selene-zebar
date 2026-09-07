@@ -1,9 +1,19 @@
-# selene-zebar
+<div align="center">
 
-> A minimal [Zebar](https://github.com/glzr-io/zebar) status bar for Windows,
-> built for [GlazeWM](https://github.com/glzr-io/glazewm).
+<h1>selene-zebar</h1>
 
-![The bar](resources/bar.png)
+<p>A minimal <a href="https://github.com/glzr-io/zebar">Zebar</a> status bar for Windows, built for <a href="https://github.com/glzr-io/glazewm">GlazeWM</a>.</p>
+
+<p>
+<img alt="Zebar 3.3.1+" src="https://img.shields.io/badge/Zebar-3.3.1+-b3baea?style=flat-square&labelColor=0e0f17">
+<img alt="GlazeWM 3.10+" src="https://img.shields.io/badge/GlazeWM-3.10+-b3baea?style=flat-square&labelColor=0e0f17">
+<img alt="Windows only" src="https://img.shields.io/badge/platform-Windows-c5c9e0?style=flat-square&labelColor=0e0f17">
+<img alt="MIT licensed" src="https://img.shields.io/badge/license-MIT-c5c9e0?style=flat-square&labelColor=0e0f17">
+</p>
+
+<img src="resources/bar.png" width="830" alt="The bar">
+
+</div>
 
 Night-sky ground, moonlit silver, one hue throughout. Every mark is a drawn
 SVG and the typeface ships with the pack, so there is nothing to install for it
@@ -11,7 +21,7 @@ to look the way it does here.
 
 ## What's in it
 
-| Widget         |                                                                                                                                         |
+| Widget         | What it does                                                                                                                            |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | Workspaces     | One dot per GlazeWM workspace. Size says empty / has windows / displayed, and the focused one wears a ring and a halo. Click to switch. |
 | Media          | What is playing, with an equaliser that runs while it plays. Click for the transport panel.                                             |
@@ -23,17 +33,28 @@ to look the way it does here.
 | Layout         | Which way the next tiling window goes, whether a binding mode is on, and whether GlazeWM is paused. Click to flip the split direction.  |
 | Power          | Lock, sleep, restart, shut down — the last two on a press-and-hold.                                                                     |
 
-![Workspace indicators](resources/widget-workspaces.png)
+<img src="resources/widget-workspaces.png" width="380" alt="Workspace indicators: empty, has windows, displayed, focused">
+
+### States
 
 States are colour, not just brightness. Amber is a caution and red is a
 problem; nothing else in the bar leaves its one hue.
 
-|                                                               |                                                 |
-| ------------------------------------------------------------- | ----------------------------------------------- |
-| Battery — charging, full, discharging, low, critical, unknown | ![Battery states](resources/states-battery.png) |
-| Volume — loud, quiet, silent, muted                           | ![Volume states](resources/states-volume.png)   |
-| RAM — normal, 80%, 90%                                        | ![RAM states](resources/states-memory.png)      |
-| Layout — split sideways, split down, binding mode, paused     | ![Layout states](resources/states-layout.png)   |
+**Battery** — charging, full, discharging, low, critical, unknown
+
+<img src="resources/states-battery.png" width="802" alt="">
+
+**Volume** — loud, quiet, silent, muted
+
+<img src="resources/states-volume.png" width="446" alt="">
+
+**RAM** — normal, 80%, 90%
+
+<img src="resources/states-memory.png" width="348" alt="">
+
+**Layout** — split sideways, split down, binding mode, paused
+
+<img src="resources/states-layout.png" width="267" alt="">
 
 ### Panels
 
