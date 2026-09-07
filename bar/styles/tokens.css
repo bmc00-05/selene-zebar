@@ -209,10 +209,18 @@
    * panel is clipped at the window edge; too large costs nothing, since the
    * reserved strip does not follow the window. */
   --menu-width: 208px;
-  /* The panel measures about 258 and its shadow reaches 32 below that, so it
-   * needs 326; the rest is room for another line of chips, since a window
-   * taller than the panel costs nothing. */
-  --menu-window-h: 360px;
+  /*
+   *     bar band 40 + margin 6 + panel 334 + shadow 32 = 412
+   *
+   * The panel is 334 with nine widget chips over four lines, and it grew there
+   * from 258 without this number moving with it. At 360 the browser had to fit
+   * the panel into the window by shifting it up over the bar — measured at top
+   * 26 against the 38 it should sit at, with its bottom flush to the window
+   * edge and the shadow cut off. Anything added to the panel has to be measured
+   * against this again; a window taller than the panel costs nothing, since the
+   * strip GlazeWM reserves comes from the preset rather than the live window.
+   */
+  --menu-window-h: 420px;
 
   /* Settings switches. The travel works out as --switch-w minus --switch-h,
    * because the thumb is inset by the same amount all round — so the two
