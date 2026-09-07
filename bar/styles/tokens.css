@@ -186,8 +186,20 @@
    * bar: it is on screen permanently and meant to be ignorable. */
   --ws-breathe-dur: 3s;
 
-  /* Rendered dot = --ws-dot x scale: 5px, 6px, 7px, 8px. */
-  --ws-scale-empty: 0.625;
+  /* Rendered dot = --ws-dot x scale: 6px, 6px, 7px, 8px.
+   *
+   * Empty and occupied share a diameter on purpose. They used to differ by a
+   * single pixel, 5 against 6, which is a weak signal sitting next to a much
+   * stronger one — the empty dot is an outline and the occupied one is solid,
+   * and that reads at a glance where a pixel of diameter has to be hunted for.
+   * Spending a rung of the ramp to restate it left the top of the ramp, where
+   * displayed and focused actually need the room, one step tighter than it
+   * needed to be.
+   *
+   * The two stay separate tokens because they answer different questions. That
+   * they currently hold the same number is the answer to one of them, not a
+   * duplicate waiting to be collapsed. */
+  --ws-scale-empty: 0.75;
   --ws-scale-occupied: 0.75;
   --ws-scale-displayed: 0.875;
   --ws-scale-focused: 1;

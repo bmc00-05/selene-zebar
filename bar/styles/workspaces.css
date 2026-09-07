@@ -8,9 +8,13 @@
  * There are no numbers; the tooltip carries the name and position carries the
  * rest, which is the trade for a row that reads as texture rather than text.
  *
+ * Empty and occupied are the same diameter, so the dot says those two apart by
+ * fill alone and keeps size for how far forward the workspace is. See the
+ * scale tokens in tokens.css for why that trade is worth making.
+ *
  * The dot never changes its box. All four states are the same 8px element at a
- * different `transform: scale()` — see --ws-dot in tokens.css for why width
- * and height could not be animated.
+ * `transform: scale()` — see --ws-dot in tokens.css for why width and height
+ * could not be animated.
  */
 
 .workspaces {

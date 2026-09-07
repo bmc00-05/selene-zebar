@@ -33,7 +33,7 @@ to look the way it does here.
 | Layout         | Which way the next tiling window goes, whether a binding mode is on, and whether GlazeWM is paused. Click to flip the split direction.  |
 | Power          | Lock, sleep, restart, shut down — the last two on a press-and-hold.                                                                     |
 
-<img src="resources/widget-workspaces.png" width="380" alt="Workspace indicators: empty, has windows, displayed, focused">
+<img src="resources/widget-workspaces.png" width="345" alt="Workspace indicators: outlined where the workspace is empty, filled where it holds windows, ringed and haloed where it is focused">
 
 ### States
 
