@@ -116,6 +116,8 @@ startup_commands: ['shell-exec cmd /c timeout /t 5 && zebar startup']
 `shell-exec` does not pass its argument through a shell, so `&&` only chains
 inside a `cmd /c` wrapper. Without it the line quietly does nothing.
 
+What changed between versions is in [CHANGELOG.md](CHANGELOG.md).
+
 ## Settings
 
 The crescent at the left end opens the panel.
