@@ -91,7 +91,7 @@ Zebar loads packs from one level under `~/.glzr/zebar/`, taking the pack's id
 from the folder name.
 
 ```powershell
-git clone https://github.com/bmc00-05/selene-zebar `
+git clone https://github.com/bo-mun/selene-zebar `
   "$env:USERPROFILE\.glzr\zebar\selene-zebar"
 ```
 

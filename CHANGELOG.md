@@ -67,5 +67,5 @@ bar comes up.
 - The typeface ships inside the pack, so there is nothing to install for the
   bar to look the way it does in the screenshots.
 
-[0.2.0]: https://github.com/bmc00-05/selene-zebar/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/bmc00-05/selene-zebar/releases/tag/v0.1.0
+[0.2.0]: https://github.com/bo-mun/selene-zebar/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/bo-mun/selene-zebar/releases/tag/v0.1.0

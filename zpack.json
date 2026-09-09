@@ -9,7 +9,7 @@
     "resources/settings.png",
     "resources/states-battery.png"
   ],
-  "repositoryUrl": "https://github.com/bmc00-05/selene-zebar",
+  "repositoryUrl": "https://github.com/bo-mun/selene-zebar",
   "widgets": [
     {
       "name": "bar",
